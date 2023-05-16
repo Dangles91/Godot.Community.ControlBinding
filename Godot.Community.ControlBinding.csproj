@@ -1,0 +1,12 @@
+﻿<Project Sdk="Godot.NET.Sdk/4.0.2">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>Godot 4 C# Control Binding</Title>
+    <Authors>Aidan Danglmaier</Authors>
+    <Description>WPF-style control bindings for Godot 4 controls</Description>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+</Project>
