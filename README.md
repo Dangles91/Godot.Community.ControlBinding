@@ -20,8 +20,8 @@ Though functional, this project is in the early stages of development. More adva
 Simple property binding from Godot controls to C# properties
 
 ### List binding
-A simple implementation of ObservableList to support list bindings to OptionButton and ItemList controls.
-If the list objects inherit from `ObservableObject` the list items will receive update notifications.
+A simple implementation of `ObservableList` to support list bindings to `OptionButton` and `ItemList` controls.
+If the list objects inherit from `ObservableList` the list items will receive update notifications.
 
 ### Enum list binding
 A very specific list binding implementation to bind Enums to an OptionButton with support a target property to store the selected option.
@@ -32,7 +32,7 @@ Supported properties:
 - LineEdit.Text
 - TextEdit.Text
 - CodeEdit.Text
-- Slider, Progress, SpinBox, and ScrollBar.Value
+- Slider.Value, Progress.Value, SpinBox.Value, and ScrollBar.Value
 - CheckBox.ButtonPressed
 - OptionButton.Selected
 
