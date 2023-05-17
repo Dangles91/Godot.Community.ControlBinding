@@ -11,6 +11,9 @@
     <AssemblyVersion>1.0.1.0</AssemblyVersion>
     <FileVersion>1.0.1.0</FileVersion>
     <Version>$(AssemblyVersion)</Version>
+    <RepositoryUrl>https://github.com/Dangles91/Godot.Community.ControlBinding</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>godot controlbinding</PackageTags>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="examples\**" />
