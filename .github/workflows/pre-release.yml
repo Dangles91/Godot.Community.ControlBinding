@@ -1,0 +1,24 @@
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+-preview.[0-9]"
+      - "v[0-9]+.[0-9]+.[0-9]+-alpha.[0-9]"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set VERSION variable from tag
+        run: echo "VERSION=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_ENV
+      - name: Build
+        run: dotnet build --configuration ExportRelease /p:Version=${VERSION}
+      - name: Test
+        run: dotnet test --configuration ExportRelease /p:Version=${VERSION} --no-build
+      - name: Pack
+        run: dotnet pack --configuration ExportRelease /p:Version=${VERSION} --no-build --output .
+      - name: Push
+        run: dotnet nuget push Godot.Community.ControlBinding.${VERSION}.nupkg --source https://api.nuget.org/v3/index.json --api-key ${NUGET_KEY}
+        env:
+          NUGET_KEY: ${{ secrets.NUGET_KEY }}
