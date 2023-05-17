@@ -10,14 +10,14 @@ config_version=5
 
 [application]
 
-config/name="Control Binding 2"
+config/name="ControlBinding"
 run/main_scene="res://Control.tscn"
-config/features=PackedStringArray("4.0", "C#")
+config/features=PackedStringArray("4.0")
 config/icon="res://icon.png"
 
 [dotnet]
 
-project/assembly_name="Control Binding 2"
+project/assembly_name="ControlBinding"
 
 [physics]
 

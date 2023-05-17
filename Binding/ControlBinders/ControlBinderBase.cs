@@ -1,14 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using ControlBinding.Binding.EventArgs;
-using ControlBinding.Binding.Interfaces;
-using ControlBinding.Binding.Utilities;
-using ControlBinding.Binding.Services;
+using ControlBinding.EventArgs;
 using Godot;
 
-namespace ControlBinding.Binding.ControlBinders
+namespace ControlBinding.ControlBinders
 {
     public abstract partial class ControlBinderBase : GodotObject, IControlBinder
     {
@@ -17,7 +10,7 @@ namespace ControlBinding.Binding.ControlBinders
 
         internal BindingConfiguration _bindingConfiguration;
 
-        public bool IsBound {get; set;}
+        public bool IsBound { get; set; }
 
         public virtual void BindControl(BindingConfiguration bindingConfiguration)
         {

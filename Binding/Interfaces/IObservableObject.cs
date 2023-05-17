@@ -1,7 +1,6 @@
-namespace ControlBinding.Interfaces
+namespace ControlBinding.Interfaces;
+
+internal interface IObservableObject
 {
-    internal interface IObservableObject
-    {
-        void OnPropertyChanged(string name);
-    }
+    void OnPropertyChanged(string name);
 }

@@ -1,10 +1,9 @@
 using System;
 
-namespace ControlBinding.Binding
+namespace ControlBinding;
+
+public class WeakBackReference
 {
-    public class WeakBackReference
-    {
-        public WeakReference ObjectReference { get; set; }
-        public string PropertyName { get; set; }  
-    }
+    public WeakReference ObjectReference { get; set; }
+    public string PropertyName { get; set; }
 }

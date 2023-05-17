@@ -1,70 +1,66 @@
+using ControlBinding.EventArgs;
+using Godot;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using ControlBinding.Binding.EventArgs;
-using ControlBinding.Binding.Interfaces;
-using Godot;
 using Range = Godot.Range;
 
-namespace ControlBinding.Binding.ControlBinders
+namespace ControlBinding.ControlBinders;
+
+public partial class RangeControlBinder : ControlBinderBase
 {
-    public partial class RangeControlBinder : ControlBinderBase
-    {
-        private readonly List<string> _allowedTwoBindingProperties = new List<string>()
+    private readonly List<string> _allowedTwoBindingProperties = new List<string>()
         {
             nameof(Range.Value)
         };
 
-        public override void BindControl(BindingConfiguration bindingConfiguration)
+    public override void BindControl(BindingConfiguration bindingConfiguration)
+    {
+        if ((bindingConfiguration.BindingMode == BindingMode.OneWayToTarget || bindingConfiguration.BindingMode == BindingMode.TwoWay)
+            && _allowedTwoBindingProperties.Contains(bindingConfiguration.BoundPropertyName))
         {
-            if ((bindingConfiguration.BindingMode == BindingMode.OneWayToTarget || bindingConfiguration.BindingMode == BindingMode.TwoWay)
-                && _allowedTwoBindingProperties.Contains(bindingConfiguration.BoundPropertyName))
-            {
-                Godot.Range boundControl = bindingConfiguration.BoundControl.Target as Range;
+            Godot.Range boundControl = bindingConfiguration.BoundControl.Target as Range;
 
-                if (bindingConfiguration.BoundPropertyName == nameof(Range.Value))
-                    boundControl.ValueChanged += onValueChanged;
-            }
-
-            base.BindControl(bindingConfiguration);
+            if (bindingConfiguration.BoundPropertyName == nameof(Range.Value))
+                boundControl.ValueChanged += onValueChanged;
         }
 
-        public void onValueChanged(double value)
-        {
-            EmitSignal(nameof(ControlValueChanged), _bindingConfiguration.BoundControl.Target as GodotObject, "Value");
-        }
+        base.BindControl(bindingConfiguration);
+    }
 
-        public override void ClearEventBindings()
-        {
-            if ((_bindingConfiguration.BindingMode == BindingMode.OneWayToTarget || _bindingConfiguration.BindingMode == BindingMode.TwoWay)
-                && _allowedTwoBindingProperties.Contains(_bindingConfiguration.BoundPropertyName))
-            {
-                Godot.Range boundControl = _bindingConfiguration.BoundControl.Target as Range;
+    public void onValueChanged(double value)
+    {
+        EmitSignal(nameof(ControlValueChanged), _bindingConfiguration.BoundControl.Target as GodotObject, "Value");
+    }
 
-                if (_bindingConfiguration.BoundPropertyName == nameof(Range.Value))
-                    boundControl.ValueChanged -= onValueChanged;
-            }
-        }
-
-        public override void OnObservableListChanged(ObservableListChangedEventArgs eventArgs)
+    public override void ClearEventBindings()
+    {
+        if ((_bindingConfiguration.BindingMode == BindingMode.OneWayToTarget || _bindingConfiguration.BindingMode == BindingMode.TwoWay)
+            && _allowedTwoBindingProperties.Contains(_bindingConfiguration.BoundPropertyName))
         {
-            throw new NotImplementedException();
-        }
+            Godot.Range boundControl = _bindingConfiguration.BoundControl.Target as Range;
 
-        public override bool CanBindFor(object control)
-        {
-            return control is Range;
+            if (_bindingConfiguration.BoundPropertyName == nameof(Range.Value))
+                boundControl.ValueChanged -= onValueChanged;
         }
+    }
 
-        public override IControlBinder CreateInstance()
-        {
-            return new RangeControlBinder();
-        }
+    public override void OnObservableListChanged(ObservableListChangedEventArgs eventArgs)
+    {
+        throw new NotImplementedException();
+    }
 
-        public override void OnListItemChanged(object entry)
-        {
-            throw new NotImplementedException();
-        }
+    public override bool CanBindFor(object control)
+    {
+        return control is Range;
+    }
+
+    public override IControlBinder CreateInstance()
+    {
+        return new RangeControlBinder();
+    }
+
+    public override void OnListItemChanged(object entry)
+    {
+        throw new NotImplementedException();
     }
 }
