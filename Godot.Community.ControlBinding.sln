@@ -1,12 +1,17 @@
-﻿Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Godot.Community.ControlBinding", "Godot.Community.ControlBinding.csproj", "{FE2B3EC2-1CB6-498D-A1A8-CEA8B79D8F2E}"
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33627.172
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Godot.Community.ControlBinding", "Godot.Community.ControlBinding.csproj", "{FE2B3EC2-1CB6-498D-A1A8-CEA8B79D8F2E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ControlBinding.Example", "examples\basic-bindings\ControlBinding.Example.csproj", "{FD83ED8E-0164-4F9A-A705-D7EE074CCE35}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-	Debug|Any CPU = Debug|Any CPU
-	ExportDebug|Any CPU = ExportDebug|Any CPU
-	ExportRelease|Any CPU = ExportRelease|Any CPU
+		Debug|Any CPU = Debug|Any CPU
+		ExportDebug|Any CPU = ExportDebug|Any CPU
+		ExportRelease|Any CPU = ExportRelease|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{FE2B3EC2-1CB6-498D-A1A8-CEA8B79D8F2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -15,5 +20,14 @@ Global
 		{FE2B3EC2-1CB6-498D-A1A8-CEA8B79D8F2E}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
 		{FE2B3EC2-1CB6-498D-A1A8-CEA8B79D8F2E}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
 		{FE2B3EC2-1CB6-498D-A1A8-CEA8B79D8F2E}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+		{FD83ED8E-0164-4F9A-A705-D7EE074CCE35}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD83ED8E-0164-4F9A-A705-D7EE074CCE35}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD83ED8E-0164-4F9A-A705-D7EE074CCE35}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
+		{FD83ED8E-0164-4F9A-A705-D7EE074CCE35}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
+		{FD83ED8E-0164-4F9A-A705-D7EE074CCE35}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
+		{FD83ED8E-0164-4F9A-A705-D7EE074CCE35}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal

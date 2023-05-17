@@ -8,5 +8,12 @@
     <Description>WPF-style control bindings for Godot 4 controls</Description>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <FileVersion>1.0.1.0</FileVersion>
+    <Version>$(AssemblyVersion)</Version>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="examples\**" />
+    <EmbeddedResource Remove="examples\**" />
+  </ItemGroup>
 </Project>
