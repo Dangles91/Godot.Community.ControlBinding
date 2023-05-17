@@ -12,6 +12,8 @@ Though functional, this project is in the early stages of development. More adva
 - Control style formatting
 - Formatting target objects as scenes
 - Adding formatted scenes as children of a control
+- Creating an editor plugin to specify bindings in the editor
+- Code generation to implement OnPropertyChanged via an attribute decorator
 
 ## Features
 ### Property binding
@@ -97,6 +99,56 @@ public PlayerData SelectedPlayerData
 ```
 
 ### Formatters
-TODO: Write this doco
+Binding can be declared with an optional formatter to format the value between your control and the property or implement custom type conversion as well as format list items
+```c#
+public class PlayerHealthFormatter : IValueFormatter
+{
+    public Func<object, object> FormatControl => (v) =>
+    {
+        return $"Player health: {v}";
+    };
+
+    public Func<object, object> FormatTarget => (v) =>
+    {
+        throw new NotImplementedException();
+    };
+}
+
+BindProperty("%SpinBox", nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay, new PlayerHealthFormatter());
+```
+
+This formatter will set a string value into the target control using the input value substituted into a string. `FormatControl` is not implemented here so the value would be passed back as-is in the case of a two-way binding.
+
 ### List Binding
-TODO: Write this doco
+List bindings must bound to an `ObservableList` to benefit from adding and removing items
+
+```c#
+public ObservableList<PlayerData> PlayerDatas {get;set;} = new(){
+    new PlayerData{Health = 500},
+};
+
+BindListProperty("%ItemList2", nameof(PlayerDatas), formatter: new PlayerDataListFormatter());
+```
+
+The `PlayerDataListFormatter` formats the PlayerData entry into a usable string value using a `ListItem` to also provided conditional formatting to the control
+
+```c#
+public class PlayerDataListFormatter : IValueFormatter
+{
+    public Func<object, object> FormatControl => (v) =>
+    {
+        var pData = v as PlayerData;
+        var listItem = new ListItem
+        {
+            DisplayValue = $"Health: {pData.Health}",
+            Icon = ResourceLoader.Load<Texture2D>("uid://bfdb75li0y86u"),
+            Disabled = pData.Health < 1,
+            Tooltip = pData.Health == 0 ? "Health must be greater than 0" : null,
+
+        };
+        return listItem;
+    };
+
+    public Func<object, object> FormatTarget => throw new NotImplementedException();
+}
+```
