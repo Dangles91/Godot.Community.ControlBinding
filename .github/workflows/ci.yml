@@ -16,12 +16,12 @@ jobs:
       - name: Set VERSION variable from tag
         run: echo "VERSION=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_ENV
       - name: Build
-        run: dotnet build --configuration Release /p:Version=${VERSION}
+        run: dotnet build --configuration ExportRelease /p:Version=${VERSION}
       - name: Test
-        run: dotnet test --configuration Release /p:Version=${VERSION} --no-build
+        run: dotnet test --configuration ExportRelease /p:Version=${VERSION} --no-build
       - name: Pack
-        run: dotnet pack --configuration Release /p:Version=${VERSION} --no-build --output .
+        run: dotnet pack --configuration ExportRelease /p:Version=${VERSION} --no-build --output .
       - name: Push
-        run: dotnet nuget push NuGet.Workflow.${VERSION}.nupkg --source --source https://api.nuget.org/v3/index.json --api-key ${NUGET_KEY}
+        run: dotnet nuget push Godot.Community.ControlBinding.${VERSION}.nupkg --source --source https://api.nuget.org/v3/index.json --api-key ${NUGET_KEY}
         env:
           GITHUB_TOKEN: ${{ secrets.NUGET_KEY }}
