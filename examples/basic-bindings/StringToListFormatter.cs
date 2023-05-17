@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using ControlBinding.Binding;
-using Godot;
+using ControlBinding.Collections;
+using ControlBinding.Formatters;
+
 
 namespace ControlBinding
 {
-    public class DamageAudioFormatter : IValueFormatter
+    public class StringToListFormatter : IValueFormatter
     {
         public Func<object, object> FormatControl
         {
@@ -32,7 +32,7 @@ namespace ControlBinding
                     var data = v as string;
                     if(data is null)
                         return null;
-                    return data.Split("\n").ToList();                    
+                    return new ObservableList<string>(data.Split("\n").ToList());
                 };
             } 
         }

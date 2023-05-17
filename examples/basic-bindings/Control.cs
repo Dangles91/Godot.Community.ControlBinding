@@ -73,7 +73,7 @@ public partial class Control : ObservableObject
         BindListProperty("%ItemList", nameof(playerDatas), formatter: new PlayerDataListFormatter());
         BindListProperty("%ItemList2", nameof(playerDatas2), formatter: new PlayerDataListFormatter());
 
-        BindProperty("%TextEdit", nameof(TextEdit.Text), $"{nameof(SelectedPlayerData)}.{nameof(PlayerData.ListOfThings)}", BindingMode.OneWayToTarget, new DamageAudioFormatter());
+        BindProperty("%TextEdit", nameof(TextEdit.Text), $"{nameof(SelectedPlayerData)}.{nameof(PlayerData.ListOfThings)}", BindingMode.OneWayToTarget, new StringToListFormatter());
         BindListProperty("%ItemList3", $"{nameof(SelectedPlayerData)}.{nameof(PlayerData.ListOfThings)}", BindingMode.TwoWay);
 
         BindEnumProperty<BindingMode>("%OptionButton", $"{nameof(SelectedPlayerData)}.{nameof(SelectedPlayerData.BindingMode)}");
