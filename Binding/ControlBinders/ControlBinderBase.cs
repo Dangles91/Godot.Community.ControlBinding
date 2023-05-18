@@ -11,6 +11,7 @@ namespace ControlBinding.ControlBinders
         internal BindingConfiguration _bindingConfiguration;
 
         public bool IsBound { get; set; }
+        public int Priority => 1;
 
         public virtual void BindControl(BindingConfiguration bindingConfiguration)
         {

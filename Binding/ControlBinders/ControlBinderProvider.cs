@@ -20,7 +20,9 @@ namespace ControlBinding.ControlBinders
 
         public IControlBinder GetBinder(object sourceObject)
         {
-            var binder = _binders.FirstOrDefault(x => x.CanBindFor(sourceObject));
+            var binder = _binders.Where(x => x.CanBindFor(sourceObject))
+                .OrderByDescending(x => x.Priority)
+                .FirstOrDefault();
 
             if (binder == null)
             {
