@@ -52,6 +52,19 @@ public partial class ObservableObject : Node, IObservableObject
     }
 
     /// <summary>
+    /// Sets a value to the backing field of a property and triggers <see cref="OnPropertyChanged"/>
+    /// </summary>
+    /// <param name="field">The backing field of the property</param>
+    /// <param name="value">The value that should be set</param>
+    /// <param name="name">Name of the property</param>
+    /// <typeparam name="T">Type of the property</typeparam>
+    public void SetValue<T>(ref T field, T value, [CallerMemberName] string name = "not a property")
+    {
+        field = value;
+        OnPropertyChanged(name);
+    }
+
+    /// <summary>
     /// Bind a control property to an object property
     /// </summary>
     /// <param name="controlPath">The path of the Godot control in the scene</param>
