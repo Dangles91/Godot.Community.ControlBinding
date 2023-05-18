@@ -70,8 +70,6 @@ public partial class ItemListControlBinder : ControlBinderBase
         {
             itemList.Clear();
         }
-
-        convertedValues.Clear();
     }
 
     public override void OnListItemChanged(object entry)
@@ -96,8 +94,6 @@ public partial class ItemListControlBinder : ControlBinderBase
         {
             itemList.SetItemText(changedIndex, convertedVal.ToString());
         }
-
-        convertedVal = null;
     }
 
     private void SetItemValues(ItemList itemList, int index, ListItem listItem)

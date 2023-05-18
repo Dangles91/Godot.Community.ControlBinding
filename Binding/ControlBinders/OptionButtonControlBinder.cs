@@ -135,8 +135,6 @@ public partial class OptionButtonControlBinder : ControlBinderBase
         {
             itemList.SetItemText(changedIndex, convertedVal.ToString());
         }
-
-        convertedVal = null;
     }
 
     private void SetItemValues(OptionButton optionButton, int index, ListItem listItem)

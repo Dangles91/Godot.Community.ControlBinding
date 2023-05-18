@@ -78,6 +78,6 @@ public static class BackReferenceFactory
             }
         }
 
-        return pathObjects.ToList();
+        return pathObjects;
     }
 }

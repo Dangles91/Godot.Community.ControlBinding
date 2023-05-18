@@ -59,9 +59,6 @@ namespace Godot.Community.ControlBinding
             
             _bindingConfiguration.TargetObject = new WeakReference(pathObjects.Last());
             _bindingConfiguration.TargetPropertyName = targetPropertyName;
-
-            pathObjects.Clear();
-            targetObject = null;
         }
 
         private void subscribeChangeEvents()
@@ -261,7 +258,6 @@ namespace Godot.Community.ControlBinding
             }
                   
             _bindingConfiguration.BackReferences.Clear();
-            GC.Collect();
         }
     }
 }
