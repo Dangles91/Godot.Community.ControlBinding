@@ -6,6 +6,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace ControlBinding;
 
@@ -26,8 +27,11 @@ public partial class ObservableObject : Node, IObservableObject
     /// Raise OnPropertyChanged when a bound property on this object changes
     /// </summary>
     /// <param name="name"></param>
-    public void OnPropertyChanged(string name)
+    public void OnPropertyChanged([CallerMemberName] string name = "not a property")
     {
+        if(name == "not a property")
+            return;
+            
         EmitSignal(SignalName.PropertyChanged, this, name);
 
         var invalidBindings = _controlBindings.Where(x => x.BindingStatus == BindingStatus.Invalid);
