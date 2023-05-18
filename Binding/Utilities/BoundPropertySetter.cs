@@ -1,11 +1,11 @@
-using ControlBinding.Formatters;
-using ControlBinding.Services;
+using Godot.Community.ControlBinding.Formatters;
+using Godot.Community.ControlBinding.Services;
 using Godot;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace ControlBinding.Utilities;
+namespace Godot.Community.ControlBinding.Utilities;
 
 public class BoundPropertySetter
 {
@@ -40,8 +40,8 @@ public class BoundPropertySetter
         if(sourceObject == null)
             return;
         
-        string sourceCacheKey = $"{sourceObject.GetType().AssemblyQualifiedName}.{sourcePropertyName}";
-        string targetCacheKey = $"{targetObject.GetType().AssemblyQualifiedName}.{targetPropertyName}";
+        string sourceCacheKey = $"{sourceObject.GetType().FullName}.{sourcePropertyName}";
+        string targetCacheKey = $"{targetObject.GetType().FullName}.{targetPropertyName}";
         
         if(!_propertyInfoCache.ContainsKey(sourceCacheKey))
         {

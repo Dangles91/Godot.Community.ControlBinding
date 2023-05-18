@@ -1,13 +1,12 @@
-using ControlBinding.EventArgs;
+using Godot.Community.ControlBinding.EventArgs;
 using Godot;
+using Godot.Community.ControlBinding;
 
-namespace ControlBinding.Collections;
+namespace Godot.Community.ControlBinding.Collections;
 
-public partial class ObservableListBase : GodotObject
+public partial class ObservableListBase : ObservableObject
 {
     [Signal]
-    public delegate void PropertyChangedEventHandler(GodotObject sender);
-
-    [Signal]
     public delegate void ObservableListChangedEventHandler(ObservableListChangedEventArgs args);
+
 }

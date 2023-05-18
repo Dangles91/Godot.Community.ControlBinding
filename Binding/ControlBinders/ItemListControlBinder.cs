@@ -1,12 +1,12 @@
-using ControlBinding.Collections;
-using ControlBinding.EventArgs;
-using ControlBinding.Utilities;
+using Godot.Community.ControlBinding.Collections;
+using Godot.Community.ControlBinding.EventArgs;
+using Godot.Community.ControlBinding.Utilities;
 using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ControlBinding.ControlBinders;
+namespace Godot.Community.ControlBinding.ControlBinders;
 public partial class ItemListControlBinder : ControlBinderBase
 {
     public override void OnObservableListChanged(ObservableListChangedEventArgs eventArgs)
@@ -44,7 +44,11 @@ public partial class ItemListControlBinder : ControlBinderBase
         {
             bool itemsSelected = itemList.GetSelectedItems().Any();
             itemList.RemoveItem(eventArgs.Index);
-            itemList.Deselect(eventArgs.Index);
+            
+            if(itemsSelected && itemList.ItemCount == 0)
+            {
+                itemList.DeselectAll();
+            }
 
             if (itemList.SelectMode == ItemList.SelectModeEnum.Single)
             {
@@ -56,7 +60,7 @@ public partial class ItemListControlBinder : ControlBinderBase
                 }
                 else
                 {
-                    itemList.Select(-1);
+                    itemList.DeselectAll();
                     itemList.EmitSignal(ItemList.SignalName.ItemSelected, -1);
                 }
             }

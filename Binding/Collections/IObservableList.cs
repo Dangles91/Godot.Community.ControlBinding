@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using ControlBinding.EventArgs;
+using Godot.Community.ControlBinding.EventArgs;
 
-namespace ControlBinding.Collections;
+namespace Godot.Community.ControlBinding.Collections;
 public interface IObservableList
 {
     public IList<object> GetBackingList();

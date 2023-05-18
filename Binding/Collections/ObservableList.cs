@@ -1,13 +1,14 @@
-using ControlBinding.EventArgs;
-using ControlBinding.Interfaces;
+using Godot.Community.ControlBinding.EventArgs;
+using Godot.Community.ControlBinding.Interfaces;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ControlBinding.Collections;
+namespace Godot.Community.ControlBinding.Collections;
 
 public partial class ObservableList<T> : ObservableListBase, IObservableObject, IList<T>, IObservableList
 {
+
     private IList<T> _backingList = new List<T>();
 
     public int Count => _backingList.Count;
@@ -76,12 +77,6 @@ public partial class ObservableList<T> : ObservableListBase, IObservableObject, 
         });
     }
 
-    public void OnPropertyChanged(string name)
-    {
-
-        EmitSignal(nameof(PropertyChanged), this);
-    }
-
     public bool Remove(T item)
     {
         var removedIndex = _backingList.IndexOf(item);
@@ -134,7 +129,7 @@ public partial class ObservableList<T> : ObservableListBase, IObservableObject, 
 
     public ObservableList(IList<T> list)
     {
-        this._backingList = list;
+        this._backingList = list;        
         EmitSignal(nameof(ObservableListChanged), new ObservableListChangedEventArgs
         {
             ChangeType = ObservableListChangeType.Add,

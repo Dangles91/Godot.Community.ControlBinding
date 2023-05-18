@@ -1,13 +1,14 @@
 using Godot;
+using Godot.Community.ControlBinding;
 
-namespace ControlBinding.Utilities;
+namespace Godot.Community.ControlBinding.Utilities;
 
 public static class SceneInstancer
 {
     public static Node CreateSceneInstance(string scenePath, object viewModelData)
     {
         var scene = (Godot.PackedScene)ResourceLoader.Load(scenePath);        
-        var node = scene.Instantiate<ObservableObject>();        
+        var node = scene.Instantiate<ObservableNode>();        
 
         node.SetViewModelData(viewModelData);
         return node;

@@ -1,4 +1,5 @@
-using ControlBinding.Collections;
+using Godot.Community.ControlBinding.Collections;
+using Godot.Community.ControlBinding;
 
 namespace ControlBinding;
 public partial class PlayerData : ObservableObject

@@ -1,6 +1,6 @@
 using System;
 
-namespace ControlBinding.Formatters;
+namespace Godot.Community.ControlBinding.Formatters;
 
 /// <summary>
 /// The interface to implement to create a value formatter that formats data before being set on the target control or object

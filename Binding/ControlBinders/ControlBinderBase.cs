@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using ControlBinding.EventArgs;
+using Godot.Community.ControlBinding.EventArgs;
 using Godot;
 
-namespace ControlBinding.ControlBinders
+namespace Godot.Community.ControlBinding.ControlBinders
 {
     public abstract partial class ControlBinderBase : GodotObject, IControlBinder
     {

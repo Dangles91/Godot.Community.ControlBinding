@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace ControlBinding.Services;
+namespace Godot.Community.ControlBinding.Services;
 public static class ReflectionService
 {
     public static PropertyInfo GetPropertyInfo(object instance, string propertyName)

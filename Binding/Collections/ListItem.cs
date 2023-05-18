@@ -1,6 +1,6 @@
 using Godot;
 
-namespace ControlBinding.Collections;
+namespace Godot.Community.ControlBinding.Collections;
 /// <summary>
 /// A ListItem can be used to format items in an ItemList control when bound to a list.
 /// Return a ListItem from an T:ControlBinding.Formatters.IValueFormatter to format the list item.
@@ -9,9 +9,8 @@ public class ListItem
 {
     public string DisplayValue { get; set; }
     public int Id { get; set; } = -1;
-    public Texture2D Icon { get; set; }
-    public ViewModel SceneViewModel { get; set; }
-    public ObservableObject ViewModelData { get; set; }
+    public Texture2D Icon { get; set; }   
+
     public string ScenePath { get; set; }
     public string Tooltip { get; set; }
     public Variant Metadata { get; set; }

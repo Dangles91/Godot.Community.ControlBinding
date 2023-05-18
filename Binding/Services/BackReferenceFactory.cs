@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Godot.Community.ControlBinding.Collections;
+using Godot.Community.ControlBinding.Interfaces;
 
-namespace ControlBinding.Services;
+namespace Godot.Community.ControlBinding.Services;
 
 public static class BackReferenceFactory
 {
@@ -63,7 +65,7 @@ public static class BackReferenceFactory
                 pathObjects.Add(bindingConfiguration.TargetObject);
             }
 
-            if (pathObjects.Last() is ObservableObject observableObject)
+            if (pathObjects.Last() is IObservableObject observableObject && pathObjects.Last() is not IObservableList)
             {
                 var list = ReflectionService.GetPropertyInfo(observableObject, pathNodes.Last()).GetValue(observableObject);
                 pathObjects.Add(list);

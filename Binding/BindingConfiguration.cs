@@ -1,9 +1,9 @@
-using ControlBinding.Formatters;
+using Godot.Community.ControlBinding.Formatters;
 using Godot;
 using System;
 using System.Collections.Generic;
 
-namespace ControlBinding;
+namespace Godot.Community.ControlBinding;
 
 public enum BindingMode
 {

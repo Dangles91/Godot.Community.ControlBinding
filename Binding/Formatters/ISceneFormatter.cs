@@ -1,7 +1,7 @@
-using ControlBinding.Utilities;
+using Godot.Community.ControlBinding.Utilities;
 using Godot;
 
-namespace ControlBinding.Formatters;
+namespace Godot.Community.ControlBinding.Formatters;
 
 public interface ISceneFormatter
 {

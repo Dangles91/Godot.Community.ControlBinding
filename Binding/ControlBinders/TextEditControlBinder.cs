@@ -1,9 +1,9 @@
-using ControlBinding.EventArgs;
+using Godot.Community.ControlBinding.EventArgs;
 using Godot;
 using System;
 using System.Collections.Generic;
 
-namespace ControlBinding.ControlBinders;
+namespace Godot.Community.ControlBinding.ControlBinders;
 
 public partial class TextEditControlBinder : ControlBinderBase
 {

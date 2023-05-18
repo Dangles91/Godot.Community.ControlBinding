@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ControlBinding.Collections;
-using ControlBinding.Formatters;
+using Godot.Community.ControlBinding.Collections;
+using Godot.Community.ControlBinding.Formatters;
 
 
 namespace ControlBinding

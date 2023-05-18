@@ -1,13 +1,14 @@
 using System;
 using System.Linq;
-using ControlBinding.Services;
+using Godot.Community.ControlBinding.Services;
 using Godot;
-using ControlBinding.Collections;
-using ControlBinding.EventArgs;
-using ControlBinding.ControlBinders;
-using ControlBinding.Utilities;
+using Godot.Community.ControlBinding.Collections;
+using Godot.Community.ControlBinding.EventArgs;
+using Godot.Community.ControlBinding.ControlBinders;
+using Godot.Community.ControlBinding.Utilities;
+using Godot.Community.ControlBinding.Interfaces;
 
-namespace ControlBinding
+namespace Godot.Community.ControlBinding
 {
     public enum BindingStatus
     {
@@ -51,7 +52,7 @@ namespace ControlBinding
 
             var targetObject = pathObjects.Last();
 
-            if (targetObject is not null && targetObject is not ObservableObject && targetObject is not ObservableListBase)
+            if (targetObject is not null && targetObject is not IObservableObject && targetObject is not ObservableListBase)
             {                
                 GD.PrintErr($"ControlBinding: Binding from node {targetObject} on path {_bindingConfiguration.Path} will not update with changes. Node is not of type ObservableObject");
             }
@@ -70,7 +71,7 @@ namespace ControlBinding
             if(BindingStatus != BindingStatus.Active)            
                 (_bindingConfiguration.BoundControl.Target as Godot.Control).TreeExiting += OnBoundControlTreeExiting;
 
-            if (_bindingConfiguration.TargetObject is ObservableObject observable)
+            if (_bindingConfiguration.TargetObject is IObservableObject observable)
             {
                 observable.PropertyChanged += OnPropertyChanged;
             }
@@ -84,7 +85,7 @@ namespace ControlBinding
             foreach (var backReference in _bindingConfiguration.BackReferences.Select(x => x.ObjectReference.Target))
             {
                 if (backReference != _bindingConfiguration.TargetObject &&
-                    backReference is ObservableObject observable3)
+                    backReference is IObservableObject observable3)
                 {
                     observable3.PropertyChanged += OnBackReferenceChanged;
                 }
@@ -198,17 +199,33 @@ namespace ControlBinding
             {
                 foreach (var item in eventArgs.ChangedEntries)
                 {
-                    if (item is ObservableObject observableObject)
+                    if (item is IObservableObject observableObject)
                     {
-                        observableObject.PropertyChanged += (s, p) => _controlBinder.OnListItemChanged(s);
+                        observableObject.PropertyChanged += OnItemListChanged;
+                    }
+                }
+            }
+
+            if(eventArgs.ChangeType == ObservableListChangeType.Remove)
+            {
+                foreach (var item in eventArgs.ChangedEntries)
+                {
+                    if (item is IObservableObject observableObject)
+                    {
+                        observableObject.PropertyChanged -= OnItemListChanged;
                     }
                 }
             }
         }
 
+        private void OnItemListChanged(object sender, string propertyName)
+        {
+            _controlBinder.OnListItemChanged(sender);
+        }    
+
         public void UnbindControl()
         {
-            if (_bindingConfiguration.TargetObject is ObservableObject observable)
+            if (_bindingConfiguration.TargetObject is IObservableObject observable)
             {
                 observable.PropertyChanged -= OnPropertyChanged;
             }
@@ -220,7 +237,7 @@ namespace ControlBinding
 
             foreach (var backReference in _bindingConfiguration.BackReferences)
             {
-                if (backReference.ObjectReference.Target is ObservableObject observableObject)
+                if (backReference.ObjectReference.Target is IObservableObject observableObject)
                 {
                     observableObject.PropertyChanged -= OnBackReferenceChanged;
                 }

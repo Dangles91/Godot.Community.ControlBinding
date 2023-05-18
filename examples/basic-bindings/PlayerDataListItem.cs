@@ -1,8 +1,9 @@
 using ControlBinding;
 using Godot;
+using Godot.Community.ControlBinding;
 using System;
 
-public partial class PlayerDataListItem : ObservableObject
+public partial class PlayerDataListItem : ObservableNode
 {
 
 	private PlayerData ViewModelData { get; set; }

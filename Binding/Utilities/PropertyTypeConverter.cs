@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel;
 using Godot;
 
-namespace ControlBinding.Utilities;
+namespace Godot.Community.ControlBinding.Utilities;
 
 public static class PropertyTypeConverter
 {

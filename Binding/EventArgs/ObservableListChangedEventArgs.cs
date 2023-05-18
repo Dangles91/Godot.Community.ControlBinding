@@ -2,7 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-namespace ControlBinding.EventArgs;
+namespace Godot.Community.ControlBinding.EventArgs;
 public enum ObservableListChangeType
 {
     Add,

@@ -1,6 +1,6 @@
 using System;
 
-namespace ControlBinding.Formatters;
+namespace Godot.Community.ControlBinding.Formatters;
 
 public class ReverseBoolValueFormatter : IValueFormatter
 {

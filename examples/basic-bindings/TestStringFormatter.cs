@@ -1,6 +1,6 @@
 
 
-using ControlBinding.Formatters;
+using Godot.Community.ControlBinding.Formatters;
 using System;
 
 namespace ControlBinding;
