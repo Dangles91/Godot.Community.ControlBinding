@@ -11,21 +11,21 @@ public partial class Control : ObservableObject
     public bool IsAddNewPlayerEnabled
     {
         get { return labelIsVisible; }
-        set { labelIsVisible = value; OnPropertyChanged(nameof(IsAddNewPlayerEnabled)); }
+        set { labelIsVisible = value; OnPropertyChanged(); }
     }
 
     private string longText;
     public string LongText
     {
         get { return longText; }
-        set { longText = value; OnPropertyChanged(nameof(LongText)); }
+        set { longText = value; OnPropertyChanged(); }
     }
 
     private int spinBoxValue;
     public int SpinBoxValue
     {
         get { return spinBoxValue; }
-        set { spinBoxValue = value; OnPropertyChanged(nameof(SpinBoxValue)); }
+        set { spinBoxValue = value; OnPropertyChanged(); }
     }
 
     public ObservableList<PlayerData> playerDatas {get;set;} = new(){
@@ -40,14 +40,14 @@ public partial class Control : ObservableObject
     public BindingMode SelectedBindingMode
     {
         get { return _selectedBindingMode; }
-        set { _selectedBindingMode = value; OnPropertyChanged(nameof(SelectedBindingMode)); }
+        set { _selectedBindingMode = value; OnPropertyChanged(); }
     }    
 
     private ObservableList<string> _backinglistForTesting = new ObservableList<string>{"Test"};
     public ObservableList<string> BackingListForTesting
     {
         get { return _backinglistForTesting; }
-        set { _backinglistForTesting = value; OnPropertyChanged(nameof(BackingListForTesting));}
+        set { _backinglistForTesting = value; OnPropertyChanged();}
     }
 
     public override void _Ready()
@@ -102,7 +102,7 @@ public partial class Control : ObservableObject
     public PlayerData SelectedPlayerData
     {
         get { return selectedPlayerData; }
-        set { selectedPlayerData = value; OnPropertyChanged(nameof(SelectedPlayerData)); }
+        set { selectedPlayerData = value; OnPropertyChanged(); }
     }
 
     public void _on_button_2_pressed()
