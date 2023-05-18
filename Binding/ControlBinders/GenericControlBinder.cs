@@ -6,9 +6,10 @@ namespace ControlBinding.ControlBinders;
 
 public partial class GenericControlBinder : ControlBinderBase
 {
+    public new int Priority => 0;
     public override bool CanBindFor(object control)
     {
-        return control is Label || control is Button;
+        return control is Godot.Control;
     }
 
     public override void ClearEventBindings()

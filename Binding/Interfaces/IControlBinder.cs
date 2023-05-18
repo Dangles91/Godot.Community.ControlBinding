@@ -10,4 +10,5 @@ public interface IControlBinder
     void OnObservableListChanged(ObservableListChangedEventArgs eventArgs);
     void ClearEventBindings();
     bool IsBound { get; set; }
+    public int Priority { get; }
 }
