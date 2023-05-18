@@ -11,7 +11,7 @@ using System.Runtime.CompilerServices;
 
 namespace Godot.Community.ControlBinding;
 
-public partial class ObservableObject : GodotObject, IObservableObject
+public partial class ObservableObject : IObservableObject
 {
     public event PropertyChangedEventHandler PropertyChanged;
 

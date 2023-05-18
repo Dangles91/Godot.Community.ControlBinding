@@ -8,19 +8,19 @@ namespace Godot.Community.ControlBinding.Services;
 
 public static class BackReferenceFactory
 {
-    public static List<object> GetPathObjectsAndBuildBackReferences(string[] pathNodes, ref BindingConfiguration bindingConfiguration)
+    public static List<object> GetPathObjectsAndBuildBackReferences(List<string> pathNodes, ref BindingConfiguration bindingConfiguration)
     {
-        if (bindingConfiguration.BackReferences == null)
-            bindingConfiguration.BackReferences = new();
+        bindingConfiguration.BackReferences?.Clear();
+        bindingConfiguration.BackReferences = new();
 
         List<object> pathObjects = new();
         pathObjects.Add(bindingConfiguration.Owner);
 
-        if (pathNodes.Length > 1)
+        if (pathNodes.Count > 1)
         {
             object root = bindingConfiguration.Owner;
 
-            for (int i = 0; i < pathNodes.Length; i++)
+            for (int i = 0; i < pathNodes.Count; i++)
             {
                 // TODO: make this easier to read
                 object pathObject = null;
@@ -34,7 +34,7 @@ public static class BackReferenceFactory
                     var pathNode = pathNodes[i - 1];
                     pathObject = ReflectionService.GetPropertyInfo(root, pathNode).GetValue(root);
                     pathObjects.Add(pathObject);
-                    if (!bindingConfiguration.IsListBinding && i + 1 > pathNodes.Length - 1)
+                    if (!bindingConfiguration.IsListBinding && i + 1 > pathNodes.Count - 1)
                         continue;
                 }
 
@@ -53,16 +53,16 @@ public static class BackReferenceFactory
 
         if (bindingConfiguration.IsListBinding)
         {
-            pathNodes = pathNodes.Where(x => !string.IsNullOrEmpty(x)).ToArray();
-            if (pathNodes.Length == 1)
+            pathNodes = pathNodes.Where(x => !string.IsNullOrEmpty(x)).ToList();
+            if (pathNodes.Count == 1)
             {
                 pathObjects.Add(bindingConfiguration.Owner);
             }
 
             // Support enum bindings
-            if (pathNodes.Length == 0 && bindingConfiguration.TargetObject != null)
+            if (pathNodes.Count == 0 && bindingConfiguration.TargetObject.Target != null)
             {
-                pathObjects.Add(bindingConfiguration.TargetObject);
+                pathObjects.Add(bindingConfiguration.TargetObject.Target);
             }
 
             if (pathObjects.Last() is IObservableObject observableObject && pathObjects.Last() is not IObservableList)
@@ -72,12 +72,12 @@ public static class BackReferenceFactory
 
                 bindingConfiguration.BackReferences.Add(new WeakBackReference
                 {
-                    ObjectReference = new WeakReference(pathObjects[pathObjects.Count - 2]),
+                    ObjectReference = new WeakReference(pathObjects[pathObjects.Count - 2], false),
                     PropertyName = pathNodes.Last()
                 });
             }
         }
 
-        return pathObjects;
+        return pathObjects.ToList();
     }
 }

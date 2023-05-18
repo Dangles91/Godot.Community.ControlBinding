@@ -5,8 +5,7 @@ using Godot.Community.ControlBinding;
 namespace Godot.Community.ControlBinding.Collections;
 
 public partial class ObservableListBase : ObservableObject
-{
-    [Signal]
-    public delegate void ObservableListChangedEventHandler(ObservableListChangedEventArgs args);
+{    
+    
 
 }

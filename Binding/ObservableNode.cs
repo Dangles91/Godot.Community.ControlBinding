@@ -162,7 +162,7 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
             var bindingConfiguration = new BindingConfiguration
             {
                 BindingMode = BindingMode.OneWay,
-                TargetObject = targetObject,
+                TargetObject = new WeakReference(targetObject),
                 BoundControl = new WeakReference(node),
                 IsListBinding = true,
                 Path = string.Empty,

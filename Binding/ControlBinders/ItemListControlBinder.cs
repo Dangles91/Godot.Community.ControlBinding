@@ -70,11 +70,13 @@ public partial class ItemListControlBinder : ControlBinderBase
         {
             itemList.Clear();
         }
+
+        convertedValues.Clear();
     }
 
     public override void OnListItemChanged(object entry)
     {
-        var observableList = _bindingConfiguration.TargetObject as IObservableList;
+        var observableList = _bindingConfiguration.TargetObject.Target as IObservableList;
         ItemList itemList = _bindingConfiguration.BoundControl.Target as ItemList;
 
         var listItems = observableList.GetBackingList();
@@ -94,6 +96,8 @@ public partial class ItemListControlBinder : ControlBinderBase
         {
             itemList.SetItemText(changedIndex, convertedVal.ToString());
         }
+
+        convertedVal = null;
     }
 
     private void SetItemValues(ItemList itemList, int index, ListItem listItem)

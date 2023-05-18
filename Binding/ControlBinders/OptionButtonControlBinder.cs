@@ -115,7 +115,7 @@ public partial class OptionButtonControlBinder : ControlBinderBase
 
     public override void OnListItemChanged(object entry)
     {
-        var observableList = _bindingConfiguration.TargetObject as IObservableList;
+        var observableList = _bindingConfiguration.TargetObject.Target as IObservableList;
         OptionButton itemList = _bindingConfiguration.BoundControl.Target as OptionButton;
 
         var listItems = observableList.GetBackingList();
@@ -135,6 +135,8 @@ public partial class OptionButtonControlBinder : ControlBinderBase
         {
             itemList.SetItemText(changedIndex, convertedVal.ToString());
         }
+
+        convertedVal = null;
     }
 
     private void SetItemValues(OptionButton optionButton, int index, ListItem listItem)

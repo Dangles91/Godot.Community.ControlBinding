@@ -6,4 +6,5 @@ public interface IObservableList
 {
     public IList<object> GetBackingList();
     void OnObservableListChanged(ObservableListChangedEventArgs eventArgs);
+    event ObservableListChangedEventHandler ObservableListChanged;
 }

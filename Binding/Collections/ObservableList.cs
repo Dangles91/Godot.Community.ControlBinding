@@ -6,8 +6,9 @@ using System.Linq;
 
 namespace Godot.Community.ControlBinding.Collections;
 
-public partial class ObservableList<T> : ObservableListBase, IObservableObject, IList<T>, IObservableList
+public partial class ObservableList<T> : ObservableObject, IObservableObject, IList<T>, IObservableList
 {
+    public event ObservableListChangedEventHandler ObservableListChanged;    
 
     private IList<T> _backingList = new List<T>();
 
@@ -114,7 +115,7 @@ public partial class ObservableList<T> : ObservableListBase, IObservableObject, 
 
     public void OnObservableListChanged(ObservableListChangedEventArgs eventArgs)
     {
-        EmitSignal(nameof(ObservableListChanged), eventArgs);
+        ObservableListChanged?.Invoke(eventArgs);
     }
 
     public void SetViewModelData(object viewModelData)
@@ -130,7 +131,7 @@ public partial class ObservableList<T> : ObservableListBase, IObservableObject, 
     public ObservableList(IList<T> list)
     {
         this._backingList = list;        
-        EmitSignal(nameof(ObservableListChanged), new ObservableListChangedEventArgs
+        ObservableListChanged?.Invoke(new ObservableListChangedEventArgs
         {
             ChangeType = ObservableListChangeType.Add,
             ChangedEntries = _backingList.Cast<object>().ToList()
