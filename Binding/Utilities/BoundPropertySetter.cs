@@ -2,12 +2,15 @@ using ControlBinding.Formatters;
 using ControlBinding.Services;
 using Godot;
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace ControlBinding.Utilities;
 
 public class BoundPropertySetter
 {
     private readonly IValueFormatter _valueFormatter;
+    private static Dictionary<string, PropertyInfo> _propertyInfoCache = new();
     public BoundPropertySetter(IValueFormatter valueFormatter)
     {
         _valueFormatter = valueFormatter;
@@ -36,12 +39,28 @@ public class BoundPropertySetter
     {
         if(sourceObject == null)
             return;
-            
-        var sourcePropertyInfo = ReflectionService.GetPropertyInfo(sourceObject, sourcePropertyName);
-        var targetPropertyInfo = ReflectionService.GetPropertyInfo(targetObject, targetPropertyName);
+        
+        string sourceCacheKey = $"{sourceObject.GetType().AssemblyQualifiedName}.{sourcePropertyName}";
+        string targetCacheKey = $"{targetObject.GetType().AssemblyQualifiedName}.{targetPropertyName}";
+        
+        if(!_propertyInfoCache.ContainsKey(sourceCacheKey))
+        {
+            var pInfo = ReflectionService.GetPropertyInfo(sourceObject, sourcePropertyName);
+            if(pInfo == null)
+                return;
+            _propertyInfoCache.Add(sourceCacheKey, pInfo);
+        }
 
-        if (sourcePropertyInfo is null || targetPropertyInfo is null)
-            return;
+        if(!_propertyInfoCache.ContainsKey(targetCacheKey))
+        {
+            var pInfo = ReflectionService.GetPropertyInfo(targetObject, targetPropertyName);
+            if(pInfo == null)
+                return;
+            _propertyInfoCache.Add(targetCacheKey, pInfo);
+        }
+
+        PropertyInfo sourcePropertyInfo = _propertyInfoCache[sourceCacheKey];
+        PropertyInfo targetPropertyInfo = _propertyInfoCache[targetCacheKey];
 
         var sourceValue = sourcePropertyInfo.GetValue(sourceObject);
         var targetValue = targetPropertyInfo.GetValue(targetObject);
