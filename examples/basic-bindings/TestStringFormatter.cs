@@ -5,17 +5,16 @@ using System;
 
 namespace ControlBinding;
 
-public class TestStringFormatter : IValueFormatter
+public class PlayerHealthFormatter : IValueFormatter
 {
     public Func<object, object> FormatControl => (v) =>
     {
         var input = (string)v;
-        return input.PadRight(10, '.');
+        return $"Player health: {v}";
     };
 
     public Func<object, object> FormatTarget => (v) =>
     {
-        var input = (string)v;
-        return input.Replace(",", "");
+        throw new NotImplementedException();
     };
 }

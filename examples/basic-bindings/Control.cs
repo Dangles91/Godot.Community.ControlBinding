@@ -77,7 +77,7 @@ public partial class Control : ObservableObject
         BindListProperty("%ItemList3", $"{nameof(SelectedPlayerData)}.{nameof(PlayerData.ListOfThings)}", BindingMode.TwoWay);
 
         BindEnumProperty<BindingMode>("%OptionButton", $"{nameof(SelectedPlayerData)}.{nameof(SelectedPlayerData.BindingMode)}");
-        
+        BindSceneList("%VBoxContainer", nameof(playerDatas), "uid://die1856ftg8w8");
 
         base._Ready();
     }

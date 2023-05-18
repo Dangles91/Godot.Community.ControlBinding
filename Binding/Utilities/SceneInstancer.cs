@@ -4,18 +4,12 @@ namespace ControlBinding.Utilities;
 
 public static class SceneInstancer
 {
-    public static Node CreateSceneInstance(string scenePath, ViewModel viewModel)
+    public static Node CreateSceneInstance(string scenePath, object viewModelData)
     {
-        var scene = (Godot.PackedScene)ResourceLoader.Load(scenePath);
-        var script = ResourceLoader.Load(viewModel.GetScriptPath());
+        var scene = (Godot.PackedScene)ResourceLoader.Load(scenePath);        
+        var node = scene.Instantiate<ObservableObject>();        
 
-        var node = scene.Instantiate();
-        var id = node.GetInstanceId();
-
-        node.SetScript(script);
-
-        node = (Node)Node.InstanceFromId(id);
-
+        node.SetViewModelData(viewModelData);
         return node;
     }
 }

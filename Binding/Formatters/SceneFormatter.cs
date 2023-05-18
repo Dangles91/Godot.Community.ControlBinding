@@ -1,15 +1,11 @@
 using System;
+using ControlBinding.Utilities;
 using Godot;
 
 namespace ControlBinding.Formatters
 {
     public class SceneFormatter : ISceneFormatter
     {
-        public string ScenePath { get; }
-
-        public PackedScene Format()
-        {
-            throw new NotImplementedException();
-        }
+        public string ScenePath { get; init; }
     }
 }

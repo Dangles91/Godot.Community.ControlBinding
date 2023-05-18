@@ -1,28 +1,24 @@
-[gd_scene format=3 uid="uid://die1856ftg8w8"]
+[gd_scene load_steps=2 format=3 uid="uid://die1856ftg8w8"]
 
-[node name="Control" type="Control"]
-layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
+[ext_resource type="Script" path="res://PlayerDataListItem.cs" id="1_qb3km"]
+
+[node name="PanelContainer" type="PanelContainer"]
+offset_right = 302.0
 offset_bottom = 40.0
+script = ExtResource("1_qb3km")
 
-[node name="TextEdit" type="TextEdit" parent="."]
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
 layout_mode = 2
-offset_left = 64.0
-offset_top = 2.0
-offset_right = 200.0
-offset_bottom = 32.0
 
-[node name="Label" type="Label" parent="."]
-layout_mode = 0
-offset_right = 65.0
-offset_bottom = 26.0
+[node name="Label" type="Label" parent="HBoxContainer"]
+layout_mode = 2
 text = "Health"
 
-[node name="Button" type="Button" parent="."]
-layout_mode = 0
-offset_left = 212.0
-offset_top = 2.0
-offset_right = 283.0
-offset_bottom = 27.0
+[node name="TextEdit" type="TextEdit" parent="HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Button" type="Button" parent="HBoxContainer"]
+layout_mode = 2
 text = "Remove"

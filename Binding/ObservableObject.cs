@@ -23,15 +23,21 @@ public partial class ObservableObject : Node, IObservableObject
     {
         base._Ready();
     }
+
+    public virtual void SetViewModelData(object viewModelData)
+    {
+        // no default implementation. Intended to be overridden for use with scene formatters. 
+    }
+
     /// <summary>
     /// Raise OnPropertyChanged when a bound property on this object changes
     /// </summary>
     /// <param name="name"></param>
     public void OnPropertyChanged([CallerMemberName] string name = "not a property")
     {
-        if(name == "not a property")
+        if (name == "not a property")
             return;
-            
+
         EmitSignal(SignalName.PropertyChanged, this, name);
 
         var invalidBindings = _controlBindings.Where(x => x.BindingStatus == BindingStatus.Invalid);
@@ -202,8 +208,32 @@ public partial class ObservableObject : Node, IObservableObject
         }
     }
 
-    public void BindSceneListProperty(string controlPath, string path, ISceneFormatter sceneFormatter)
+    public void BindSceneList(string controlPath, string path, string scenePath, BindingMode bindingMode = BindingMode.OneWay)
     {
+        var node = GetNode<Godot.Control>(controlPath);
+        if (node == null)
+        {
+            GD.PrintErr($"DataBinding: Unable to find node with path '{controlPath}'");
+            return;
+        }
+
+        var binder = new GenericControlBinder();
+        var bindingConfiguration = new BindingConfiguration
+        {
+            BindingMode = bindingMode,
+            BoundControl = new WeakReference(node),
+            SceneFormatter = new SceneFormatter
+            {
+                ScenePath = scenePath
+            },
+            IsListBinding = true,
+            Owner = this,
+            Path = path
+        };
+
+        var binding = new Binding(bindingConfiguration, binder);
+        binding.BindControl();
+        _controlBindings.Add(binding);
 
     }
 }

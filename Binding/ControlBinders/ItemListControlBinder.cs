@@ -34,17 +34,8 @@ public partial class ItemListControlBinder : ControlBinderBase
 
                 if (item is ListItem listItem)
                 {
-                    if (listItem.ScenePath != null && listItem.SceneViewModel != null)
-                    {
-                        var scene = SceneInstancer.CreateSceneInstance(listItem.ScenePath, listItem.SceneViewModel);
-                        (scene as ViewModel).SetViewModelData(listItem.ViewModelData);
-                        itemList.AddChild(scene);
-                    }
-                    else
-                    {
-                        itemList.AddItem(listItem.DisplayValue);
-                        SetItemValues(itemList, itemList.ItemCount - 1, listItem);
-                    }
+                    itemList.AddItem(listItem.DisplayValue);
+                    SetItemValues(itemList, itemList.ItemCount - 1, listItem);
                 }
             }
         }

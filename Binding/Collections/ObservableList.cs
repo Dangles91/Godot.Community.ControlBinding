@@ -122,6 +122,11 @@ public partial class ObservableList<T> : ObservableListBase, IObservableObject, 
         EmitSignal(nameof(ObservableListChanged), eventArgs);
     }
 
+    public void SetViewModelData(object viewModelData)
+    {
+        throw new System.NotImplementedException();
+    }
+
     public ObservableList()
     {
 

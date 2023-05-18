@@ -23,7 +23,4 @@ public partial class PlayerData : ObservableObject
         get { return _listOfThings; }
         set { _listOfThings = value; OnPropertyChanged(nameof(ListOfThings));}
     }
-    
-    
-
 }
