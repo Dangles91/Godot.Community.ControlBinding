@@ -11,21 +11,21 @@ public partial class Control : ObservableObject
     public bool IsAddNewPlayerEnabled
     {
         get { return labelIsVisible; }
-        set { labelIsVisible = value; OnPropertyChanged(); }
+        set { SetValue(ref labelIsVisible, value); }
     }
 
     private string longText;
     public string LongText
     {
         get { return longText; }
-        set { longText = value; OnPropertyChanged(); }
+        set { SetValue(ref longText, value); }
     }
 
     private int spinBoxValue;
     public int SpinBoxValue
     {
         get { return spinBoxValue; }
-        set { spinBoxValue = value; OnPropertyChanged(); }
+        set { SetValue(ref spinBoxValue, value); }
     }
 
     public ObservableList<PlayerData> playerDatas {get;set;} = new(){
@@ -40,14 +40,14 @@ public partial class Control : ObservableObject
     public BindingMode SelectedBindingMode
     {
         get { return _selectedBindingMode; }
-        set { _selectedBindingMode = value; OnPropertyChanged(); }
+        set { SetValue(ref _selectedBindingMode, value); }
     }    
 
     private ObservableList<string> _backinglistForTesting = new ObservableList<string>{"Test"};
     public ObservableList<string> BackingListForTesting
     {
         get { return _backinglistForTesting; }
-        set { _backinglistForTesting = value; OnPropertyChanged();}
+        set { SetValue(ref _backinglistForTesting, value); }
     }
 
     public override void _Ready()
@@ -102,7 +102,7 @@ public partial class Control : ObservableObject
     public PlayerData SelectedPlayerData
     {
         get { return selectedPlayerData; }
-        set { selectedPlayerData = value; OnPropertyChanged(); }
+        set { SetValue(ref selectedPlayerData, value); }
     }
 
     public void _on_button_2_pressed()
