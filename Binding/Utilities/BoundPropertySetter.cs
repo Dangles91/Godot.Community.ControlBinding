@@ -9,7 +9,6 @@ namespace Godot.Community.ControlBinding.Utilities;
 public class BoundPropertySetter
 {
     private readonly IValueFormatter _valueFormatter;
-    private static Dictionary<string, PropertyInfo> _propertyInfoCache = new();
     public BoundPropertySetter(IValueFormatter valueFormatter)
     {
         _valueFormatter = valueFormatter;
@@ -36,30 +35,21 @@ public class BoundPropertySetter
         string targetPropertyName,
         Func<object, object> formatter)
     {
-        if (sourceObject == null)
+        if (sourceObject is null && targetObject is not null)
+        {            
+            var propertyInfo = ReflectionService.GetPropertyInfo(targetObject, targetPropertyName);
+            propertyInfo.SetValue(targetObject, null);
             return;
-
-        string sourceCacheKey = $"{sourceObject.GetType().FullName}.{sourcePropertyName}";
-        string targetCacheKey = $"{targetObject.GetType().FullName}.{targetPropertyName}";
-
-        if (!_propertyInfoCache.ContainsKey(sourceCacheKey))
-        {
-            var pInfo = ReflectionService.GetPropertyInfo(sourceObject, sourcePropertyName);
-            if (pInfo == null)
-                return;
-            _propertyInfoCache.Add(sourceCacheKey, pInfo);
         }
 
-        if (!_propertyInfoCache.ContainsKey(targetCacheKey))
+        if(targetObject is null)
         {
-            var pInfo = ReflectionService.GetPropertyInfo(targetObject, targetPropertyName);
-            if (pInfo == null)
-                return;
-            _propertyInfoCache.Add(targetCacheKey, pInfo);
+            // can't set a value on a null target
+            return;
         }
-
-        PropertyInfo sourcePropertyInfo = _propertyInfoCache[sourceCacheKey];
-        PropertyInfo targetPropertyInfo = _propertyInfoCache[targetCacheKey];
+        
+        PropertyInfo sourcePropertyInfo = ReflectionService.GetPropertyInfo(sourceObject, sourcePropertyName);
+        PropertyInfo targetPropertyInfo = ReflectionService.GetPropertyInfo(targetObject, targetPropertyName);
 
         var sourceValue = sourcePropertyInfo.GetValue(sourceObject);
         var targetValue = targetPropertyInfo.GetValue(targetObject);
