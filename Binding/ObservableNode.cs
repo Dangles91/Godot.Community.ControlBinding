@@ -1,9 +1,7 @@
-using Godot.Community.ControlBinding;
 using Godot.Community.ControlBinding.Collections;
 using Godot.Community.ControlBinding.ControlBinders;
 using Godot.Community.ControlBinding.Formatters;
 using Godot.Community.ControlBinding.Interfaces;
-using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +12,7 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
 {
     public event PropertyChangedEventHandler PropertyChanged;
     private ControlBinderProvider _controlBinderProvider = new ControlBinderProvider();
-    
+
     private readonly List<Binding> _controlBindings = new List<Binding>();
     private readonly object cleanUpLock = 0;
 
@@ -42,11 +40,6 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
     public virtual void SetViewModelData(object viewModelData)
     {
         // no default implementation. Intended to be overridden for use with scene formatters. 
-    }
-
-    public override void _Ready()
-    {
-        base._Ready();
     }
 
     /// <summary>

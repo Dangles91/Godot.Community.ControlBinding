@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using Godot.Community.ControlBinding.EventArgs;
+using System.Collections.Generic;
 
 namespace Godot.Community.ControlBinding.Collections;
 public interface IObservableList

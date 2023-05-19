@@ -1,8 +1,6 @@
 using Godot.Community.ControlBinding.EventArgs;
-using Godot;
 using System;
 using System.Collections.Generic;
-using Range = Godot.Range;
 
 namespace Godot.Community.ControlBinding.ControlBinders;
 
@@ -28,7 +26,7 @@ public partial class RangeControlBinder : ControlBinderBase
     }
 
     public void onValueChanged(double value)
-    {        
+    {
         OnControlValueChanged(_bindingConfiguration.BoundControl.Target as Godot.Control, "Value");
     }
 

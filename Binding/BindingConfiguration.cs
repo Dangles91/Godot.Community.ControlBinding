@@ -1,5 +1,4 @@
 using Godot.Community.ControlBinding.Formatters;
-using Godot;
 using System;
 using System.Collections.Generic;
 
@@ -12,7 +11,7 @@ public enum BindingMode
     OneWayToTarget,
 }
 
-public class BindingConfiguration 
+public class BindingConfiguration
 {
     public string BoundPropertyName { get; set; }
     public string TargetPropertyName { get; set; }

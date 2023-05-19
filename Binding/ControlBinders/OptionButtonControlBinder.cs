@@ -1,6 +1,5 @@
 using Godot.Community.ControlBinding.Collections;
 using Godot.Community.ControlBinding.EventArgs;
-using Godot;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -96,7 +95,7 @@ public partial class OptionButtonControlBinder : ControlBinderBase
 
             if (itemsSelected && optionButton.ItemCount > 0)
             {
-                var newIndex = eventArgs.Index -1 <= 0 ? 0 : eventArgs.Index -1;
+                var newIndex = eventArgs.Index - 1 <= 0 ? 0 : eventArgs.Index - 1;
                 optionButton.Select(newIndex);
                 optionButton.EmitSignal(OptionButton.SignalName.ItemSelected, newIndex);
             }

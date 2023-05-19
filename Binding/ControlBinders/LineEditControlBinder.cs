@@ -1,5 +1,4 @@
 using Godot.Community.ControlBinding.EventArgs;
-using Godot;
 using System;
 using System.Collections.Generic;
 
@@ -27,7 +26,7 @@ public partial class LineEditControlBinder : ControlBinderBase
     }
 
     public void onTextChanged(string value)
-    {        
+    {
         OnControlValueChanged(_bindingConfiguration.BoundControl.Target as Godot.Control, "Text");
     }
 

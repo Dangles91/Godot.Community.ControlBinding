@@ -1,5 +1,3 @@
-using Godot;
-
 namespace Godot.Community.ControlBinding.Collections;
 /// <summary>
 /// A ListItem can be used to format items in an ItemList control when bound to a list.
@@ -9,7 +7,7 @@ public class ListItem
 {
     public string DisplayValue { get; set; }
     public int Id { get; set; } = -1;
-    public Texture2D Icon { get; set; }   
+    public Texture2D Icon { get; set; }
 
     public string ScenePath { get; set; }
     public string Tooltip { get; set; }

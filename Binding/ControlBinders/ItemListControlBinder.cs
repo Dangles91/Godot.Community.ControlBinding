@@ -1,7 +1,5 @@
 using Godot.Community.ControlBinding.Collections;
 using Godot.Community.ControlBinding.EventArgs;
-using Godot.Community.ControlBinding.Utilities;
-using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,8 +42,8 @@ public partial class ItemListControlBinder : ControlBinderBase
         {
             bool itemsSelected = itemList.GetSelectedItems().Any();
             itemList.RemoveItem(eventArgs.Index);
-            
-            if(itemsSelected && itemList.ItemCount == 0)
+
+            if (itemsSelected && itemList.ItemCount == 0)
             {
                 itemList.DeselectAll();
             }
@@ -54,9 +52,9 @@ public partial class ItemListControlBinder : ControlBinderBase
             {
                 if (itemsSelected && itemList.ItemCount > 0)
                 {
-                    var newIndex = eventArgs.Index -1 <= 0 ? 0 : eventArgs.Index -1;
+                    var newIndex = eventArgs.Index - 1 <= 0 ? 0 : eventArgs.Index - 1;
                     itemList.Select(newIndex);
-                    itemList.EmitSignal(ItemList.SignalName.ItemSelected,newIndex);
+                    itemList.EmitSignal(ItemList.SignalName.ItemSelected, newIndex);
                 }
                 else
                 {

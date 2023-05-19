@@ -1,6 +1,5 @@
 using Godot.Community.ControlBinding.Formatters;
 using Godot.Community.ControlBinding.Services;
-using Godot;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -37,24 +36,24 @@ public class BoundPropertySetter
         string targetPropertyName,
         Func<object, object> formatter)
     {
-        if(sourceObject == null)
+        if (sourceObject == null)
             return;
-        
+
         string sourceCacheKey = $"{sourceObject.GetType().FullName}.{sourcePropertyName}";
         string targetCacheKey = $"{targetObject.GetType().FullName}.{targetPropertyName}";
-        
-        if(!_propertyInfoCache.ContainsKey(sourceCacheKey))
+
+        if (!_propertyInfoCache.ContainsKey(sourceCacheKey))
         {
             var pInfo = ReflectionService.GetPropertyInfo(sourceObject, sourcePropertyName);
-            if(pInfo == null)
+            if (pInfo == null)
                 return;
             _propertyInfoCache.Add(sourceCacheKey, pInfo);
         }
 
-        if(!_propertyInfoCache.ContainsKey(targetCacheKey))
+        if (!_propertyInfoCache.ContainsKey(targetCacheKey))
         {
             var pInfo = ReflectionService.GetPropertyInfo(targetObject, targetPropertyName);
-            if(pInfo == null)
+            if (pInfo == null)
                 return;
             _propertyInfoCache.Add(targetCacheKey, pInfo);
         }
@@ -68,35 +67,32 @@ public class BoundPropertySetter
         object convertedValue = null;
         bool formatterFailed = false;
 
-        if (targetObject != null)
+        convertedValue = sourceValue;
+        if (formatter != null)
         {
-            convertedValue = sourceValue;
-            if (formatter != null)
+            try
             {
-                try
-                {
-                    convertedValue = formatter(sourceValue);
-                }
-                catch (Exception ex)
-                {
-                    GD.PrintErr($"DataBinding: Failed to format target. {ex.Message}. {ex.StackTrace}");
-                    formatterFailed = true;
-                }
+                convertedValue = formatter(sourceValue);
             }
-
-            if ((_valueFormatter == null || _valueFormatter.FormatControl == null) ||
-                formatterFailed)
+            catch (Exception ex)
             {
-                try
-                {
-                    convertedValue = PropertyTypeConverter.ConvertValue(sourcePropertyInfo.PropertyType,
-                        targetPropertyInfo.PropertyType,
-                        sourceValue);
-                }
-                catch
-                {                    
-                    convertedValue = null;
-                }
+                GD.PrintErr($"DataBinding: Failed to format target. {ex.Message}. {ex.StackTrace}");
+                formatterFailed = true;
+            }
+        }
+
+        if ((_valueFormatter == null || _valueFormatter.FormatControl == null) ||
+            formatterFailed)
+        {
+            try
+            {
+                convertedValue = PropertyTypeConverter.ConvertValue(sourcePropertyInfo.PropertyType,
+                    targetPropertyInfo.PropertyType,
+                    sourceValue);
+            }
+            catch
+            {
+                convertedValue = null;
             }
         }
 

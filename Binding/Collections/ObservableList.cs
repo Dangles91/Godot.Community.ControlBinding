@@ -1,16 +1,15 @@
 using Godot.Community.ControlBinding.EventArgs;
-using Godot.Community.ControlBinding.Interfaces;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Godot.Community.ControlBinding.Collections;
 
-public partial class ObservableList<T> : ObservableObject, IObservableObject, IList<T>, IObservableList
+public partial class ObservableList<T> : ObservableObject, IList<T>, IObservableList
 {
-    public event ObservableListChangedEventHandler ObservableListChanged;    
+    public event ObservableListChangedEventHandler ObservableListChanged;
 
-    private IList<T> _backingList = new List<T>();
+    private readonly IList<T> _backingList = new List<T>();
 
     public int Count => _backingList.Count;
 
@@ -130,7 +129,7 @@ public partial class ObservableList<T> : ObservableObject, IObservableObject, IL
 
     public ObservableList(IList<T> list)
     {
-        this._backingList = list;        
+        this._backingList = list;
         ObservableListChanged?.Invoke(new ObservableListChangedEventArgs
         {
             ChangeType = ObservableListChangeType.Add,

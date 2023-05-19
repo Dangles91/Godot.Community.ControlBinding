@@ -1,6 +1,5 @@
 using System;
 using System.ComponentModel;
-using Godot;
 
 namespace Godot.Community.ControlBinding.Utilities;
 
@@ -8,10 +7,10 @@ public static class PropertyTypeConverter
 {
     public static object ConvertValue(Type fromType, Type targetType, object value)
     {
-        if(value == null)
+        if (value == null)
             return value;
-            
-        object convertedValue = value;        
+
+        object convertedValue = value;
         try
         {
             if (!fromType.Equals(targetType))
@@ -23,7 +22,7 @@ public static class PropertyTypeConverter
                     convertedValue = System.Convert.ChangeType(value, targetType);
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             GD.PrintErr($"ControlBinding: Unable to convert value. {ex.Message}");
             convertedValue = value?.ToString();
