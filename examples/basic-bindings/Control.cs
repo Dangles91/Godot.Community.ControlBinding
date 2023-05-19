@@ -86,7 +86,7 @@ public partial class Control : ObservableNode
     public void _on_item_list_item_selected(int index)
     {
         if (index == -1)
-            selectedPlayerData = null;
+            SelectedPlayerData = null;
         else
             SelectedPlayerData = playerDatas[index];
     }
