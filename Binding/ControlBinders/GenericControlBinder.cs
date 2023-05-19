@@ -72,7 +72,9 @@ public partial class GenericControlBinder : ControlBinderBase
                 if(sceneItem != null)
                 {
                     _boundControl.RemoveChild(sceneItem);
+                    sceneItem.QueueFree();
                 }
+                _controlChildCache.Remove(removedItem);
             }
         }
 
