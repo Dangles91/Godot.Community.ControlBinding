@@ -12,12 +12,18 @@ namespace Godot.Community.ControlBinding;
 public partial class ObservableNode : Node, IObservableNode, IObservableObject
 {
     public event PropertyChangedEventHandler PropertyChanged;
-    private ControlBinderProvider _controlBinderProvider = new ControlBinderProvider();
+    private readonly ControlBinderProvider _controlBinderProvider = new();
 
-    private readonly List<Binding> _controlBindings = new List<Binding>();
+    private readonly List<Binding> _controlBindings = new();
     private readonly object cleanUpLock = 0;
-
     
+    /// <inheritdoc />
+    public void SetValue<T>(ref T field, T value, [CallerMemberName] string name = "not a property")
+    {
+        field = value;
+        OnPropertyChanged(name);
+    }
+
     /// <inheritdoc />
     public void OnPropertyChanged([CallerMemberName] string name = "not a property")
     {
@@ -146,7 +152,7 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
             return;
         }
 
-        ObservableList<T> targetObject = new ObservableList<T>();
+        ObservableList<T> targetObject = new();
         foreach (var entry in Enum.GetValues(typeof(T)))
         {
             targetObject.Add((T)entry);

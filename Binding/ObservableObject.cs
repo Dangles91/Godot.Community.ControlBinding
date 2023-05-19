@@ -18,4 +18,11 @@ public partial class ObservableObject : IObservableObject
 
         PropertyChanged?.Invoke(this, name);
     }
+
+    /// <inheritdoc />
+    public void SetValue<T>(ref T field, T value, [CallerMemberName] string name = "not a property")
+    {
+        field = value;
+        OnPropertyChanged(name);
+    }
 }
