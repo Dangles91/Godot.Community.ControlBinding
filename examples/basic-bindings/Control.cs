@@ -1,11 +1,12 @@
-using ControlBinding.Collections;
-using ControlBinding.Formatters;
+using Godot.Community.ControlBinding.Collections;
+using Godot.Community.ControlBinding.Formatters;
 using Godot;
+using Godot.Community.ControlBinding;
 using System.Collections.Generic;
 
 namespace ControlBinding;
 
-public partial class Control : ObservableObject
+public partial class Control : ObservableNode
 {
     private bool labelIsVisible = true;
     public bool IsAddNewPlayerEnabled
@@ -77,7 +78,7 @@ public partial class Control : ObservableObject
         BindListProperty("%ItemList3", $"{nameof(SelectedPlayerData)}.{nameof(PlayerData.ListOfThings)}", BindingMode.TwoWay);
 
         BindEnumProperty<BindingMode>("%OptionButton", $"{nameof(SelectedPlayerData)}.{nameof(SelectedPlayerData.BindingMode)}");
-        
+        BindSceneList("%VBoxContainer", nameof(playerDatas), "uid://die1856ftg8w8");
 
         base._Ready();
     }
@@ -85,7 +86,7 @@ public partial class Control : ObservableObject
     public void _on_item_list_item_selected(int index)
     {
         if (index == -1)
-            selectedPlayerData = null;
+            SelectedPlayerData = null;
         else
             SelectedPlayerData = playerDatas[index];
     }

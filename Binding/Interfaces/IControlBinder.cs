@@ -1,6 +1,6 @@
-using ControlBinding.EventArgs;
+using Godot.Community.ControlBinding.EventArgs;
 
-namespace ControlBinding.ControlBinders;
+namespace Godot.Community.ControlBinding.ControlBinders;
 public interface IControlBinder
 {
     bool CanBindFor(System.Object control);
@@ -10,5 +10,5 @@ public interface IControlBinder
     void OnObservableListChanged(ObservableListChangedEventArgs eventArgs);
     void ClearEventBindings();
     bool IsBound { get; set; }
-    public int Priority { get; }
+    int Priority { get; }
 }

@@ -1,12 +1,11 @@
-using ControlBinding.EventArgs;
-using Godot;
+using Godot.Community.ControlBinding.EventArgs;
 using System;
 using System.Collections.Generic;
 
-namespace ControlBinding.ControlBinders;
+namespace Godot.Community.ControlBinding.ControlBinders;
 public partial class LineEditControlBinder : ControlBinderBase
 {
-    private readonly List<string> _allowedTwoBindingProperties = new List<string>(){
+    private readonly List<string> _allowedTwoBindingProperties = new(){
             nameof(LineEdit.Text)
         };
 
@@ -28,7 +27,7 @@ public partial class LineEditControlBinder : ControlBinderBase
 
     public void onTextChanged(string value)
     {
-        EmitSignal(nameof(ControlValueChanged), _bindingConfiguration.BoundControl.Target as GodotObject, "Text");
+        OnControlValueChanged(_bindingConfiguration.BoundControl.Target as Godot.Control, "Text");
     }
 
     public override void OnObservableListChanged(ObservableListChangedEventArgs eventArgs)

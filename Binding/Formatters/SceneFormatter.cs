@@ -1,15 +1,7 @@
-using System;
-using Godot;
-
-namespace ControlBinding.Formatters
+namespace Godot.Community.ControlBinding.Formatters
 {
     public class SceneFormatter : ISceneFormatter
     {
-        public string ScenePath { get; }
-
-        public PackedScene Format()
-        {
-            throw new NotImplementedException();
-        }
+        public string ScenePath { get; init; }
     }
 }

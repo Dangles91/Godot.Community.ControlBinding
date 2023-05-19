@@ -1,4 +1,5 @@
-using ControlBinding.Collections;
+using Godot.Community.ControlBinding.Collections;
+using Godot.Community.ControlBinding;
 
 namespace ControlBinding;
 public partial class PlayerData : ObservableObject
@@ -23,7 +24,4 @@ public partial class PlayerData : ObservableObject
         get { return _listOfThings; }
         set { _listOfThings = value; OnPropertyChanged(nameof(ListOfThings));}
     }
-    
-    
-
 }

@@ -1,8 +1,7 @@
-using Godot;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ControlBinding.ControlBinders
+namespace Godot.Community.ControlBinding.ControlBinders
 {
     public partial class ControlBinderProvider
     {

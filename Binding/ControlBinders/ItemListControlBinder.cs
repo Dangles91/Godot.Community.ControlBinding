@@ -1,12 +1,10 @@
-using ControlBinding.Collections;
-using ControlBinding.EventArgs;
-using ControlBinding.Utilities;
-using Godot;
+using Godot.Community.ControlBinding.Collections;
+using Godot.Community.ControlBinding.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ControlBinding.ControlBinders;
+namespace Godot.Community.ControlBinding.ControlBinders;
 public partial class ItemListControlBinder : ControlBinderBase
 {
     public override void OnObservableListChanged(ObservableListChangedEventArgs eventArgs)
@@ -34,17 +32,8 @@ public partial class ItemListControlBinder : ControlBinderBase
 
                 if (item is ListItem listItem)
                 {
-                    if (listItem.ScenePath != null && listItem.SceneViewModel != null)
-                    {
-                        var scene = SceneInstancer.CreateSceneInstance(listItem.ScenePath, listItem.SceneViewModel);
-                        (scene as ViewModel).SetViewModelData(listItem.ViewModelData);
-                        itemList.AddChild(scene);
-                    }
-                    else
-                    {
-                        itemList.AddItem(listItem.DisplayValue);
-                        SetItemValues(itemList, itemList.ItemCount - 1, listItem);
-                    }
+                    itemList.AddItem(listItem.DisplayValue);
+                    SetItemValues(itemList, itemList.ItemCount - 1, listItem);
                 }
             }
         }
@@ -53,19 +42,23 @@ public partial class ItemListControlBinder : ControlBinderBase
         {
             bool itemsSelected = itemList.GetSelectedItems().Any();
             itemList.RemoveItem(eventArgs.Index);
-            itemList.Deselect(eventArgs.Index);
+
+            if (itemsSelected && itemList.ItemCount == 0)
+            {
+                itemList.DeselectAll();
+            }
 
             if (itemList.SelectMode == ItemList.SelectModeEnum.Single)
             {
                 if (itemsSelected && itemList.ItemCount > 0)
                 {
-                    var newIndex = eventArgs.Index -1 <= 0 ? 0 : eventArgs.Index -1;
+                    var newIndex = eventArgs.Index - 1 <= 0 ? 0 : eventArgs.Index - 1;
                     itemList.Select(newIndex);
-                    itemList.EmitSignal(ItemList.SignalName.ItemSelected,newIndex);
+                    itemList.EmitSignal(ItemList.SignalName.ItemSelected, newIndex);
                 }
                 else
                 {
-                    itemList.Select(-1);
+                    itemList.DeselectAll();
                     itemList.EmitSignal(ItemList.SignalName.ItemSelected, -1);
                 }
             }
@@ -79,7 +72,7 @@ public partial class ItemListControlBinder : ControlBinderBase
 
     public override void OnListItemChanged(object entry)
     {
-        var observableList = _bindingConfiguration.TargetObject as IObservableList;
+        var observableList = _bindingConfiguration.TargetObject.Target as IObservableList;
         ItemList itemList = _bindingConfiguration.BoundControl.Target as ItemList;
 
         var listItems = observableList.GetBackingList();

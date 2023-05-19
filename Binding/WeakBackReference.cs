@@ -1,6 +1,6 @@
 using System;
 
-namespace ControlBinding;
+namespace Godot.Community.ControlBinding;
 
 public class WeakBackReference
 {

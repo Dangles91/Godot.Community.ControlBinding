@@ -1,14 +1,15 @@
-using ControlBinding.EventArgs;
-using ControlBinding.Interfaces;
+using Godot.Community.ControlBinding.EventArgs;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ControlBinding.Collections;
+namespace Godot.Community.ControlBinding.Collections;
 
-public partial class ObservableList<T> : ObservableListBase, IObservableObject, IList<T>, IObservableList
+public partial class ObservableList<T> : ObservableObject, IList<T>, IObservableList
 {
-    private IList<T> _backingList = new List<T>();
+    public event ObservableListChangedEventHandler ObservableListChanged;
+
+    private readonly IList<T> _backingList = new List<T>();
 
     public int Count => _backingList.Count;
 
@@ -43,7 +44,7 @@ public partial class ObservableList<T> : ObservableListBase, IObservableObject, 
 
     public void Clear()
     {
-        List<T> copy = new List<T>();
+        List<T> copy = new();
         copy.AddRange(_backingList);
 
         _backingList.Clear();
@@ -74,12 +75,6 @@ public partial class ObservableList<T> : ObservableListBase, IObservableObject, 
             ChangeType = ObservableListChangeType.Insert,
             Index = index
         });
-    }
-
-    public void OnPropertyChanged(string name)
-    {
-
-        EmitSignal(nameof(PropertyChanged), this);
     }
 
     public bool Remove(T item)
@@ -119,7 +114,12 @@ public partial class ObservableList<T> : ObservableListBase, IObservableObject, 
 
     public void OnObservableListChanged(ObservableListChangedEventArgs eventArgs)
     {
-        EmitSignal(nameof(ObservableListChanged), eventArgs);
+        ObservableListChanged?.Invoke(eventArgs);
+    }
+
+    public void SetViewModelData(object viewModelData)
+    {
+        throw new System.NotImplementedException();
     }
 
     public ObservableList()
@@ -130,7 +130,7 @@ public partial class ObservableList<T> : ObservableListBase, IObservableObject, 
     public ObservableList(IList<T> list)
     {
         this._backingList = list;
-        EmitSignal(nameof(ObservableListChanged), new ObservableListChangedEventArgs
+        ObservableListChanged?.Invoke(new ObservableListChangedEventArgs
         {
             ChangeType = ObservableListChangeType.Add,
             ChangedEntries = _backingList.Cast<object>().ToList()

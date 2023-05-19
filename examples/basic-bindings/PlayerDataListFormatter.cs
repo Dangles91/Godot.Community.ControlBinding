@@ -1,5 +1,5 @@
-using ControlBinding.Collections;
-using ControlBinding.Formatters;
+using Godot.Community.ControlBinding.Collections;
+using Godot.Community.ControlBinding.Formatters;
 using Godot;
 using System;
 

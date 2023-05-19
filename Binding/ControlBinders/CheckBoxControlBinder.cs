@@ -1,12 +1,11 @@
-using ControlBinding.EventArgs;
-using Godot;
+using Godot.Community.ControlBinding.EventArgs;
 using System;
 using System.Collections.Generic;
 
-namespace ControlBinding.ControlBinders;
+namespace Godot.Community.ControlBinding.ControlBinders;
 public partial class CheckBoxControlBinder : ControlBinderBase
 {
-    private readonly List<string> _allowedTwoWayBindingProperties = new List<string>(){
+    private readonly List<string> _allowedTwoWayBindingProperties = new(){
             nameof(CheckBox.ButtonPressed)
         };
 
@@ -25,7 +24,7 @@ public partial class CheckBoxControlBinder : ControlBinderBase
 
     public void onToggledChanged(bool value)
     {
-        EmitSignal(nameof(ControlValueChanged), _bindingConfiguration.BoundControl.Target as GodotObject, "ButtonPressed");
+        OnControlValueChanged(_bindingConfiguration.BoundControl.Target as Godot.Control, "ButtonPressed");
     }
 
     public override bool CanBindFor(object control)

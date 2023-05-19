@@ -1,12 +1,16 @@
-using ControlBinding.EventArgs;
-using Godot;
+using Godot.Community.ControlBinding.EventArgs;
 
-namespace ControlBinding.ControlBinders
+namespace Godot.Community.ControlBinding.ControlBinders
 {
-    public abstract partial class ControlBinderBase : GodotObject, IControlBinder
+    public abstract partial class ControlBinderBase : IControlBinder
     {
-        [Signal]
         public delegate void ControlValueChangedEventHandler(Godot.Control control, string propertyName);
+        public event ControlValueChangedEventHandler ControlValueChanged;
+
+        public void OnControlValueChanged(Godot.Control control, string propertyName)
+        {
+            ControlValueChanged?.Invoke(control, propertyName);
+        }
 
         internal BindingConfiguration _bindingConfiguration;
 
@@ -20,14 +24,16 @@ namespace ControlBinding.ControlBinders
         }
 
         #region Abstract methods
+
         public abstract IControlBinder CreateInstance();
         public abstract bool CanBindFor(object control);
 
         public abstract void OnListItemChanged(object entry);
 
-        public abstract void OnObservableListChanged(ObservableListChangedEventArgs eventArgs);
         public abstract void ClearEventBindings();
+        public abstract void OnObservableListChanged(ObservableListChangedEventArgs eventArgs);
 
         #endregion
+
     }
 }

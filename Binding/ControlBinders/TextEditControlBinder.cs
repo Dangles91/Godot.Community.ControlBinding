@@ -1,13 +1,12 @@
-using ControlBinding.EventArgs;
-using Godot;
+using Godot.Community.ControlBinding.EventArgs;
 using System;
 using System.Collections.Generic;
 
-namespace ControlBinding.ControlBinders;
+namespace Godot.Community.ControlBinding.ControlBinders;
 
 public partial class TextEditControlBinder : ControlBinderBase
 {
-    private readonly List<string> _allowedTwoBindingProperties = new List<string>(){
+    private readonly List<string> _allowedTwoBindingProperties = new(){
             nameof(TextEdit.Text)
         };
 
@@ -28,7 +27,7 @@ public partial class TextEditControlBinder : ControlBinderBase
 
     public void onTextChanged()
     {
-        EmitSignal(nameof(ControlValueChanged), _bindingConfiguration.BoundControl.Target as GodotObject, "Text");
+        OnControlValueChanged(_bindingConfiguration.BoundControl.Target as Godot.Control, "Text");
     }
 
     public override void ClearEventBindings()

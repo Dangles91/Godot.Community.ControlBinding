@@ -1,14 +1,12 @@
-using ControlBinding.EventArgs;
-using Godot;
+using Godot.Community.ControlBinding.EventArgs;
 using System;
 using System.Collections.Generic;
-using Range = Godot.Range;
 
-namespace ControlBinding.ControlBinders;
+namespace Godot.Community.ControlBinding.ControlBinders;
 
 public partial class RangeControlBinder : ControlBinderBase
 {
-    private readonly List<string> _allowedTwoBindingProperties = new List<string>()
+    private readonly List<string> _allowedTwoBindingProperties = new()
         {
             nameof(Range.Value)
         };
@@ -29,7 +27,7 @@ public partial class RangeControlBinder : ControlBinderBase
 
     public void onValueChanged(double value)
     {
-        EmitSignal(nameof(ControlValueChanged), _bindingConfiguration.BoundControl.Target as GodotObject, "Value");
+        OnControlValueChanged(_bindingConfiguration.BoundControl.Target as Godot.Control, "Value");
     }
 
     public override void ClearEventBindings()

@@ -1,10 +1,9 @@
-using ControlBinding.Collections;
-using ControlBinding.EventArgs;
-using Godot;
+using Godot.Community.ControlBinding.Collections;
+using Godot.Community.ControlBinding.EventArgs;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ControlBinding.ControlBinders;
+namespace Godot.Community.ControlBinding.ControlBinders;
 public partial class OptionButtonControlBinder : ControlBinderBase
 {
     private readonly List<string> _allowedTwoBindingProperties = new List<string>(){
@@ -32,7 +31,7 @@ public partial class OptionButtonControlBinder : ControlBinderBase
 
     public void OnItemSelected(long selectedValue)
     {
-        EmitSignal(nameof(ControlValueChanged), _bindingConfiguration.BoundControl.Target as GodotObject, "Selected");
+        OnControlValueChanged(_bindingConfiguration.BoundControl.Target as Godot.Control, "Selected");
     }
 
     public override void ClearEventBindings()
@@ -96,7 +95,7 @@ public partial class OptionButtonControlBinder : ControlBinderBase
 
             if (itemsSelected && optionButton.ItemCount > 0)
             {
-                var newIndex = eventArgs.Index -1 <= 0 ? 0 : eventArgs.Index -1;
+                var newIndex = eventArgs.Index - 1 <= 0 ? 0 : eventArgs.Index - 1;
                 optionButton.Select(newIndex);
                 optionButton.EmitSignal(OptionButton.SignalName.ItemSelected, newIndex);
             }
@@ -115,7 +114,7 @@ public partial class OptionButtonControlBinder : ControlBinderBase
 
     public override void OnListItemChanged(object entry)
     {
-        var observableList = _bindingConfiguration.TargetObject as IObservableList;
+        var observableList = _bindingConfiguration.TargetObject.Target as IObservableList;
         OptionButton itemList = _bindingConfiguration.BoundControl.Target as OptionButton;
 
         var listItems = observableList.GetBackingList();

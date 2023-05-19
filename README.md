@@ -51,10 +51,14 @@ Binding to target properties is implemented using a path syntax. eg. `MyClass.My
 ### Automatic rebinding
 If any objects along the path are updated, the binding will be refreshed. Objects along the path must inherit from `ObservableObject` and implement `PropertyChanged`.
 
-## Usage
-The main components of control binding are the `ObservableObject` class and `OnPropertyChanged` method.
+### Scene list binding
+Bind a list to a control and provide a scene to instiate as a child. Modifications (add/remove) are reflected in the control's child list.
+![scenelist](https://github.com/Dangles91/Godot.Community.ControlBinding/assets/9249458/58e270db-6af6-492b-8403-477dc8d63c9d)
 
-The script which backs your scene must inherit from `ObservableObejct`
+## Usage
+The main components of control binding are the `ObservableObject` and `ObservableNode` classes which implement a `PropertyChanged` event and `OnPropertyChanged` method.
+
+The script which backs your scene must inherit from `ObservableNode`. Other observable objects that are not added to the scene tree should inherit from `ObservableObject`. This prevents orphaned nodes.
 
 See the example project for some bindings in action!
 ![image](https://github.com/Dangles91/Godot.Community.ControlBinding/assets/9249458/e0071bff-133a-4b49-be7d-7dfefd84616e)
@@ -67,8 +71,20 @@ private int spinBoxValue;
 public int SpinBoxValue
 {
     get { return spinBoxValue; }
-    set { spinBoxValue = value; OnPropertyChanged(nameof(SpinBoxValue)); }
+    set { spinBoxValue = value; OnPropertyChanged(); }
 }
+```
+
+Alternatively, use the `SetValue` method to update the backing field and trigger `OnPropertyChanged`
+```c#
+private int spinBoxValue;
+public int SpinBoxValue
+{
+    get { return spinBoxValue; }
+    set { SetValue(ref spinBoxValue, value); }
+}
+
+
 ```
 
 Add a binding in `_Ready()`. This binding targets a control in the scene with the unique name **%SpinBox** with the `BindingMode` __TwoWay__. A BindingMode of TwoWay states that we want the spinbox value to be set into the target property and vice-versa.
@@ -93,7 +109,7 @@ private PlayerData selectedPlayerData = new();
 public PlayerData SelectedPlayerData
 {
     get { return selectedPlayerData; }
-    set { selectedPlayerData = value; OnPropertyChanged(nameof(SelectedPlayerData)); }
+    set { SetValue(ref selectedPlayerData, value); }
 }
 
 ```
@@ -150,5 +166,33 @@ public class PlayerDataListFormatter : IValueFormatter
     };
 
     public Func<object, object> FormatTarget => throw new NotImplementedException();
+}
+```
+
+### Scene List Binding
+Bind an `ObservableList` to a controls child list to add/remove children. The target scene must have a script attached and inherit from `ObservableNode`. It must also provide an implementation for `SetViewModeldata()`
+
+**Bind the control to a list and provide a path to the scene to instiate**
+```c#
+BindSceneList("%VBoxContainer", nameof(PlayerDatas), "uid://die1856ftg8w8");
+```
+
+**Scene implementation**
+```c#
+public partial class PlayerDataListItem : ObservableNode
+{
+    private PlayerData ViewModelData { get; set; }
+
+    public override void SetViewModelData(object viewModelData)
+    {
+        ViewModelData = viewModelData as PlayerData;
+        base.SetViewModelData(viewModelData);
+    }
+
+    public override void _Ready()
+    {
+        BindProperty("%TextEdit", "Text", "ViewModelData.Health", BindingMode.TwoWay);
+        base._Ready();
+    }
 }
 ```

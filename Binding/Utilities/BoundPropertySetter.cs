@@ -1,16 +1,14 @@
-using ControlBinding.Formatters;
-using ControlBinding.Services;
-using Godot;
+using Godot.Community.ControlBinding.Formatters;
+using Godot.Community.ControlBinding.Services;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace ControlBinding.Utilities;
+namespace Godot.Community.ControlBinding.Utilities;
 
 public class BoundPropertySetter
 {
     private readonly IValueFormatter _valueFormatter;
-    private static Dictionary<string, PropertyInfo> _propertyInfoCache = new();
     public BoundPropertySetter(IValueFormatter valueFormatter)
     {
         _valueFormatter = valueFormatter;
@@ -37,66 +35,53 @@ public class BoundPropertySetter
         string targetPropertyName,
         Func<object, object> formatter)
     {
-        if(sourceObject == null)
+        if (sourceObject is null && targetObject is not null)
+        {            
+            var propertyInfo = ReflectionService.GetPropertyInfo(targetObject, targetPropertyName);
+            propertyInfo.SetValue(targetObject, null);
             return;
-        
-        string sourceCacheKey = $"{sourceObject.GetType().AssemblyQualifiedName}.{sourcePropertyName}";
-        string targetCacheKey = $"{targetObject.GetType().AssemblyQualifiedName}.{targetPropertyName}";
-        
-        if(!_propertyInfoCache.ContainsKey(sourceCacheKey))
-        {
-            var pInfo = ReflectionService.GetPropertyInfo(sourceObject, sourcePropertyName);
-            if(pInfo == null)
-                return;
-            _propertyInfoCache.Add(sourceCacheKey, pInfo);
         }
 
-        if(!_propertyInfoCache.ContainsKey(targetCacheKey))
+        if(targetObject is null)
         {
-            var pInfo = ReflectionService.GetPropertyInfo(targetObject, targetPropertyName);
-            if(pInfo == null)
-                return;
-            _propertyInfoCache.Add(targetCacheKey, pInfo);
+            // can't set a value on a null target
+            return;
         }
-
-        PropertyInfo sourcePropertyInfo = _propertyInfoCache[sourceCacheKey];
-        PropertyInfo targetPropertyInfo = _propertyInfoCache[targetCacheKey];
+        
+        PropertyInfo sourcePropertyInfo = ReflectionService.GetPropertyInfo(sourceObject, sourcePropertyName);
+        PropertyInfo targetPropertyInfo = ReflectionService.GetPropertyInfo(targetObject, targetPropertyName);
 
         var sourceValue = sourcePropertyInfo.GetValue(sourceObject);
         var targetValue = targetPropertyInfo.GetValue(targetObject);
 
-        object convertedValue = null;
+        object convertedValue = sourceValue;
         bool formatterFailed = false;
 
-        if (targetObject != null)
+        if (formatter != null)
         {
-            convertedValue = sourceValue;
-            if (formatter != null)
+            try
             {
-                try
-                {
-                    convertedValue = formatter(sourceValue);
-                }
-                catch (Exception ex)
-                {
-                    GD.PrintErr($"DataBinding: Failed to format target. {ex.Message}. {ex.StackTrace}");
-                    formatterFailed = true;
-                }
+                convertedValue = formatter(sourceValue);
             }
-
-            if ((_valueFormatter == null || _valueFormatter.FormatControl == null) ||
-                formatterFailed)
+            catch (Exception ex)
             {
-                try
-                {
-                    convertedValue = PropertyTypeConverter.ConvertValue(sourcePropertyInfo.PropertyType,
-                        targetPropertyInfo.PropertyType,
-                        sourceValue);
-                }
-                catch
-                {                    
-                    convertedValue = null;
-                }
+                GD.PrintErr($"DataBinding: Failed to format target. {ex.Message}. {ex.StackTrace}");
+                formatterFailed = true;
+            }
+        }
+
+        if ((_valueFormatter == null || _valueFormatter.FormatControl == null) ||
+            formatterFailed)
+        {
+            try
+            {
+                convertedValue = PropertyTypeConverter.ConvertValue(sourcePropertyInfo.PropertyType,
+                    targetPropertyInfo.PropertyType,
+                    sourceValue);
+            }
+            catch
+            {
+                convertedValue = null;
             }
         }
 
