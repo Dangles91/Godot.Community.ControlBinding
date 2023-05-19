@@ -13,8 +13,10 @@ public static class BackReferenceFactory
         bindingConfiguration.BackReferences?.Clear();
         bindingConfiguration.BackReferences = new();
 
-        List<object> pathObjects = new();
-        pathObjects.Add(bindingConfiguration.Owner);
+        List<object> pathObjects = new()
+        {
+            bindingConfiguration.Owner
+        };
 
         if (pathNodes.Count > 1)
         {
@@ -72,7 +74,7 @@ public static class BackReferenceFactory
 
                 bindingConfiguration.BackReferences.Add(new WeakBackReference
                 {
-                    ObjectReference = new WeakReference(pathObjects[pathObjects.Count - 2], false),
+                    ObjectReference = new WeakReference(pathObjects[^2], false),
                     PropertyName = pathNodes.Last()
                 });
             }

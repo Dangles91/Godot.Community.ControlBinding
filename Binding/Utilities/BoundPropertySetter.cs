@@ -54,10 +54,9 @@ public class BoundPropertySetter
         var sourceValue = sourcePropertyInfo.GetValue(sourceObject);
         var targetValue = targetPropertyInfo.GetValue(targetObject);
 
-        object convertedValue = null;
+        object convertedValue = sourceValue;
         bool formatterFailed = false;
 
-        convertedValue = sourceValue;
         if (formatter != null)
         {
             try

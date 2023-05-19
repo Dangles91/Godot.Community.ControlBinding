@@ -39,9 +39,7 @@ public partial class GenericControlBinder : ControlBinderBase
             return;
         }
 
-        if (_boundControl == null)
-            _boundControl = _bindingConfiguration.BoundControl.Target as Godot.Control;
-
+        _boundControl ??= _bindingConfiguration.BoundControl.Target as Godot.Control;
 
         if (eventArgs.ChangeType == ObservableListChangeType.Add)
         {

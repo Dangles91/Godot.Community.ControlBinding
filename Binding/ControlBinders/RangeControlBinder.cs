@@ -6,7 +6,7 @@ namespace Godot.Community.ControlBinding.ControlBinders;
 
 public partial class RangeControlBinder : ControlBinderBase
 {
-    private readonly List<string> _allowedTwoBindingProperties = new List<string>()
+    private readonly List<string> _allowedTwoBindingProperties = new()
         {
             nameof(Range.Value)
         };

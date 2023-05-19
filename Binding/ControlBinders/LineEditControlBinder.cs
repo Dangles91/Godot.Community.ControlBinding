@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace Godot.Community.ControlBinding.ControlBinders;
 public partial class LineEditControlBinder : ControlBinderBase
 {
-    private readonly List<string> _allowedTwoBindingProperties = new List<string>(){
+    private readonly List<string> _allowedTwoBindingProperties = new(){
             nameof(LineEdit.Text)
         };
 

@@ -44,7 +44,7 @@ public partial class ObservableList<T> : ObservableObject, IList<T>, IObservable
 
     public void Clear()
     {
-        List<T> copy = new List<T>();
+        List<T> copy = new();
         copy.AddRange(_backingList);
 
         _backingList.Clear();
