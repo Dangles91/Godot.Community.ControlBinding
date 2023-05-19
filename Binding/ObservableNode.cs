@@ -5,6 +5,7 @@ using Godot.Community.ControlBinding.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace Godot.Community.ControlBinding;
 
@@ -16,7 +17,9 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
     private readonly List<Binding> _controlBindings = new List<Binding>();
     private readonly object cleanUpLock = 0;
 
-    public void OnPropertyChanged(string name)
+    
+    /// <inheritdoc />
+    public void OnPropertyChanged([CallerMemberName] string name = "not a property")
     {
         var invalidBindings = _controlBindings.Where(x => x.BindingStatus == BindingStatus.Invalid);
         if (invalidBindings.Any())
