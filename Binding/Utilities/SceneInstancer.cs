@@ -10,7 +10,7 @@ public static class SceneInstancer
         var scene = (Godot.PackedScene)ResourceLoader.Load(scenePath);        
         var node = scene.Instantiate<ObservableNode>();        
 
-        node.SetViewModelData(viewModelData);
+        node.SetViewModelData(viewModelData);        
         return node;
     }
 }

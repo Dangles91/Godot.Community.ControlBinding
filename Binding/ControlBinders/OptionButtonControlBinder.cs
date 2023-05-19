@@ -32,7 +32,7 @@ public partial class OptionButtonControlBinder : ControlBinderBase
 
     public void OnItemSelected(long selectedValue)
     {
-        EmitSignal(nameof(ControlValueChanged), _bindingConfiguration.BoundControl.Target as GodotObject, "Selected");
+        OnControlValueChanged(_bindingConfiguration.BoundControl.Target as Godot.Control, "Selected");
     }
 
     public override void ClearEventBindings()

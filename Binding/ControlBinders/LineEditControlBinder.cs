@@ -27,8 +27,8 @@ public partial class LineEditControlBinder : ControlBinderBase
     }
 
     public void onTextChanged(string value)
-    {
-        EmitSignal(nameof(ControlValueChanged), _bindingConfiguration.BoundControl.Target as GodotObject, "Text");
+    {        
+        OnControlValueChanged(_bindingConfiguration.BoundControl.Target as Godot.Control, "Text");
     }
 
     public override void OnObservableListChanged(ObservableListChangedEventArgs eventArgs)

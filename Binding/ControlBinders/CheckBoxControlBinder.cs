@@ -25,7 +25,7 @@ public partial class CheckBoxControlBinder : ControlBinderBase
 
     public void onToggledChanged(bool value)
     {
-        EmitSignal(nameof(ControlValueChanged), _bindingConfiguration.BoundControl.Target as GodotObject, "ButtonPressed");
+        OnControlValueChanged(_bindingConfiguration.BoundControl.Target as Godot.Control, "ButtonPressed");
     }
 
     public override bool CanBindFor(object control)

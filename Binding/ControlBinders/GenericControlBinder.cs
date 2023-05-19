@@ -71,7 +71,7 @@ public partial class GenericControlBinder : ControlBinderBase
                 var sceneItem = _boundControl.GetChildren().FirstOrDefault(x => x.GetInstanceId() == instanceId);
                 if(sceneItem != null)
                 {
-                    _boundControl.RemoveChild(sceneItem);
+                    _boundControl.RemoveChild(sceneItem);                    
                     sceneItem.QueueFree();
                 }
                 _controlChildCache.Remove(removedItem);
@@ -83,7 +83,9 @@ public partial class GenericControlBinder : ControlBinderBase
             foreach(var child in _boundControl?.GetChildren())
             {
                 _boundControl.RemoveChild(child);
+                child.QueueFree();
             }
+            _controlChildCache.Clear();
         }
     }
 }

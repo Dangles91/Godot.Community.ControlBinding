@@ -5,10 +5,15 @@ using Godot;
 
 namespace Godot.Community.ControlBinding.ControlBinders
 {
-    public abstract partial class ControlBinderBase : GodotObject, IControlBinder
-    {
-        [Signal]
+    public abstract partial class ControlBinderBase : IControlBinder
+    {        
         public delegate void ControlValueChangedEventHandler(Godot.Control control, string propertyName);
+        public event ControlValueChangedEventHandler ControlValueChanged;
+
+        public void OnControlValueChanged(Godot.Control control, string propertyName)
+        {
+            ControlValueChanged?.Invoke(control, propertyName);
+        }
 
         internal BindingConfiguration _bindingConfiguration;
 
@@ -31,5 +36,7 @@ namespace Godot.Community.ControlBinding.ControlBinders
         public abstract void OnObservableListChanged(ObservableListChangedEventArgs eventArgs);
 
         #endregion
+
+
     }
 }

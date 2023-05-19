@@ -27,8 +27,8 @@ public partial class TextEditControlBinder : ControlBinderBase
     }
 
     public void onTextChanged()
-    {
-        EmitSignal(nameof(ControlValueChanged), _bindingConfiguration.BoundControl.Target as GodotObject, "Text");
+    {        
+        OnControlValueChanged(_bindingConfiguration.BoundControl.Target as Godot.Control, "Text");
     }
 
     public override void ClearEventBindings()

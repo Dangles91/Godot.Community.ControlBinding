@@ -28,8 +28,8 @@ public partial class RangeControlBinder : ControlBinderBase
     }
 
     public void onValueChanged(double value)
-    {
-        EmitSignal(nameof(ControlValueChanged), _bindingConfiguration.BoundControl.Target as GodotObject, "Value");
+    {        
+        OnControlValueChanged(_bindingConfiguration.BoundControl.Target as Godot.Control, "Value");
     }
 
     public override void ClearEventBindings()

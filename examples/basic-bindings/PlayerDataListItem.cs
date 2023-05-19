@@ -18,6 +18,7 @@ public partial class PlayerDataListItem : ObservableNode
 	public override void _Ready()
 	{
 		BindProperty("%TextEdit", "Text", "ViewModelData.Health", BindingMode.TwoWay);
+		base._Ready();
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
