@@ -52,7 +52,8 @@ Binding to target properties is implemented using a path syntax. eg. `MyClass.My
 If any objects along the path are updated, the binding will be refreshed. Objects along the path must inherit from `ObservableObject` and implement `PropertyChanged`.
 
 ### Scene list binding
-Bindg a list to a control and provide a scene to instiate as a child of the target control. Modification (add/remove) are reflected in the contorls child list.
+Bind a list to a control and provide a scene to instiate as a child. Modifications (add/remove) are reflected in the control's child list.
+![scenelist](https://github.com/Dangles91/Godot.Community.ControlBinding/assets/9249458/58e270db-6af6-492b-8403-477dc8d63c9d)
 
 ## Usage
 The main components of control binding are the `ObservableObject` and `ObservableNode` classes which implement a `PropertyChanged` event and `OnPropertyChanged` method.
@@ -180,19 +181,18 @@ BindSceneList("%VBoxContainer", nameof(PlayerDatas), "uid://die1856ftg8w8");
 ```c#
 public partial class PlayerDataListItem : ObservableNode
 {
-
-	private PlayerData ViewModelData { get; set; }
+    private PlayerData ViewModelData { get; set; }
 
     public override void SetViewModelData(object viewModelData)
     {
-		ViewModelData = viewModelData as PlayerData;
+        ViewModelData = viewModelData as PlayerData;
         base.SetViewModelData(viewModelData);
-    }	
+    }
 
-	public override void _Ready()
-	{
-		BindProperty("%TextEdit", "Text", "ViewModelData.Health", BindingMode.TwoWay);
-		base._Ready();
-	}
+    public override void _Ready()
+    {
+        BindProperty("%TextEdit", "Text", "ViewModelData.Health", BindingMode.TwoWay);
+        base._Ready();
+    }
 }
 ```
