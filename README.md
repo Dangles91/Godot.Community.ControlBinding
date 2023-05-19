@@ -10,10 +10,9 @@ A Nuget package is currently available here: https://www.nuget.org/packages/Godo
 Though functional, this project is in the early stages of development. More advanced features could still yet be developed, including:
 - Control validation
 - Control style formatting
-- Formatting target objects as scenes
-- Adding formatted scenes as children of a control
 - Creating an editor plugin to specify bindings in the editor
 - Code generation to implement OnPropertyChanged via an attribute decorator
+- TwoWay list binding
 
 ## Features
 ### Property binding
@@ -52,7 +51,7 @@ Binding to target properties is implemented using a path syntax. eg. `MyClass.My
 If any objects along the path are updated, the binding will be refreshed. Objects along the path must inherit from `ObservableObject` and implement `PropertyChanged`.
 
 ### Scene list binding
-Bind a list to a control and provide a scene to instiate as a child. Modifications (add/remove) are reflected in the control's child list.
+Bind a list to a control and provide a scene to instantiate as a child. Modifications (add/remove) are reflected in the control's child list.
 ![scenelist](https://github.com/Dangles91/Godot.Community.ControlBinding/assets/9249458/58e270db-6af6-492b-8403-477dc8d63c9d)
 
 ## Usage
@@ -170,7 +169,7 @@ public class PlayerDataListFormatter : IValueFormatter
 ```
 
 ### Scene List Binding
-Bind an `ObservableList` to a controls child list to add/remove children. The target scene must have a script attached and inherit from `ObservableNode`. It must also provide an implementation for `SetViewModeldata()`
+Bind an `ObservableList` to a control's child list to add/remove children. The target scene must have a script attached and inherit from `ObservableNode`. It must also provide an implementation for `SetViewModeldata()`
 
 **Bind the control to a list and provide a path to the scene to instiate**
 ```c#
