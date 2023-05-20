@@ -72,7 +72,10 @@ public partial class GenericControlBinder : ControlBinderBase
 
     public override void ClearEventBindings()
     {
-        throw new NotImplementedException();
+        if(_bindingConfiguration.BindingMode == BindingMode.TwoWay)
+        {
+            _boundControl.ChildExitingTree -= OnChildExitingTree;
+        }
     }
 
     public override IControlBinder CreateInstance()
