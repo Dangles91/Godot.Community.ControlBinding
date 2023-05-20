@@ -56,6 +56,8 @@ If any objects along the path are updated, the binding will be refreshed. Object
 ### Scene list binding
 Bind a `ObservableList<T>` to any control and provide a scene to instiate as child nodes. Modifications (add/remove) are reflected in the control's child list.
 
+Scene list bindings have limited TwoWay binding support. Child items removed from the tree will also be removed from the bound list.
+
 ![scenelist](https://github.com/Dangles91/Godot.Community.ControlBinding/assets/9249458/58e270db-6af6-492b-8403-477dc8d63c9d)
 
 ## :toolbox: Usage
