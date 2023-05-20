@@ -96,7 +96,7 @@ public partial class ObservableList<T> : ObservableObject, IList<T>, IObservable
 
     public void RemoveAt(int index)
     {
-        if (index >= 0 && index < _backingList.Count - 1)
+        if (index >= 0 && index <= _backingList.Count - 1)
         {
             var removedItem = _backingList[index];
             _backingList.RemoveAt(index);
