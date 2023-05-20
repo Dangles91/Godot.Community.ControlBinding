@@ -58,7 +58,7 @@ Bind a `ObservableList<T>` to any control and provide a scene to instiate as chi
 
 Scene list bindings have limited TwoWay binding support. Child items removed from the tree will also be removed from the bound list.
 
-![scenelist](https://github.com/Dangles91/Godot.Community.ControlBinding/assets/9249458/58e270db-6af6-492b-8403-477dc8d63c9d)
+![Animation](https://github.com/Dangles91/Godot.Community.ControlBinding/assets/9249458/8c21a527-8326-4ace-b4b3-8035b6c25ac6)
 
 ## :toolbox: Usage
 The main components of control binding are the `ObservableObject` and `ObservableNode` classes which implement a `PropertyChanged` event and `OnPropertyChanged` method.
@@ -66,8 +66,6 @@ The main components of control binding are the `ObservableObject` and `Observabl
 The script which backs your scene must inherit from `ObservableNode`. Other observable objects that are not added to the scene tree should inherit from `ObservableObject`. This prevents orphaned nodes.
 
 See the ![example project](/examples/basic-bindings) for some bindings in action!
-
-![image](https://github.com/Dangles91/Godot.Community.ControlBinding/assets/9249458/e0071bff-133a-4b49-be7d-7dfefd84616e)
 
 
 ### Property binding
