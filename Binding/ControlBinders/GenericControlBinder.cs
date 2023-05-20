@@ -19,7 +19,7 @@ public partial class GenericControlBinder : ControlBinderBase
         if (bindingConfiguration.BoundControl.Target is Godot.Control controlInstance)
             _boundControl = controlInstance;
 
-        if (bindingConfiguration.IsListBinding)
+        if (bindingConfiguration.IsListBinding && bindingConfiguration.BindingMode == BindingMode.TwoWay)
         {
             _boundControl.ChildExitingTree += OnChildExitingTree;
         }
