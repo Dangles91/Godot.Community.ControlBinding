@@ -12,6 +12,13 @@ namespace Godot.Community.ControlBinding.ControlBinders
             ControlValueChanged?.Invoke(control, propertyName);
         }
 
+        public delegate void ControlChildListChangedEventHandler(Godot.Control control, ObservableListChangedEventArgs args);
+        public event ControlChildListChangedEventHandler ControlChildListChanged;
+        public void OnControlChildListChanged(Godot.Control control, ObservableListChangedEventArgs args)
+        {
+            ControlChildListChanged?.Invoke(control, args);
+        }
+
         internal BindingConfiguration _bindingConfiguration;
 
         public bool IsBound { get; set; }
