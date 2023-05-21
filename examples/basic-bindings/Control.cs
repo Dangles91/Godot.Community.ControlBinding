@@ -78,8 +78,10 @@ public partial class Control : ObservableNode
         BindProperty("%LineEdit", nameof(LineEdit.Text), $"{nameof(SelectedPlayerData)}.{nameof(PlayerData.Health)}", BindingMode.TwoWay,
             new ValueFormatter()
             {
-                FormatTarget = (v, p) => int.TryParse((string)v, out int value) ? value : throw new ValidationException("Health must be a number"),
-            });
+                FormatTarget = (v, p) => int.TryParse((string)v, out int value) ? value : 0,
+            })
+            .AddValidator(v => int.TryParse((string)v, out int value) ? null : "Health must be a number")
+            .AddValidator(v => int.TryParse((string)v, out int value) && value > 0 ? null : "Health must be greater than 0");
 
         // list binding
         BindListProperty("%ItemList", nameof(playerDatas), formatter: new PlayerDataListFormatter());
@@ -97,6 +99,7 @@ public partial class Control : ObservableNode
         {
             if(m != null)
                 ErrorMessage = m;
+            GetValidationMessages().ForEach(x => GD.Print(x));
         };
 
         base._Ready();

@@ -1,5 +1,6 @@
 using Godot.Community.ControlBinding.Collections;
 using Godot.Community.ControlBinding.ControlBinders;
+using Godot.Community.ControlBinding.Factories;
 using Godot.Community.ControlBinding.Formatters;
 using Godot.Community.ControlBinding.Interfaces;
 using System;
@@ -60,7 +61,7 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
     /// <param name="path">The path of the property to bind to. Relative to this object</param>
     /// <param name="bindingMode">The binding mode to use</param>
     /// <param name="formatter">The <see cref="ControlBinding.Formatters.IValueFormatter" /> to use to format the the Control property and target property</param>
-    public void BindProperty(
+    public BindingFactory BindProperty(
         string controlPath,
         string sourceProperty,
         string path,
@@ -72,7 +73,7 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
         if (node == null)
         {
             GD.PrintErr($"DataBinding: Unable to find node with path '{controlPath}'");
-            return;
+            return null;
         }
 
         if (_controlBinderProvider.GetBinder(node) is IControlBinder binder)
@@ -90,7 +91,9 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
             var binding = new Binding(bindingConfiguration, binder);
             binding.BindControl();
             _controlBindings.Add(binding);
+            return new BindingFactory(binding);
         }
+        return null;
     }
 
     /// <summary>
@@ -101,7 +104,7 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
     /// <param name="path">The path of the property to bind to. Relative to this object.</param>
     /// <param name="bindingMode">The binding mode to use</param>
     /// <param name="formatter">The IValueFormatter to use to format the the list item and target property. Return a <see cref="ControlBinding.Collections.ListItem"/> for greater formatting control.</param>
-    public void BindListProperty(
+    public BindingFactory BindListProperty(
         string controlPath,
         string path,
         BindingMode bindingMode = BindingMode.OneWay,
@@ -111,7 +114,7 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
         if (node == null)
         {
             GD.PrintErr($"DataBinding: Unable to find node with path '{controlPath}'");
-            return;
+            return null;
         }
 
         if (_controlBinderProvider.GetBinder(node) is IControlBinder binder)
@@ -129,7 +132,10 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
             var binding = new Binding(bindingConfiguration, binder);
             binding.BindControl();
             _controlBindings.Add(binding);
+            return new BindingFactory(binding);
         }
+
+        return null;
     }
 
     /// <summary>
@@ -227,16 +233,23 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
 
     }
 
-    private readonly List<string> _validationErrors = new();
+    private readonly Dictionary<string, List<string>> _validationErrors = new();
     public void OnPropertyValidationFailed(Control control, string targetPropertyName, string message)
     {
-        if (!HasErrors)
-            HasErrors = true;
-
-        if (!_validationErrors.Contains(targetPropertyName))
+        if (!_validationErrors.ContainsKey(targetPropertyName))
         {
-            _validationErrors.Add(targetPropertyName);
+            _validationErrors.Add(targetPropertyName, new List<string> { message });
+            HasErrors = true;
         }
+        else
+        {
+            if (!_validationErrors[targetPropertyName].Contains(message))
+            {
+                _validationErrors[targetPropertyName].Add(message);
+                HasErrors = true;
+            }
+        }
+
         PropertyValidationChanged?.Invoke(control, targetPropertyName, message, false);
     }
 
@@ -249,14 +262,19 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
 
     public void OnPropertyValidationSuceeded(Godot.Control control, string propertyName)
     {
-        if (_validationErrors.Contains(propertyName))
+        if (_validationErrors.ContainsKey(propertyName))
         {
             // raise validation changed
-            PropertyValidationChanged?.Invoke(control, propertyName, null, false);
             _validationErrors.Remove(propertyName);
+            PropertyValidationChanged?.Invoke(control, propertyName, null, false);
         }
 
         if (!_validationErrors.Any() && HasErrors)
             HasErrors = false;
+    }
+
+    public List<string> GetValidationMessages()
+    {
+        return _validationErrors.SelectMany(x => x.Value).ToList();
     }
 }

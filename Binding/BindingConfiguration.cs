@@ -24,5 +24,6 @@ public class BindingConfiguration
     public IValueFormatter Formatter { get; set; }
     public List<WeakBackReference> BackReferences { get; set; }
     public ISceneFormatter SceneFormatter { get; set; }
+    public List<Func<object, string>> Validators { get; set; } = new();
     public string Path { get; set; }
 }

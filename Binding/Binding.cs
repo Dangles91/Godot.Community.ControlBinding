@@ -19,15 +19,21 @@ namespace Godot.Community.ControlBinding
     public class Binding
     {
         private BindingConfiguration _bindingConfiguration;
+        public BindingConfiguration BindingConfiguration
+        {
+            get => _bindingConfiguration;
+            private set => _bindingConfiguration = value;
+        }
+
         private readonly IControlBinder _controlBinder;
-        private readonly BoundPropertySetter _boundPropertySetter;
+        public readonly BoundPropertySetter BoundPropertySetter;
 
         public Binding(BindingConfiguration bindingConfiguration,
             IControlBinder controlBinder)
         {
-            _bindingConfiguration = bindingConfiguration;
+            BindingConfiguration = bindingConfiguration;
             _controlBinder = controlBinder;
-            _boundPropertySetter = new BoundPropertySetter(bindingConfiguration.Formatter);
+            BoundPropertySetter = new BoundPropertySetter(bindingConfiguration.Formatter, bindingConfiguration.Validators);
         }
 
         public BindingStatus BindingStatus { get; set; }
@@ -35,7 +41,7 @@ namespace Godot.Community.ControlBinding
         public void BindControl()
         {
             if (!_controlBinder.IsBound)
-                _controlBinder.BindControl(_bindingConfiguration);
+                _controlBinder.BindControl(BindingConfiguration);
 
             resolveBindingPath();
             subscribeChangeEvents();
@@ -44,7 +50,7 @@ namespace Godot.Community.ControlBinding
 
         private void resolveBindingPath()
         {
-            var pathNodes = _bindingConfiguration.Path?.Split('.');
+            var pathNodes = BindingConfiguration.Path?.Split('.');
             var targetPropertyName = pathNodes.Last();
 
             var pathObjects = BackReferenceFactory.GetPathObjectsAndBuildBackReferences(pathNodes.ToList(), ref _bindingConfiguration);
@@ -53,45 +59,45 @@ namespace Godot.Community.ControlBinding
 
             if (targetObject is not null && targetObject is not IObservableObject && targetObject is not IObservableList)
             {
-                GD.PrintErr($"ControlBinding: Binding from node {targetObject} on path {_bindingConfiguration.Path} will not update with changes. Node is not of type ObservableObject");
+                GD.PrintErr($"ControlBinding: Binding from node {targetObject} on path {BindingConfiguration.Path} will not update with changes. Node is not of type ObservableObject");
             }
 
-            _bindingConfiguration.TargetObject = new WeakReference(pathObjects.Last());
-            _bindingConfiguration.TargetPropertyName = targetPropertyName;
+            BindingConfiguration.TargetObject = new WeakReference(pathObjects.Last());
+            BindingConfiguration.TargetPropertyName = targetPropertyName;
         }
 
         private void subscribeChangeEvents()
         {
-            if (_bindingConfiguration.BoundControl.Target is not Godot.Control)
+            if (BindingConfiguration.BoundControl.Target is not Godot.Control)
             {
                 BindingStatus = BindingStatus.Invalid;
                 return;
             }
 
             if (BindingStatus != BindingStatus.Active)
-                (_bindingConfiguration.BoundControl.Target as Godot.Control).TreeExiting += OnBoundControlTreeExiting;
+                (BindingConfiguration.BoundControl.Target as Godot.Control).TreeExiting += OnBoundControlTreeExiting;
 
-            if (_bindingConfiguration.TargetObject.Target is IObservableObject observable)
+            if (BindingConfiguration.TargetObject.Target is IObservableObject observable)
             {
                 observable.PropertyChanged += OnPropertyChanged;
             }
 
-            if (_bindingConfiguration.TargetObject.Target is IObservableList observable1)
+            if (BindingConfiguration.TargetObject.Target is IObservableList observable1)
             {
                 observable1.ObservableListChanged += OnObservableListChanged;
             }
 
             // Register for changes to back references to trigger rebinding
-            foreach (var backReference in _bindingConfiguration.BackReferences.Select(x => x.ObjectReference.Target))
+            foreach (var backReference in BindingConfiguration.BackReferences.Select(x => x.ObjectReference.Target))
             {
-                if (backReference != _bindingConfiguration.TargetObject.Target &&
+                if (backReference != BindingConfiguration.TargetObject.Target &&
                     backReference is IObservableObject observable3)
                 {
                     observable3.PropertyChanged += OnBackReferenceChanged;
                 }
             }
 
-            if (_bindingConfiguration.BoundControl.IsAlive)
+            if (BindingConfiguration.BoundControl.IsAlive)
             {
                 (_controlBinder as ControlBinderBase).ControlValueChanged += OnSourcePropertyChanged;
             }
@@ -104,28 +110,28 @@ namespace Godot.Community.ControlBinding
             if (BindingStatus != BindingStatus.Active)
                 return;
 
-            if (_bindingConfiguration.BindingMode == BindingMode.OneWay || _bindingConfiguration.BindingMode == BindingMode.TwoWay)
+            if (BindingConfiguration.BindingMode == BindingMode.OneWay || BindingConfiguration.BindingMode == BindingMode.TwoWay)
             {
-                if (_bindingConfiguration.IsListBinding)
+                if (BindingConfiguration.IsListBinding)
                 {
-                    setInitialListValue(_bindingConfiguration.TargetObject.Target);
+                    setInitialListValue(BindingConfiguration.TargetObject.Target);
                 }
                 else
                 {
-                    _boundPropertySetter.SetBoundControlValue(_bindingConfiguration.TargetObject.Target,
-                                    _bindingConfiguration.TargetPropertyName,
-                                    _bindingConfiguration.BoundControl.Target as Godot.Control,
-                                    _bindingConfiguration.BoundPropertyName);
+                    BoundPropertySetter.SetBoundControlValue(BindingConfiguration.TargetObject.Target,
+                                    BindingConfiguration.TargetPropertyName,
+                                    BindingConfiguration.BoundControl.Target as Godot.Control,
+                                    BindingConfiguration.BoundPropertyName);
                 }
             }
             else
             {
-                if (!_bindingConfiguration.IsListBinding)
+                if (!BindingConfiguration.IsListBinding)
                 {
-                    _boundPropertySetter.SetBoundPropertyValue(_bindingConfiguration.BoundControl.Target as Godot.Control,
-                        _bindingConfiguration.BoundPropertyName,
-                        _bindingConfiguration.TargetObject.Target,
-                        _bindingConfiguration.TargetPropertyName);
+                    BoundPropertySetter.SetBoundPropertyValue(BindingConfiguration.BoundControl.Target as Godot.Control,
+                        BindingConfiguration.BoundPropertyName,
+                        BindingConfiguration.TargetObject.Target,
+                        BindingConfiguration.TargetPropertyName);
                 }
             }
         }
@@ -152,19 +158,19 @@ namespace Godot.Community.ControlBinding
 
         public virtual void OnPropertyChanged(object sender, string propertyName)
         {
-            if ((_bindingConfiguration.BindingMode == BindingMode.OneWay || _bindingConfiguration.BindingMode == BindingMode.TwoWay)
-                && propertyName == _bindingConfiguration.TargetPropertyName)
+            if ((BindingConfiguration.BindingMode == BindingMode.OneWay || BindingConfiguration.BindingMode == BindingMode.TwoWay)
+                && propertyName == BindingConfiguration.TargetPropertyName)
             {
-                _boundPropertySetter.SetBoundControlValue(_bindingConfiguration.TargetObject.Target,
-                    _bindingConfiguration.TargetPropertyName,
-                    _bindingConfiguration.BoundControl.Target as Godot.Control,
-                    _bindingConfiguration.BoundPropertyName);
+                BoundPropertySetter.SetBoundControlValue(BindingConfiguration.TargetObject.Target,
+                    BindingConfiguration.TargetPropertyName,
+                    BindingConfiguration.BoundControl.Target as Godot.Control,
+                    BindingConfiguration.BoundPropertyName);
             }
         }
 
         public void OnBackReferenceChanged(object sender, string propertyName)
         {
-            if (_bindingConfiguration.BackReferences.Any(x => x.ObjectReference.Target == sender && x.PropertyName == propertyName))
+            if (BindingConfiguration.BackReferences.Any(x => x.ObjectReference.Target == sender && x.PropertyName == propertyName))
             {
                 UnbindControl();
                 BindControl();
@@ -179,25 +185,25 @@ namespace Godot.Community.ControlBinding
 
         public void OnSourcePropertyChanged(GodotObject sender, string propertyName)
         {
-            if (_bindingConfiguration.TargetObject.Target == null)
+            if (BindingConfiguration.TargetObject.Target == null)
                 return;
 
-            if (_bindingConfiguration.BoundPropertyName != propertyName)
+            if (BindingConfiguration.BoundPropertyName != propertyName)
                 return;
 
-            if (_bindingConfiguration.BindingMode == BindingMode.TwoWay || _bindingConfiguration.BindingMode == BindingMode.OneWayToTarget)
+            if (BindingConfiguration.BindingMode == BindingMode.TwoWay || BindingConfiguration.BindingMode == BindingMode.OneWayToTarget)
             {
                 try
                 {
-                    _boundPropertySetter.SetBoundPropertyValue(_bindingConfiguration.BoundControl.Target as Godot.Control,
-                            _bindingConfiguration.BoundPropertyName,
-                            _bindingConfiguration.TargetObject.Target,
-                            _bindingConfiguration.TargetPropertyName);
-                    _bindingConfiguration.Owner.OnPropertyValidationSuceeded(_bindingConfiguration.BoundControl.Target as Godot.Control, _bindingConfiguration.TargetPropertyName);
+                    BoundPropertySetter.SetBoundPropertyValue(BindingConfiguration.BoundControl.Target as Godot.Control,
+                            BindingConfiguration.BoundPropertyName,
+                            BindingConfiguration.TargetObject.Target,
+                            BindingConfiguration.TargetPropertyName);
+                    BindingConfiguration.Owner.OnPropertyValidationSuceeded(BindingConfiguration.BoundControl.Target as Godot.Control, BindingConfiguration.TargetPropertyName);
                 }
-                catch(ValidationException vex)
+                catch (ValidationException vex)
                 {
-                    _bindingConfiguration.Owner.OnPropertyValidationFailed(_bindingConfiguration.BoundControl.Target as Godot.Control, _bindingConfiguration.TargetPropertyName, vex.Message);
+                    BindingConfiguration.Owner.OnPropertyValidationFailed(BindingConfiguration.BoundControl.Target as Godot.Control, BindingConfiguration.TargetPropertyName, vex.Message);
                 }
             }
         }
@@ -236,12 +242,12 @@ namespace Godot.Community.ControlBinding
 
         public void UnbindControl()
         {
-            if (_bindingConfiguration.TargetObject.Target is IObservableObject observable)
+            if (BindingConfiguration.TargetObject.Target is IObservableObject observable)
             {
                 observable.PropertyChanged -= OnPropertyChanged;
             }
 
-            if (_bindingConfiguration.TargetObject.Target is IObservableList observable1)
+            if (BindingConfiguration.TargetObject.Target is IObservableList observable1)
             {
                 observable1.ObservableListChanged -= _controlBinder.OnObservableListChanged;
                 foreach (var item in observable1.GetBackingList())
@@ -253,7 +259,7 @@ namespace Godot.Community.ControlBinding
                 }
             }
 
-            foreach (var backReference in _bindingConfiguration.BackReferences)
+            foreach (var backReference in BindingConfiguration.BackReferences)
             {
                 if (backReference.ObjectReference.Target is IObservableObject observableObject)
                 {
@@ -261,12 +267,12 @@ namespace Godot.Community.ControlBinding
                 }
             }
 
-            if (_bindingConfiguration.BoundControl.IsAlive)
+            if (BindingConfiguration.BoundControl.IsAlive)
             {
                 (_controlBinder as ControlBinderBase).ControlValueChanged -= OnSourcePropertyChanged;
             }
 
-            _bindingConfiguration.BackReferences.Clear();
+            BindingConfiguration.BackReferences.Clear();
         }
     }
 }
