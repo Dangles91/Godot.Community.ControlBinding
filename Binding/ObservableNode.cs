@@ -59,7 +59,7 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
     /// <param name="sourceProperty">The property of the Godot control to bind to</param>
     /// <param name="path">The path of the property to bind to. Relative to this object</param>
     /// <param name="bindingMode">The binding mode to use</param>
-    /// <param name="formatter">The <see cref="ControlBinding.Formatters.IValueFormatter" /> to use to format the the Control property and target property</param>
+    /// <param name="formatter">The <see cref="Godot.Community.ControlBinding.Formatters.IValueFormatter" /> to use to format the Control property and target property</param>
     public void BindProperty(
         string controlPath,
         string sourceProperty,
@@ -100,7 +100,7 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
     /// <param name="controlPath">The path of the Godot control in the scene.</param>
     /// <param name="path">The path of the property to bind to. Relative to this object.</param>
     /// <param name="bindingMode">The binding mode to use</param>
-    /// <param name="formatter">The IValueFormatter to use to format the list item and target property. Return a <see cref="ControlBinding.Collections.ListItem"/> for greater formatting control.</param>
+    /// <param name="formatter">The <see cref="Godot.Community.ControlBinding.Formatters.IValueFormatter" /> to use to format the list item and target property. Return a <see cref="Godot.Community.ControlBinding.Collections.ListItem"/> for greater formatting control.</param>
     public void BindListProperty(
         string controlPath,
         string path,
@@ -133,7 +133,7 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
     }
 
     /// <summary>
-    /// Binds an emum to an OptionButton control with optional path for the selected value
+    /// Binds an emum to an <see cref="Godot.OptionButton" /> control with optional path for the selected value
     /// </summary>
     /// <param name="controlPath">The path of the Godot control in the scene.</param>
     /// <param name="selectedItemPath">The path of the property to bind to. Relative to this object.</param>

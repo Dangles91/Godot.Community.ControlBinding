@@ -18,5 +18,5 @@ public interface IObservableObject
     /// <param name="value">The value that should be set</param>
     /// <param name="name">Name of the property</param>
     /// <typeparam name="T">Type of the property</typeparam>
-    public void SetValue<T>(ref T field, T value, [CallerMemberName] string name = "not a property");  
+    public void SetValue<T>(ref T field, T value, [CallerMemberName] string name = "not a property");
 }
