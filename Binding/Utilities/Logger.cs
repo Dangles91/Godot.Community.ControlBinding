@@ -5,7 +5,7 @@ namespace Godot.Community.ControlBinding.Utilities
     public static class Logger
     {
         private static readonly Configuration _configuration = new();
-        private static readonly string _messagePrefix = typeof(Logger).Assembly.GetName().Name;
+        private static readonly string _messagePrefix = Assembly.GetCallingAssembly().GetName().Name;
 
         public static void Log(string message)
         {
