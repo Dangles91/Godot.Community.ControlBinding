@@ -12,7 +12,7 @@ A Nuget package is currently available here: https://www.nuget.org/packages/Godo
 Though functional, this project is in the early stages of development. More advanced features could still yet be developed, including:
 * [x] Binding control children
 * [x] Instantiate scenes as control children
-* [ ] Control validation
+* [ ] Control validation [IN-PROGRESS]
 * [ ] Control style formatting
 * [ ] Creating an editor plugin to specify bindings in the editor
 * [ ] Code generation to implement OnPropertyChanged via an attribute decorator
