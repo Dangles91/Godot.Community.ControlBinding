@@ -12,11 +12,12 @@ namespace Godot.Community.ControlBinding;
 public partial class ObservableNode : Node, IObservableNode, IObservableObject
 {
     public event PropertyChangedEventHandler PropertyChanged;
+    public event ValidationChangedEventHandler PropertyValidationChanged;
     private readonly ControlBinderProvider _controlBinderProvider = new();
 
     private readonly List<Binding> _controlBindings = new();
     private readonly object cleanUpLock = 0;
-    
+
     /// <inheritdoc />
     public void SetValue<T>(ref T field, T value, [CallerMemberName] string name = "not a property")
     {
@@ -168,9 +169,10 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
                 BoundControl = new WeakReference(node),
                 IsListBinding = true,
                 Path = string.Empty,
+                Owner = this,
                 Formatter = new ValueFormatter
                 {
-                    FormatControl = (v) =>
+                    FormatControl = (v, p) =>
                     {
                         var enumValue = (T)v;
                         return new ListItem
@@ -190,14 +192,8 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
         {
             BindProperty(controlPath, "Selected", selectedItemPath, BindingMode.TwoWay, new ValueFormatter
             {
-                FormatTarget = (v) =>
-                {
-                    return targetObject[(int)v == -1 ? 0 : (int)v];
-                },
-                FormatControl = (v) =>
-                {
-                    return targetObject.IndexOf((T)v);
-                }
+                FormatTarget = (v, p) => targetObject[(int)v == -1 ? 0 : (int)v],
+                FormatControl = (v, p) => targetObject.IndexOf((T)v)
             });
         }
     }
@@ -229,5 +225,38 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
         binding.BindControl();
         _controlBindings.Add(binding);
 
+    }
+
+    private readonly List<string> _validationErrors = new();
+    public void OnPropertyValidationFailed(Control control, string targetPropertyName, string message)
+    {
+        if (!HasErrors)
+            HasErrors = true;
+
+        if (!_validationErrors.Contains(targetPropertyName))
+        {
+            _validationErrors.Add(targetPropertyName);
+        }
+        PropertyValidationChanged?.Invoke(control, targetPropertyName, message, false);
+    }
+
+    private bool _hasErrors;
+    public bool HasErrors
+    {
+        get => _hasErrors;
+        private set => SetValue(ref _hasErrors, value);
+    }
+
+    public void OnPropertyValidationSuceeded(Godot.Control control, string propertyName)
+    {
+        if (_validationErrors.Contains(propertyName))
+        {
+            // raise validation changed
+            PropertyValidationChanged?.Invoke(control, propertyName, null, false);
+            _validationErrors.Remove(propertyName);
+        }
+
+        if (!_validationErrors.Any() && HasErrors)
+            HasErrors = false;
     }
 }

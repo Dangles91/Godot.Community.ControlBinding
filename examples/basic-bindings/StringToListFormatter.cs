@@ -9,32 +9,18 @@ namespace ControlBinding
 {
     public class StringToListFormatter : IValueFormatter
     {
-        public Func<object, object> FormatControl
+        public Func<object, object, object> FormatControl => (v, p) =>
         {
-            get
-            {
-                return (v) =>
-                {
-                    var data = v as List<string>;
-                    if(data is null)
-                        return null;
-                    return string.Join("\n", data);
-                };
-            } 
-        }
+            if (v is not List<string> data)
+                return null;
+            return string.Join("\n", data);
+        };
 
-        public Func<object, object> FormatTarget
+        public Func<object, object, object> FormatTarget => (v, p) =>
         {
-            get 
-            {
-                return (v) =>
-                {
-                    var data = v as string;
-                    if(data is null)
-                        return null;
-                    return new ObservableList<string>(data.Split("\n").ToList());
-                };
-            } 
-        }
+            if (v is not string data)
+                return null;
+            return new ObservableList<string>(data.Split("\n").ToList());
+        };
     }
 }

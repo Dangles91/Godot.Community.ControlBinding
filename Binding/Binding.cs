@@ -111,10 +111,12 @@ namespace Godot.Community.ControlBinding
                     setInitialListValue(_bindingConfiguration.TargetObject.Target);
                 }
                 else
+                {
                     _boundPropertySetter.SetBoundControlValue(_bindingConfiguration.TargetObject.Target,
-                    _bindingConfiguration.TargetPropertyName,
-                    _bindingConfiguration.BoundControl.Target as Godot.Control,
-                    _bindingConfiguration.BoundPropertyName);
+                                    _bindingConfiguration.TargetPropertyName,
+                                    _bindingConfiguration.BoundControl.Target as Godot.Control,
+                                    _bindingConfiguration.BoundPropertyName);
+                }
             }
             else
             {
@@ -185,10 +187,18 @@ namespace Godot.Community.ControlBinding
 
             if (_bindingConfiguration.BindingMode == BindingMode.TwoWay || _bindingConfiguration.BindingMode == BindingMode.OneWayToTarget)
             {
-                _boundPropertySetter.SetBoundPropertyValue(_bindingConfiguration.BoundControl.Target as Godot.Control,
-                        _bindingConfiguration.BoundPropertyName,
-                        _bindingConfiguration.TargetObject.Target,
-                        _bindingConfiguration.TargetPropertyName);
+                try
+                {
+                    _boundPropertySetter.SetBoundPropertyValue(_bindingConfiguration.BoundControl.Target as Godot.Control,
+                            _bindingConfiguration.BoundPropertyName,
+                            _bindingConfiguration.TargetObject.Target,
+                            _bindingConfiguration.TargetPropertyName);
+                    _bindingConfiguration.Owner.OnPropertyValidationSuceeded(_bindingConfiguration.BoundControl.Target as Godot.Control, _bindingConfiguration.TargetPropertyName);
+                }
+                catch(ValidationException vex)
+                {
+                    _bindingConfiguration.Owner.OnPropertyValidationFailed(_bindingConfiguration.BoundControl.Target as Godot.Control, _bindingConfiguration.TargetPropertyName, vex.Message);
+                }
             }
         }
 

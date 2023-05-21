@@ -33,21 +33,21 @@ public class BoundPropertySetter
         string sourcePropertyName,
         object targetObject,
         string targetPropertyName,
-        Func<object, object> formatter)
+        Func<object, object, object> formatter)
     {
         if (sourceObject is null && targetObject is not null)
-        {            
+        {
             var propertyInfo = ReflectionService.GetPropertyInfo(targetObject, targetPropertyName);
             propertyInfo.SetValue(targetObject, null);
             return;
         }
 
-        if(targetObject is null)
+        if (targetObject is null)
         {
             // can't set a value on a null target
             return;
         }
-        
+
         PropertyInfo sourcePropertyInfo = ReflectionService.GetPropertyInfo(sourceObject, sourcePropertyName);
         PropertyInfo targetPropertyInfo = ReflectionService.GetPropertyInfo(targetObject, targetPropertyName);
 
@@ -61,16 +61,21 @@ public class BoundPropertySetter
         {
             try
             {
-                convertedValue = formatter(sourceValue);
+                var previousValue = targetValue;
+                convertedValue = formatter(sourceValue, targetValue);
+            }
+            catch(ValidationException)
+            {
+                throw;
             }
             catch (Exception ex)
             {
-                GD.PrintErr($"DataBinding: Failed to format target. {ex.Message}. {ex.StackTrace}");
+                GD.PrintErr($"DataBinding: Failed to format target. {ex.Message}");
                 formatterFailed = true;
             }
         }
 
-        if ((_valueFormatter == null || _valueFormatter.FormatControl == null) ||
+        if (_valueFormatter == null || _valueFormatter.FormatControl == null ||
             formatterFailed)
         {
             try
@@ -85,7 +90,7 @@ public class BoundPropertySetter
             }
         }
 
-        if (targetValue != null && targetValue.Equals(convertedValue))
+        if (targetValue?.Equals(convertedValue) == true)
             return;
 
         targetPropertyInfo.SetValue(targetObject, convertedValue);
