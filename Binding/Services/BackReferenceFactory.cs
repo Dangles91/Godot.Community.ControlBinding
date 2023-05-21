@@ -1,5 +1,6 @@
 using Godot.Community.ControlBinding.Collections;
 using Godot.Community.ControlBinding.Interfaces;
+using Godot.Community.ControlBinding.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +35,8 @@ public static class BackReferenceFactory
                 else
                 {
                     var pathNode = pathNodes[i - 1];
-                    pathObject = ReflectionService.GetPropertyInfo(root, pathNode).GetValue(root);
+                    var propertyInfo = ReflectionService.GetPropertyInfo(root, pathNode);
+                    pathObject = propertyInfo.GetValue(root);
                     pathObjects.Add(pathObject);
                     if (!bindingConfiguration.IsListBinding && i + 1 > pathNodes.Count - 1)
                         continue;
@@ -80,6 +82,7 @@ public static class BackReferenceFactory
             }
         }
 
+        object propertyOwner = pathNodes.Count > 1 ? pathObjects[^1] : bindingConfiguration.Owner;
         return pathObjects;
     }
 }

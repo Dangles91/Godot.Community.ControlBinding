@@ -77,7 +77,7 @@ public partial class Control : ObservableNode
         BindProperty("%TextEdit", nameof(TextEdit.Text), $"{nameof(SelectedPlayerData)}.{nameof(PlayerData.ListOfThings)}", BindingMode.OneWayToTarget, new StringToListFormatter());
         BindListProperty("%ItemList3", $"{nameof(SelectedPlayerData)}.{nameof(PlayerData.ListOfThings)}", BindingMode.TwoWay);
 
-        BindEnumProperty<BindingMode>("%OptionButton", $"{nameof(SelectedPlayerData)}.{nameof(SelectedPlayerData.BindingMode)}");
+        BindEnumProperty<BindingMode>("%OptionButton", $"{nameof(SelectedPlayerData)}.BindingMoode");
         BindSceneList("%VBoxContainer", nameof(playerDatas), "uid://die1856ftg8w8", BindingMode.TwoWay);
 
         base._Ready();
