@@ -6,7 +6,14 @@
 
 
 ## :package: Packages
-A Nuget package is currently available here: https://www.nuget.org/packages/Godot.Community.ControlBinding
+<div align="center">
+  <a href="https://www.nuget.org/packages/Godot.Community.ControlBinding">
+    <img src="https://img.shields.io/nuget/v/Godot.Community.ControlBinding?label=nuget%20latest"/>
+  </a>
+  <a href="https://www.nuget.org/packages/Godot.Community.ControlBinding">
+    <img alt="Nuget" src="https://img.shields.io/nuget/dt/Godot.Community.ControlBinding">
+  </a>
+</div>
 
 ## :train: Further development
 Though functional, this project is in the early stages of development. More advanced features could still yet be developed, including:
