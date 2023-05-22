@@ -15,6 +15,14 @@
   </a>
 </div>
 
+## Demo
+<details>
+  <summary>:clapper: Movie</summary>
+  
+https://github.com/Dangles91/Godot.Community.ControlBinding/assets/9249458/0983acb5-fe14-46ae-9c9c-38a073bf3b7c
+
+</details>
+
 ## :train: Further development
 Though functional, this project is in the early stages of development. More advanced features could still yet be developed, including:
 * [x] Binding control children
