@@ -2,6 +2,7 @@ using Godot.Community.ControlBinding.Collections;
 using Godot.Community.ControlBinding.ControlBinders;
 using Godot.Community.ControlBinding.Formatters;
 using Godot.Community.ControlBinding.Interfaces;
+using Godot.Community.ControlBinding.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,7 +59,7 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
     /// <param name="sourceProperty">The property of the Godot control to bind to</param>
     /// <param name="path">The path of the property to bind to. Relative to this object</param>
     /// <param name="bindingMode">The binding mode to use</param>
-    /// <param name="formatter">The <see cref="ControlBinding.Formatters.IValueFormatter" /> to use to format the the Control property and target property</param>
+    /// <param name="formatter">The <see cref="Godot.Community.ControlBinding.Formatters.IValueFormatter" /> to use to format the Control property and target property</param>
     public void BindProperty(
         string controlPath,
         string sourceProperty,
@@ -70,7 +71,7 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
         var node = GetNode<Godot.Control>(controlPath);
         if (node == null)
         {
-            GD.PrintErr($"DataBinding: Unable to find node with path '{controlPath}'");
+            Logger.Error($"Unable to find node with path '{controlPath}'");
             return;
         }
 
@@ -99,7 +100,7 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
     /// <param name="controlPath">The path of the Godot control in the scene.</param>
     /// <param name="path">The path of the property to bind to. Relative to this object.</param>
     /// <param name="bindingMode">The binding mode to use</param>
-    /// <param name="formatter">The IValueFormatter to use to format the the list item and target property. Return a <see cref="ControlBinding.Collections.ListItem"/> for greater formatting control.</param>
+    /// <param name="formatter">The <see cref="Godot.Community.ControlBinding.Formatters.IValueFormatter" /> to use to format the list item and target property. Return a <see cref="Godot.Community.ControlBinding.Collections.ListItem"/> for greater formatting control.</param>
     public void BindListProperty(
         string controlPath,
         string path,
@@ -109,7 +110,7 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
         var node = GetNode<Godot.Control>(controlPath);
         if (node == null)
         {
-            GD.PrintErr($"DataBinding: Unable to find node with path '{controlPath}'");
+            Logger.Warn($"DataBinding: Unable to find node with path '{controlPath}'");
             return;
         }
 
@@ -132,7 +133,7 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
     }
 
     /// <summary>
-    /// Binds an emum to an OptionButton control with optional path for the selected value
+    /// Binds an emum to an <see cref="Godot.OptionButton" /> control with optional path for the selected value
     /// </summary>
     /// <param name="controlPath">The path of the Godot control in the scene.</param>
     /// <param name="selectedItemPath">The path of the property to bind to. Relative to this object.</param>
@@ -142,13 +143,13 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
         var node = GetNode<Godot.Control>(controlPath);
         if (node == null)
         {
-            GD.PrintErr($"DataBinding: Unable to find node with path '{controlPath}'");
+            Logger.Error($"Unable to find node with path '{controlPath}'");
             return;
         }
 
         if (node is not OptionButton)
         {
-            GD.PrintErr($"DataBinding: Enum property binding must be backed by an OptionButton");
+            Logger.Error($"Enum property binding must be backed by an OptionButton");
             return;
         }
 
@@ -190,14 +191,8 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
         {
             BindProperty(controlPath, "Selected", selectedItemPath, BindingMode.TwoWay, new ValueFormatter
             {
-                FormatTarget = (v) =>
-                {
-                    return targetObject[(int)v == -1 ? 0 : (int)v];
-                },
-                FormatControl = (v) =>
-                {
-                    return targetObject.IndexOf((T)v);
-                }
+                FormatTarget = (v) => targetObject[(int)v == -1 ? 0 : (int)v],
+                FormatControl = (v) => targetObject.IndexOf((T)v)
             });
         }
     }
@@ -207,7 +202,7 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
         var node = GetNode<Godot.Control>(controlPath);
         if (node == null)
         {
-            GD.PrintErr($"DataBinding: Unable to find node with path '{controlPath}'");
+            GD.PrintErr($"Unable to find node with path '{controlPath}'");
             return;
         }
 

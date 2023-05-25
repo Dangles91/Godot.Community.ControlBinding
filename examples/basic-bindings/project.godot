@@ -8,6 +8,13 @@
 
 config_version=5
 
+[ControlBinding]
+
+logging/suppressAllLogMessages=false
+logging/suppressErrorLogMessages=false
+logging/suppressInfoLogMessages=false
+logging/suppressWarningLogMessages=false
+
 [application]
 
 config/name="ControlBinding.Example"

@@ -53,7 +53,7 @@ namespace Godot.Community.ControlBinding
 
             if (targetObject is not null && targetObject is not IObservableObject && targetObject is not IObservableList)
             {
-                GD.PrintErr($"ControlBinding: Binding from node {targetObject} on path {_bindingConfiguration.Path} will not update with changes. Node is not of type ObservableObject");
+                Logger.Warn($"ControlBinding: Binding from node {targetObject} on path {_bindingConfiguration.Path} will not update with changes. Node is not of type ObservableObject");
             }
 
             _bindingConfiguration.TargetObject = new WeakReference(pathObjects.Last());

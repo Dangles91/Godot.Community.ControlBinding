@@ -47,9 +47,21 @@ public class BoundPropertySetter
             // can't set a value on a null target
             return;
         }
-        
+
         PropertyInfo sourcePropertyInfo = ReflectionService.GetPropertyInfo(sourceObject, sourcePropertyName);
         PropertyInfo targetPropertyInfo = ReflectionService.GetPropertyInfo(targetObject, targetPropertyName);
+
+        if(targetPropertyInfo is null)
+        {
+            Logger.Error($"Failed to set target property value. Property '{targetPropertyName}' does not exist on target object '{targetObject.GetType().Name}'");
+            return;
+        }
+
+        if(sourcePropertyInfo is null)
+        {
+            Logger.Error($"Failed to set target property value. Property '{sourcePropertyName}' does not exist on target object '{sourceObject.GetType().Name}'");
+            return;
+        }
 
         var sourceValue = sourcePropertyInfo.GetValue(sourceObject);
         var targetValue = targetPropertyInfo.GetValue(targetObject);

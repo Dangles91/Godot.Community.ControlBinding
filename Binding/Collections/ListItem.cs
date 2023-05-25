@@ -1,7 +1,7 @@
 namespace Godot.Community.ControlBinding.Collections;
 /// <summary>
 /// A ListItem can be used to format items in an ItemList control when bound to a list.
-/// Return a ListItem from an T:ControlBinding.Formatters.IValueFormatter to format the list item.
+/// Return a ListItem from an <see cref="ControlBinding.Formatters.IValueFormatter" /> to format the list item.
 /// </summary>
 public class ListItem
 {
