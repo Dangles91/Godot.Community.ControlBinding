@@ -145,10 +145,10 @@ public PlayerData SelectedPlayerData
 ```
 </details>
 
-<br/>
-
 ### Formatters
 A binding can be declared with an optional formatter to format the value between your control and the target property or implement custom type conversion. Formatters can also be used to modify list items properties by returning a `ListItem` object.
+
+Formatter also have access to the target property value. In the example below, the `v` parameter is the value from the source property and `p` is the value of the target property.
 
 <details>
 <summary>details</summary>
@@ -156,12 +156,12 @@ A binding can be declared with an optional formatter to format the value between
 ```c#
 public class PlayerHealthFormatter : IValueFormatter
 {
-    public Func<object, object> FormatControl => (v) =>
+    public Func<object, object, object> FormatControl => (v, p) =>
     {
         return $"Player health: {v}";
     };
 
-    public Func<object, object> FormatTarget => (v) =>
+    public Func<object, object, object> FormatTarget => (v, p) =>
     {
         throw new NotImplementedException();
     };
@@ -173,8 +173,6 @@ BindProperty("%SpinBox", nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMod
 This formatter will set a string value into the target control using the input value substituted into a string. `FormatControl` is not implemented here so the value would be passed back as-is in the case of a two-way binding.
 
 </details>
-
-<br/>
 
 ### List Binding
 List bindings can be bound to an `ObservableList<T>` to benefit from adding and removing items
@@ -215,8 +213,6 @@ public class PlayerDataListFormatter : IValueFormatter
 
 </details>
 
-<br/>
-
 ### Scene List Binding
 Bind an `ObservableList<T>` to a control's child list to add/remove children. The target scene must have a script attached and inherit from `ObservableNode`. It must also provide an implementation for `SetViewModeldata()`
 
@@ -248,8 +244,6 @@ public partial class PlayerDataListItem : ObservableNode
 }
 ```
 </details>
-
-<br/>
 
 ### Control input validation
 Control bindings can be validated by either:
