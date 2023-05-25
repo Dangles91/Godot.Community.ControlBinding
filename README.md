@@ -6,13 +6,28 @@
 
 
 ## :package: Packages
-A Nuget package is currently available here: https://www.nuget.org/packages/Godot.Community.ControlBinding
+<div align="center">
+  <a href="https://www.nuget.org/packages/Godot.Community.ControlBinding">
+    <img src="https://img.shields.io/nuget/v/Godot.Community.ControlBinding?label=nuget%20latest"/>
+  </a>
+  <a href="https://www.nuget.org/packages/Godot.Community.ControlBinding">
+    <img alt="Nuget" src="https://img.shields.io/nuget/dt/Godot.Community.ControlBinding">
+  </a>
+</div>
+
+## Demo
+<details>
+  <summary>:clapper: Movie</summary>
+  
+https://github.com/Dangles91/Godot.Community.ControlBinding/assets/9249458/0983acb5-fe14-46ae-9c9c-38a073bf3b7c
+
+</details>
 
 ## :train: Further development
 Though functional, this project is in the early stages of development. More advanced features could still yet be developed, including:
 * [x] Binding control children
 * [x] Instantiate scenes as control children
-* [ ] Control validation
+* [ ] Control validation [IN-PROGRESS]
 * [ ] Control style formatting
 * [ ] Creating an editor plugin to specify bindings in the editor
 * [ ] Code generation to implement OnPropertyChanged via an attribute decorator
