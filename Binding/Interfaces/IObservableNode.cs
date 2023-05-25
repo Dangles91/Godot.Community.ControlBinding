@@ -8,6 +8,6 @@ namespace Godot.Community.ControlBinding.Interfaces
         void OnPropertyValidationFailed(Godot.Control control, string targetPropertyName, string message);
         void OnPropertyValidationSucceeded(Godot.Control control, string propertyName);
         bool HasErrors {get;}
-        event Godot.Community.ControlBinding.ValidationChangedEventHandler PropertyValidationChanged;
+        event Godot.Community.ControlBinding.ValidationChangedEventHandler ControlValidationChanged;
     }
 }

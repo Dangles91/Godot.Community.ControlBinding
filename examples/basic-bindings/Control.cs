@@ -101,7 +101,7 @@ public partial class Control : ObservableNode
         BindProperty("%ErrorLabel", nameof(Label.Visible), nameof(HasErrors), BindingMode.OneWay);
         BindProperty("%ErrorLabel", nameof(Label.Text), nameof(ErrorMessage), BindingMode.OneWay);
 
-        PropertyValidationChanged += (control, propertyName, message, isValid) =>
+        ControlValidationChanged += (control, propertyName, message, isValid) =>
         {
             control.Modulate = isValid ? Colors.White : Colors.Red;
             control.TooltipText = message;

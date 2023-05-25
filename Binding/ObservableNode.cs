@@ -13,7 +13,7 @@ namespace Godot.Community.ControlBinding;
 public partial class ObservableNode : Node, IObservableNode, IObservableObject
 {
     public event PropertyChangedEventHandler PropertyChanged;
-    public event ValidationChangedEventHandler PropertyValidationChanged;    
+    public event ValidationChangedEventHandler ControlValidationChanged;    
 
     private readonly List<Binding> _controlBindings = new();
     private readonly object cleanUpLock = 0;
@@ -245,7 +245,7 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
         _validationErrors[instanceId].Add(message);
 
         HasErrors = true;
-        PropertyValidationChanged?.Invoke(control, targetPropertyName, message, false);
+        ControlValidationChanged?.Invoke(control, targetPropertyName, message, false);
     }
 
     public void OnPropertyValidationSucceeded(Godot.Control control, string propertyName)
@@ -255,7 +255,7 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
         {
             // raise validation changed
             _validationErrors.Remove(instanceId);
-            PropertyValidationChanged?.Invoke(control, propertyName, null, true);
+            ControlValidationChanged?.Invoke(control, propertyName, null, true);
         }
 
         if (!_validationErrors.Any() && HasErrors)
