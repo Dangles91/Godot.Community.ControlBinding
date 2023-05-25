@@ -6,7 +6,7 @@ namespace Godot.Community.ControlBinding.Interfaces
     {
         void SetViewModelData(object viewModelData);
         void OnPropertyValidationFailed(Godot.Control control, string targetPropertyName, string message);
-        void OnPropertyValidationSuceeded(Godot.Control control, string propertyName);
+        void OnPropertyValidationSucceeded(Godot.Control control, string propertyName);
         bool HasErrors {get;}
         event Godot.Community.ControlBinding.ValidationChangedEventHandler PropertyValidationChanged;
     }

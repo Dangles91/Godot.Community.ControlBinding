@@ -60,7 +60,7 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
     /// <param name="path">The path of the property to bind to. Relative to this object</param>
     /// <param name="bindingMode">The binding mode to use</param>
     /// <param name="formatter">The <see cref="ControlBinding.Formatters.IValueFormatter" /> to use to format the the Control property and target property</param>
-    public BindingFactory BindProperty(
+    public BindingBuilder BindProperty(
         string controlPath,
         string sourceProperty,
         string path,
@@ -90,7 +90,7 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
             var binding = new Binding(bindingConfiguration, binder);
             binding.BindControl();
             _controlBindings.Add(binding);
-            return new BindingFactory(binding);
+            return new BindingBuilder(binding);
         }
         return null;
     }
@@ -103,7 +103,7 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
     /// <param name="path">The path of the property to bind to. Relative to this object.</param>
     /// <param name="bindingMode">The binding mode to use</param>
     /// <param name="formatter">The IValueFormatter to use to format the the list item and target property. Return a <see cref="ControlBinding.Collections.ListItem"/> for greater formatting control.</param>
-    public BindingFactory BindListProperty(
+    public BindingBuilderBase BindListProperty(
         string controlPath,
         string path,
         BindingMode bindingMode = BindingMode.OneWay,
@@ -131,7 +131,7 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
             var binding = new Binding(bindingConfiguration, binder);
             binding.BindControl();
             _controlBindings.Add(binding);
-            return new BindingFactory(binding);
+            return new BindingBuilderBase(binding);
         }
 
         return null;
@@ -232,24 +232,34 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
 
     }
 
-    private readonly Dictionary<string, List<string>> _validationErrors = new();
+    private readonly Dictionary<ulong, List<string>> _validationErrors = new();
     public void OnPropertyValidationFailed(Control control, string targetPropertyName, string message)
     {
-        if (!_validationErrors.ContainsKey(targetPropertyName))
+        var instanceId = control.GetInstanceId();
+        if (!_validationErrors.ContainsKey(instanceId))
         {
-            _validationErrors.Add(targetPropertyName, new List<string> { message });
-            HasErrors = true;
+            _validationErrors.Add(instanceId, new());
         }
-        else
+        
+        _validationErrors[instanceId].Clear();
+        _validationErrors[instanceId].Add(message);
+
+        HasErrors = true;
+        PropertyValidationChanged?.Invoke(control, targetPropertyName, message, false);
+    }
+
+    public void OnPropertyValidationSucceeded(Godot.Control control, string propertyName)
+    {
+        var instanceId = control.GetInstanceId();
+        if (_validationErrors.ContainsKey(instanceId))
         {
-            if (!_validationErrors[targetPropertyName].Contains(message))
-            {
-                _validationErrors[targetPropertyName].Add(message);
-                HasErrors = true;
-            }
+            // raise validation changed
+            _validationErrors.Remove(instanceId);
+            PropertyValidationChanged?.Invoke(control, propertyName, null, true);
         }
 
-        PropertyValidationChanged?.Invoke(control, targetPropertyName, message, false);
+        if (!_validationErrors.Any() && HasErrors)
+            HasErrors = false;
     }
 
     private bool _hasErrors;
@@ -257,19 +267,6 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
     {
         get => _hasErrors;
         private set => SetValue(ref _hasErrors, value);
-    }
-
-    public void OnPropertyValidationSuceeded(Godot.Control control, string propertyName)
-    {
-        if (_validationErrors.ContainsKey(propertyName))
-        {
-            // raise validation changed
-            _validationErrors.Remove(propertyName);
-            PropertyValidationChanged?.Invoke(control, propertyName, null, false);
-        }
-
-        if (!_validationErrors.Any() && HasErrors)
-            HasErrors = false;
     }
 
     public List<string> GetValidationMessages()

@@ -199,13 +199,28 @@ namespace Godot.Community.ControlBinding
                             BindingConfiguration.BoundPropertyName,
                             BindingConfiguration.TargetObject.Target,
                             BindingConfiguration.TargetPropertyName);
-                    BindingConfiguration.Owner.OnPropertyValidationSuceeded(BindingConfiguration.BoundControl.Target as Godot.Control, BindingConfiguration.TargetPropertyName);
+
+                    OnPropertyValidationChanged(BindingConfiguration.BoundControl.Target as Godot.Control, BindingConfiguration.TargetPropertyName, true, null);
                 }
                 catch (ValidationException vex)
                 {
-                    BindingConfiguration.Owner.OnPropertyValidationFailed(BindingConfiguration.BoundControl.Target as Godot.Control, BindingConfiguration.TargetPropertyName, vex.Message);
+                    OnPropertyValidationChanged(BindingConfiguration.BoundControl.Target as Godot.Control, BindingConfiguration.TargetPropertyName, false, vex.Message);
                 }
             }
+        }
+
+        private void OnPropertyValidationChanged(Godot.Control control, string propertyName, bool isValid, string message)
+        {
+            if(isValid)
+            {
+                BindingConfiguration.Owner.OnPropertyValidationSucceeded(control, propertyName);
+            }
+            else
+            {
+                BindingConfiguration.Owner.OnPropertyValidationFailed(control, propertyName, message);
+            }
+
+            BindingConfiguration.OnValidationChangedHandler?.Invoke(control, isValid, message);
         }
 
         public virtual void OnObservableListChanged(ObservableListChangedEventArgs eventArgs)

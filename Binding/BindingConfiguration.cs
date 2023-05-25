@@ -26,4 +26,5 @@ public class BindingConfiguration
     public ISceneFormatter SceneFormatter { get; set; }
     public List<Func<object, string>> Validators { get; set; } = new();
     public string Path { get; set; }
+    public Action<Control, bool, string> OnValidationChangedHandler { get; set; }
 }
