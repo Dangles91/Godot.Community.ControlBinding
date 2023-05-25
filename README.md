@@ -27,7 +27,7 @@ https://github.com/Dangles91/Godot.Community.ControlBinding/assets/9249458/0983a
 Though functional, this project is in the early stages of development. More advanced features could still yet be developed, including:
 * [x] Binding control children
 * [x] Instantiate scenes as control children
-* [ ] Control validation [IN-PROGRESS]
+* [x] Control validation
 * [ ] Control style formatting
 * [ ] Creating an editor plugin to specify bindings in the editor
 * [ ] Code generation to implement OnPropertyChanged via an attribute decorator
