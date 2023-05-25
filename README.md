@@ -102,6 +102,8 @@ BindProperty("%SpinBox", nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMod
 
 </details>
 
+<br/>
+
 ### Deep property binding
 Bind to property members on other objects. These objects and properties must be relative to the current scene script.
 
@@ -128,6 +130,7 @@ public PlayerData SelectedPlayerData
 ```
 </details>
 
+<br/>
 
 ### Formatters
 A binding can be declared with an optional formatter to format the value between your control and the target property or implement custom type conversion. Formatters can also be used to modify list items properties by returning a `ListItem` object.
@@ -155,6 +158,8 @@ BindProperty("%SpinBox", nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMod
 This formatter will set a string value into the target control using the input value substituted into a string. `FormatControl` is not implemented here so the value would be passed back as-is in the case of a two-way binding.
 
 </details>
+
+<br/>
 
 ### List Binding
 List bindings can be bound to an `ObservableList<T>` to benefit from adding and removing items
@@ -195,6 +200,8 @@ public class PlayerDataListFormatter : IValueFormatter
 
 </details>
 
+<br/>
+
 ### Scene List Binding
 Bind an `ObservableList<T>` to a control's child list to add/remove children. The target scene must have a script attached and inherit from `ObservableNode`. It must also provide an implementation for `SetViewModeldata()`
 
@@ -225,4 +232,81 @@ public partial class PlayerDataListItem : ObservableNode
     }
 }
 ```
+</details>
+
+<br/>
+
+### Control input validation
+Control bindings can be validated by either:
+* Adding validation function to the binding
+* Throwing a `ValidationException` from a formatter
+
+There also two main ways of subscribing to validation changed events:
+* Subscribe to the `ControlValidationChanged` event on the `ObservableNode` your bindings reside on
+* Add a validation handler to the control binding
+
+You can also use the `HasErrors` property on an `ObservableNode` to notify your UI of errors and review a full list of validation errors using the `GetValidationMessages()` method.
+
+
+<details>
+<summary>details</summary>
+<br/>
+
+**Adding validators and validation callbacks**
+
+Property bindings implement a fluent builder pattern for modify the binding upon creation to add validators and a validator callback. 
+
+You can have any number of validators but only one validation callback.
+
+Validators are run the in the order they are registered and validation will stop at the first validator to return a non-empty string. Validators are run before formatters. The formatter will not be executed if a validation error occurs.
+
+This example adds two validators and a callback to modulate the control and set the tooltip text.
+
+```c#
+BindProperty("%LineEdit", nameof(LineEdit.Text), $"{nameof(SelectedPlayerData)}.{nameof(PlayerData.Health)}", BindingMode.TwoWay)
+    .AddValidator(v => int.TryParse((string)v, out int value) ? null : "Health must be a number")
+    .AddValidator(v => int.TryParse((string)v, out int value) && value > 0 ? null : "Health must be greater than 0")
+    .AddValidationHandler((control, isValid, message) => { 
+        control.Modulate = isValid ? Colors.White : Colors.Red;
+        control.TooltipText = message;
+    });
+```
+
+**Subscribing to `ControlValidationChanged` events**
+
+If you want to have common behaviour for many or all controls, you can subscribe to the `ControlValidationChanged` event and get updates about all control validations.
+
+This example subscribes to all validation changed events to modulate the target control and set the tooltip text.
+
+The last validation error message is also stored in the local ErrorMessage property to be bound to a UI label.
+
+```csharp
+public partial class MyClass : ObservableNode
+{
+    private string errorMessage;
+    public string ErrorMessage
+    {
+        get { return errorMessage; }
+        set { SetValue(ref errorMessage, value); }
+    }
+
+    public override void _Ready()
+    {
+        BindProperty("%ErrorLabel", nameof(Label.Visible), nameof(HasErrors), BindingMode.OneWay);
+        BindProperty("%ErrorLabel", nameof(Label.Text), nameof(ErrorMessage), BindingMode.OneWay);
+        ControlValidationChanged += OnControlValidationChanged;
+    }
+
+    private void OnControlValidationChanged(control, propertyName, message, isValid)
+    {
+        control.Modulate = isValid ? Colors.White : Colors.Red;
+        control.TooltipText = message;
+
+        // set properties to bind to
+        ErrorMessage = message;
+        ValidationSummary = GetValidationMessages();
+    };
+}
+```
+
 </details>
