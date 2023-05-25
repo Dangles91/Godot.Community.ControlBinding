@@ -68,7 +68,9 @@ public partial class Control : ObservableNode
 
         BindProperty("%HSlider", nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay);
         BindProperty("%VSlider", nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay);
-        BindProperty("%SpinBox", nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay);
+        BindProperty("%SpinBox", nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay)
+            .AddValidator(v => (double)v > 0f ? null : "Value must be greater than 0");
+
         BindProperty("%HScrollBar", nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay);
         BindProperty("%VScrollBar", nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay);
         BindProperty("%ProgressBar", nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay);
@@ -81,7 +83,11 @@ public partial class Control : ObservableNode
                 FormatTarget = (v, p) => int.TryParse((string)v, out int value) ? value : 0,
             })
             .AddValidator(v => int.TryParse((string)v, out int value) ? null : "Health must be a number")
-            .AddValidator(v => int.TryParse((string)v, out int value) && value > 0 ? null : "Health must be greater than 0");
+            .AddValidator(v => int.TryParse((string)v, out int value) && value > 0 ? null : "Health must be greater than 0")
+            .AddValidationHandler((control, isValid, message) => { 
+                (control as LineEdit).RightIcon = isValid ? null : (Texture2D)ResourceLoader.Load("uid://b5s5nstqwi4jh"); 
+                (control as LineEdit).Modulate = new Color(1, 1, 1, 1) ;
+            });
 
         // list binding
         BindListProperty("%ItemList", nameof(playerDatas), formatter: new PlayerDataListFormatter());
@@ -95,11 +101,11 @@ public partial class Control : ObservableNode
         BindProperty("%ErrorLabel", nameof(Label.Visible), nameof(HasErrors), BindingMode.OneWay);
         BindProperty("%ErrorLabel", nameof(Label.Text), nameof(ErrorMessage), BindingMode.OneWay);
 
-        PropertyValidationChanged += (c, p, m, f) =>
+        PropertyValidationChanged += (control, propertyName, message, isValid) =>
         {
-            if(m != null)
-                ErrorMessage = m;
-            GetValidationMessages().ForEach(x => GD.Print(x));
+            control.Modulate = isValid ? Colors.White : Colors.Red;
+            control.TooltipText = message;
+            ErrorMessage = message;
         };
 
         base._Ready();
