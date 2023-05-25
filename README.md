@@ -82,7 +82,6 @@ The script which backs your scene must inherit from `ObservableNode`. Other obse
 
 See the ![example project](/examples/basic-bindings) for some bindings in action!
 
-
 ### Property binding
 Create a property with a backing field and trigger `OnPropertyChanged` in the setter
 <details>
@@ -116,8 +115,6 @@ BindProperty("%SpinBox", nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMod
 ```
 
 </details>
-
-<br/>
 
 ### Deep property binding
 Bind to property members on other objects. These objects and properties must be relative to the current scene script.
