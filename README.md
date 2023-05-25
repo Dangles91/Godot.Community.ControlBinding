@@ -27,7 +27,7 @@ https://github.com/Dangles91/Godot.Community.ControlBinding/assets/9249458/0983a
 Though functional, this project is in the early stages of development. More advanced features could still yet be developed, including:
 * [x] Binding control children
 * [x] Instantiate scenes as control children
-* [ ] Control validation [IN-PROGRESS]
+* [x] Control validation
 * [ ] Control style formatting
 * [ ] Creating an editor plugin to specify bindings in the editor
 * [ ] Code generation to implement OnPropertyChanged via an attribute decorator
@@ -117,6 +117,8 @@ BindProperty("%SpinBox", nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMod
 
 </details>
 
+<br/>
+
 ### Deep property binding
 Bind to property members on other objects. These objects and properties must be relative to the current scene script.
 
@@ -143,9 +145,10 @@ public PlayerData SelectedPlayerData
 ```
 </details>
 
-
 ### Formatters
 A binding can be declared with an optional formatter to format the value between your control and the target property or implement custom type conversion. Formatters can also be used to modify list items properties by returning a `ListItem` object.
+
+Formatter also have access to the target property value. In the example below, the `v` parameter is the value from the source property and `p` is the value of the target property.
 
 <details>
 <summary>details</summary>
@@ -153,12 +156,12 @@ A binding can be declared with an optional formatter to format the value between
 ```c#
 public class PlayerHealthFormatter : IValueFormatter
 {
-    public Func<object, object> FormatControl => (v) =>
+    public Func<object, object, object> FormatControl => (v, p) =>
     {
         return $"Player health: {v}";
     };
 
-    public Func<object, object> FormatTarget => (v) =>
+    public Func<object, object, object> FormatTarget => (v, p) =>
     {
         throw new NotImplementedException();
     };
@@ -240,4 +243,79 @@ public partial class PlayerDataListItem : ObservableNode
     }
 }
 ```
+</details>
+
+### Control input validation
+Control bindings can be validated by either:
+* Adding validation function to the binding
+* Throwing a `ValidationException` from a formatter
+
+There also two main ways of subscribing to validation changed events:
+* Subscribe to the `ControlValidationChanged` event on the `ObservableNode` your bindings reside on
+* Add a validation handler to the control binding
+
+You can also use the `HasErrors` property on an `ObservableNode` to notify your UI of errors and review a full list of validation errors using the `GetValidationMessages()` method.
+
+
+<details>
+<summary>details</summary>
+<br/>
+
+**Adding validators and validation callbacks**
+
+Property bindings implement a fluent builder pattern for modify the binding upon creation to add validators and a validator callback. 
+
+You can have any number of validators but only one validation callback.
+
+Validators are run the in the order they are registered and validation will stop at the first validator to return a non-empty string. Validators are run before formatters. The formatter will not be executed if a validation error occurs.
+
+This example adds two validators and a callback to modulate the control and set the tooltip text.
+
+```c#
+BindProperty("%LineEdit", nameof(LineEdit.Text), $"{nameof(SelectedPlayerData)}.{nameof(PlayerData.Health)}", BindingMode.TwoWay)
+    .AddValidator(v => int.TryParse((string)v, out int value) ? null : "Health must be a number")
+    .AddValidator(v => int.TryParse((string)v, out int value) && value > 0 ? null : "Health must be greater than 0")
+    .AddValidationHandler((control, isValid, message) => { 
+        control.Modulate = isValid ? Colors.White : Colors.Red;
+        control.TooltipText = message;
+    });
+```
+
+**Subscribing to `ControlValidationChanged` events**
+
+If you want to have common behaviour for many or all controls, you can subscribe to the `ControlValidationChanged` event and get updates about all control validations.
+
+This example subscribes to all validation changed events to modulate the target control and set the tooltip text.
+
+The last validation error message is also stored in the local ErrorMessage property to be bound to a UI label.
+
+```csharp
+public partial class MyClass : ObservableNode
+{
+    private string errorMessage;
+    public string ErrorMessage
+    {
+        get { return errorMessage; }
+        set { SetValue(ref errorMessage, value); }
+    }
+
+    public override void _Ready()
+    {
+        BindProperty("%ErrorLabel", nameof(Label.Visible), nameof(HasErrors), BindingMode.OneWay);
+        BindProperty("%ErrorLabel", nameof(Label.Text), nameof(ErrorMessage), BindingMode.OneWay);
+        ControlValidationChanged += OnControlValidationChanged;
+    }
+
+    private void OnControlValidationChanged(control, propertyName, message, isValid)
+    {
+        control.Modulate = isValid ? Colors.White : Colors.Red;
+        control.TooltipText = message;
+
+        // set properties to bind to
+        ErrorMessage = message;
+        ValidationSummary = GetValidationMessages();
+    };
+}
+```
+
 </details>

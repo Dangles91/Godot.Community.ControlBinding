@@ -1,5 +1,6 @@
 using Godot.Community.ControlBinding.Collections;
 using Godot.Community.ControlBinding.ControlBinders;
+using Godot.Community.ControlBinding.Factories;
 using Godot.Community.ControlBinding.Formatters;
 using Godot.Community.ControlBinding.Interfaces;
 using System;
@@ -12,11 +13,11 @@ namespace Godot.Community.ControlBinding;
 public partial class ObservableNode : Node, IObservableNode, IObservableObject
 {
     public event PropertyChangedEventHandler PropertyChanged;
-    private readonly ControlBinderProvider _controlBinderProvider = new();
+    public event ValidationChangedEventHandler ControlValidationChanged;    
 
     private readonly List<Binding> _controlBindings = new();
     private readonly object cleanUpLock = 0;
-    
+
     /// <inheritdoc />
     public void SetValue<T>(ref T field, T value, [CallerMemberName] string name = "not a property")
     {
@@ -59,7 +60,7 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
     /// <param name="path">The path of the property to bind to. Relative to this object</param>
     /// <param name="bindingMode">The binding mode to use</param>
     /// <param name="formatter">The <see cref="ControlBinding.Formatters.IValueFormatter" /> to use to format the the Control property and target property</param>
-    public void BindProperty(
+    public BindingBuilder BindProperty(
         string controlPath,
         string sourceProperty,
         string path,
@@ -71,10 +72,10 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
         if (node == null)
         {
             GD.PrintErr($"DataBinding: Unable to find node with path '{controlPath}'");
-            return;
+            return null;
         }
 
-        if (_controlBinderProvider.GetBinder(node) is IControlBinder binder)
+        if (ControlBinderProvider.GetBinder(node) is IControlBinder binder)
         {
             var bindingConfiguration = new BindingConfiguration
             {
@@ -89,7 +90,9 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
             var binding = new Binding(bindingConfiguration, binder);
             binding.BindControl();
             _controlBindings.Add(binding);
+            return new BindingBuilder(binding);
         }
+        return null;
     }
 
     /// <summary>
@@ -100,7 +103,7 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
     /// <param name="path">The path of the property to bind to. Relative to this object.</param>
     /// <param name="bindingMode">The binding mode to use</param>
     /// <param name="formatter">The IValueFormatter to use to format the the list item and target property. Return a <see cref="ControlBinding.Collections.ListItem"/> for greater formatting control.</param>
-    public void BindListProperty(
+    public BindingBuilderBase BindListProperty(
         string controlPath,
         string path,
         BindingMode bindingMode = BindingMode.OneWay,
@@ -110,10 +113,10 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
         if (node == null)
         {
             GD.PrintErr($"DataBinding: Unable to find node with path '{controlPath}'");
-            return;
+            return null;
         }
 
-        if (_controlBinderProvider.GetBinder(node) is IControlBinder binder)
+        if (ControlBinderProvider.GetBinder(node) is IControlBinder binder)
         {
             var bindingConfiguration = new BindingConfiguration
             {
@@ -128,7 +131,10 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
             var binding = new Binding(bindingConfiguration, binder);
             binding.BindControl();
             _controlBindings.Add(binding);
+            return new BindingBuilderBase(binding);
         }
+
+        return null;
     }
 
     /// <summary>
@@ -159,7 +165,7 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
         }
 
         // bind the list items (static list binding - enums won't change at runtime)
-        if (_controlBinderProvider.GetBinder(node) is IControlBinder binder)
+        if (ControlBinderProvider.GetBinder(node) is IControlBinder binder)
         {
             var bindingConfiguration = new BindingConfiguration
             {
@@ -168,9 +174,10 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
                 BoundControl = new WeakReference(node),
                 IsListBinding = true,
                 Path = string.Empty,
+                Owner = this,
                 Formatter = new ValueFormatter
                 {
-                    FormatControl = (v) =>
+                    FormatControl = (v, p) =>
                     {
                         var enumValue = (T)v;
                         return new ListItem
@@ -190,14 +197,8 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
         {
             BindProperty(controlPath, "Selected", selectedItemPath, BindingMode.TwoWay, new ValueFormatter
             {
-                FormatTarget = (v) =>
-                {
-                    return targetObject[(int)v == -1 ? 0 : (int)v];
-                },
-                FormatControl = (v) =>
-                {
-                    return targetObject.IndexOf((T)v);
-                }
+                FormatTarget = (v, p) => targetObject[(int)v == -1 ? 0 : (int)v],
+                FormatControl = (v, p) => targetObject.IndexOf((T)v)
             });
         }
     }
@@ -229,5 +230,47 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
         binding.BindControl();
         _controlBindings.Add(binding);
 
+    }
+
+    private readonly Dictionary<ulong, List<string>> _validationErrors = new();
+    public void OnPropertyValidationFailed(Control control, string targetPropertyName, string message)
+    {
+        var instanceId = control.GetInstanceId();
+        if (!_validationErrors.ContainsKey(instanceId))
+        {
+            _validationErrors.Add(instanceId, new());
+        }
+        
+        _validationErrors[instanceId].Clear();
+        _validationErrors[instanceId].Add(message);
+
+        HasErrors = true;
+        ControlValidationChanged?.Invoke(control, targetPropertyName, message, false);
+    }
+
+    public void OnPropertyValidationSucceeded(Godot.Control control, string propertyName)
+    {
+        var instanceId = control.GetInstanceId();
+        if (_validationErrors.ContainsKey(instanceId))
+        {
+            // raise validation changed
+            _validationErrors.Remove(instanceId);
+            ControlValidationChanged?.Invoke(control, propertyName, null, true);
+        }
+
+        if (!_validationErrors.Any() && HasErrors)
+            HasErrors = false;
+    }
+
+    private bool _hasErrors;
+    public bool HasErrors
+    {
+        get => _hasErrors;
+        private set => SetValue(ref _hasErrors, value);
+    }
+
+    public List<string> GetValidationMessages()
+    {
+        return _validationErrors.SelectMany(x => x.Value).ToList();
     }
 }

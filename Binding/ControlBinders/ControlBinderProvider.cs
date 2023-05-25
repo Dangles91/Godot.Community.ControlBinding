@@ -3,25 +3,28 @@ using System.Linq;
 
 namespace Godot.Community.ControlBinding.ControlBinders
 {
-    public partial class ControlBinderProvider
+    public static class ControlBinderProvider
     {
-        private readonly List<IControlBinder> _binders = new List<IControlBinder>();
-        public ControlBinderProvider()
+        private static readonly List<IControlBinder> _binders;
+        static ControlBinderProvider()
         {
-            _binders.Add(new LineEditControlBinder());
-            _binders.Add(new CheckBoxControlBinder());
-            _binders.Add(new OptionButtonControlBinder());
-            _binders.Add(new TextEditControlBinder());
-            _binders.Add(new RangeControlBinder());
-            _binders.Add(new ItemListControlBinder());
-            _binders.Add(new GenericControlBinder());
+            _binders = new()
+            {
+                new LineEditControlBinder(),
+                new CheckBoxControlBinder(),
+                new OptionButtonControlBinder(),
+                new TextEditControlBinder(),
+                new RangeControlBinder(),
+                new ItemListControlBinder(),
+                new GenericControlBinder(),
+            };
         }
 
-        public IControlBinder GetBinder(object sourceObject)
+        public static IControlBinder GetBinder(object sourceObject)
         {
-            var binder = _binders.Where(x => x.CanBindFor(sourceObject))
+            var binder = _binders
                 .OrderByDescending(x => x.Priority)
-                .FirstOrDefault();
+                .FirstOrDefault(x => x.CanBindFor(sourceObject));
 
             if (binder == null)
             {

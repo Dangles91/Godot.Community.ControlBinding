@@ -7,8 +7,8 @@ namespace Godot.Community.ControlBinding.Formatters;
 /// </summary>
 public interface IValueFormatter
 {
-    public Func<object, object> FormatControl { get; }
-    public Func<object, object> FormatTarget { get; }
+    public Func<object, object, object> FormatControl { get; }
+    public Func<object, object, object> FormatTarget { get; }
 }
 
 /// <summary>
@@ -16,6 +16,6 @@ public interface IValueFormatter
 /// </summary>
 public class ValueFormatter : IValueFormatter
 {
-    public Func<object, object> FormatControl { get; init; }
-    public Func<object, object> FormatTarget { get; init; }
+    public Func<object, object, object> FormatControl { get; init; }
+    public Func<object, object, object> FormatTarget { get; init; }
 }

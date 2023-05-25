@@ -29,11 +29,11 @@ public partial class Control : ObservableNode
         set { SetValue(ref spinBoxValue, value); }
     }
 
-    public ObservableList<PlayerData> playerDatas {get;set;} = new(){
+    public ObservableList<PlayerData> playerDatas { get; set; } = new(){
         new PlayerData{Health = 500},
     };
 
-    public ObservableList<PlayerData> playerDatas2 {get;set;} = new(){
+    public ObservableList<PlayerData> playerDatas2 { get; set; } = new(){
         new PlayerData{Health = 500},
     };
 
@@ -42,33 +42,52 @@ public partial class Control : ObservableNode
     {
         get { return _selectedBindingMode; }
         set { SetValue(ref _selectedBindingMode, value); }
-    }    
+    }
 
-    private ObservableList<string> _backinglistForTesting = new ObservableList<string>{"Test"};
+    private ObservableList<string> _backinglistForTesting = new() { "Test" };
     public ObservableList<string> BackingListForTesting
     {
         get { return _backinglistForTesting; }
         set { SetValue(ref _backinglistForTesting, value); }
     }
 
+    private string errorMessage;
+    public string ErrorMessage
+    {
+        get { return errorMessage; }
+        set { SetValue(ref errorMessage, value); }
+    }
+
     public override void _Ready()
     {
         // Bind root properties to UI        
         BindProperty("%Button", nameof(Button.Disabled), nameof(IsAddNewPlayerEnabled), formatter: new ReverseBoolValueFormatter());
-        BindProperty("%CheckBox", nameof(CheckBox.ButtonPressed), nameof(IsAddNewPlayerEnabled), BindingMode.TwoWay);        
+        BindProperty("%CheckBox", nameof(CheckBox.ButtonPressed), nameof(IsAddNewPlayerEnabled), BindingMode.TwoWay);
         BindProperty("%CodeEdit", nameof(CodeEdit.Text), nameof(LongText), BindingMode.TwoWay);
         BindProperty("%CodeEdit2", nameof(CodeEdit.Text), nameof(LongText), BindingMode.TwoWay);
 
         BindProperty("%HSlider", nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay);
         BindProperty("%VSlider", nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay);
-        BindProperty("%SpinBox", nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay);
+        BindProperty("%SpinBox", nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay)
+            .AddValidator(v => (double)v > 0f ? null : "Value must be greater than 0");
+
         BindProperty("%HScrollBar", nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay);
         BindProperty("%VScrollBar", nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay);
         BindProperty("%ProgressBar", nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay);
         BindProperty("%SpinboxLabel", nameof(Label.Text), nameof(SpinBoxValue), BindingMode.OneWay);
 
         // Bind to SelectedPlayerData.Health        
-        BindProperty("%LineEdit", nameof(LineEdit.Text), $"{nameof(SelectedPlayerData)}.{nameof(PlayerData.Health)}", BindingMode.TwoWay);
+        BindProperty("%LineEdit", nameof(LineEdit.Text), $"{nameof(SelectedPlayerData)}.{nameof(PlayerData.Health)}", BindingMode.TwoWay,
+            new ValueFormatter()
+            {
+                FormatTarget = (v, p) => int.TryParse((string)v, out int value) ? value : 0,
+            })
+            .AddValidator(v => int.TryParse((string)v, out int value) ? null : "Health must be a number")
+            .AddValidator(v => int.TryParse((string)v, out int value) && value > 0 ? null : "Health must be greater than 0")
+            .AddValidationHandler((control, isValid, message) => { 
+                (control as LineEdit).RightIcon = isValid ? null : (Texture2D)ResourceLoader.Load("uid://b5s5nstqwi4jh"); 
+                (control as LineEdit).Modulate = new Color(1, 1, 1, 1) ;
+            });
 
         // list binding
         BindListProperty("%ItemList", nameof(playerDatas), formatter: new PlayerDataListFormatter());
@@ -77,8 +96,17 @@ public partial class Control : ObservableNode
         BindProperty("%TextEdit", nameof(TextEdit.Text), $"{nameof(SelectedPlayerData)}.{nameof(PlayerData.ListOfThings)}", BindingMode.OneWayToTarget, new StringToListFormatter());
         BindListProperty("%ItemList3", $"{nameof(SelectedPlayerData)}.{nameof(PlayerData.ListOfThings)}", BindingMode.TwoWay);
 
-        BindEnumProperty<BindingMode>("%OptionButton", $"{nameof(SelectedPlayerData)}.{nameof(SelectedPlayerData.BindingMode)}");
+        BindEnumProperty<BindingMode>("%OptionButton", $"{nameof(SelectedPlayerData)}.BindingMode");
         BindSceneList("%VBoxContainer", nameof(playerDatas), "uid://die1856ftg8w8", BindingMode.TwoWay);
+        BindProperty("%ErrorLabel", nameof(Label.Visible), nameof(HasErrors), BindingMode.OneWay);
+        BindProperty("%ErrorLabel", nameof(Label.Text), nameof(ErrorMessage), BindingMode.OneWay);
+
+        ControlValidationChanged += (control, propertyName, message, isValid) =>
+        {
+            control.Modulate = isValid ? Colors.White : Colors.Red;
+            control.TooltipText = message;
+            ErrorMessage = message;
+        };
 
         base._Ready();
     }
@@ -92,11 +120,11 @@ public partial class Control : ObservableNode
     }
 
     public void _on_Button_pressed()
-    {        
+    {
         playerDatas.Add(new PlayerData
         {
             Health = 100
-        });        
+        });
     }
 
     private PlayerData selectedPlayerData = new();
@@ -108,7 +136,7 @@ public partial class Control : ObservableNode
 
     public void _on_button_2_pressed()
     {
-        var node = GetNode<ItemList>("%ItemList");        
+        var node = GetNode<ItemList>("%ItemList");
         var selectedIndexes = node.GetSelectedItems();
         if (selectedIndexes.Length > 0)
         {

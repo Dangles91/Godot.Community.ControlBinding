@@ -6,7 +6,7 @@ using System.Linq;
 namespace Godot.Community.ControlBinding.ControlBinders;
 public partial class OptionButtonControlBinder : ControlBinderBase
 {
-    private readonly List<string> _allowedTwoBindingProperties = new List<string>(){
+    private readonly List<string> _allowedTwoBindingProperties = new(){
             "Selected"
         };
 
@@ -58,7 +58,7 @@ public partial class OptionButtonControlBinder : ControlBinderBase
         List<object> convertedValues = eventArgs.ChangedEntries.ToList();
         if (_bindingConfiguration.Formatter != null)
         {
-            convertedValues = eventArgs.ChangedEntries.Select(x => _bindingConfiguration.Formatter.FormatControl(x)).ToList();
+            convertedValues = eventArgs.ChangedEntries.Select(x => _bindingConfiguration.Formatter.FormatControl(x, null)).ToList();
         }
 
         if (eventArgs.ChangeType == ObservableListChangeType.Add)
@@ -123,7 +123,7 @@ public partial class OptionButtonControlBinder : ControlBinderBase
         object convertedVal = entry;
         if (_bindingConfiguration.Formatter != null)
         {
-            convertedVal = _bindingConfiguration.Formatter.FormatControl(entry);
+            convertedVal = _bindingConfiguration.Formatter.FormatControl(entry, null);
         }
 
         if (convertedVal is ListItem listItem)

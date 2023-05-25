@@ -21,24 +21,24 @@ public static class BackReferenceFactory
         if (pathNodes.Count > 1)
         {
             object root = bindingConfiguration.Owner;
-
+            object pathObject = root;
             for (int i = 0; i < pathNodes.Count; i++)
-            {
-                // TODO: make this easier to read
-                object pathObject = null;
+            {                            
                 if (i == 0)
                 {
-                    pathObject = root;
-                    pathObjects.Add(pathObject);
+                    pathObjects.Add(root);
                 }
                 else
-                {
+                {                    
                     var pathNode = pathNodes[i - 1];
                     pathObject = ReflectionService.GetPropertyInfo(root, pathNode).GetValue(root);
-                    pathObjects.Add(pathObject);
-                    if (!bindingConfiguration.IsListBinding && i + 1 > pathNodes.Count - 1)
-                        continue;
+                    pathObjects.Add(pathObject);                    
                 }
+
+                if (!bindingConfiguration.IsListBinding && i + 1 > pathNodes.Count - 1)
+                {
+                    continue;
+                }                        
 
                 if (!bindingConfiguration.BackReferences.Any(x => x.ObjectReference.Target == pathObject && x.PropertyName == pathNodes[i]))
                 {
