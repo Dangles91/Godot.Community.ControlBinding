@@ -13,8 +13,7 @@ namespace Godot.Community.ControlBinding;
 public partial class ObservableNode : Node, IObservableNode, IObservableObject
 {
     public event PropertyChangedEventHandler PropertyChanged;
-    public event ValidationChangedEventHandler PropertyValidationChanged;
-    private readonly ControlBinderProvider _controlBinderProvider = new();
+    public event ValidationChangedEventHandler PropertyValidationChanged;    
 
     private readonly List<Binding> _controlBindings = new();
     private readonly object cleanUpLock = 0;
@@ -76,7 +75,7 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
             return null;
         }
 
-        if (_controlBinderProvider.GetBinder(node) is IControlBinder binder)
+        if (ControlBinderProvider.GetBinder(node) is IControlBinder binder)
         {
             var bindingConfiguration = new BindingConfiguration
             {
@@ -117,7 +116,7 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
             return null;
         }
 
-        if (_controlBinderProvider.GetBinder(node) is IControlBinder binder)
+        if (ControlBinderProvider.GetBinder(node) is IControlBinder binder)
         {
             var bindingConfiguration = new BindingConfiguration
             {
@@ -166,7 +165,7 @@ public partial class ObservableNode : Node, IObservableNode, IObservableObject
         }
 
         // bind the list items (static list binding - enums won't change at runtime)
-        if (_controlBinderProvider.GetBinder(node) is IControlBinder binder)
+        if (ControlBinderProvider.GetBinder(node) is IControlBinder binder)
         {
             var bindingConfiguration = new BindingConfiguration
             {
