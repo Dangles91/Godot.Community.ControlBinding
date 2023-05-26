@@ -75,7 +75,9 @@ namespace Godot.Community.ControlBinding
             }
 
             if (BindingStatus != BindingStatus.Active)
+            {
                 (BindingConfiguration.BoundControl.Target as Godot.Control).TreeExiting += OnBoundControlTreeExiting;
+            }
 
             if (BindingConfiguration.TargetObject.Target is IObservableObject observable)
             {
@@ -100,6 +102,11 @@ namespace Godot.Community.ControlBinding
             if (BindingConfiguration.BoundControl.IsAlive)
             {
                 (_controlBinder as ControlBinderBase).ControlValueChanged += OnSourcePropertyChanged;
+                // Allow binding to custom controls that implement IObservableObject
+                if (BindingConfiguration.BoundControl.Target is IObservableObject observable2)
+                {
+                    observable2.PropertyChanged += OnSourcePropertyChanged;
+                }
             }
 
             BindingStatus = BindingStatus.Active;
@@ -183,6 +190,14 @@ namespace Godot.Community.ControlBinding
             UnbindControl();
         }
 
+        public void OnSourcePropertyChanged(object sender, string propertyName)
+        {
+            if (sender is Godot.Control control)
+            {
+                OnSourcePropertyChanged(control, propertyName);
+            }
+        }
+
         public void OnSourcePropertyChanged(GodotObject sender, string propertyName)
         {
             if (BindingConfiguration.TargetObject.Target == null)
@@ -211,7 +226,7 @@ namespace Godot.Community.ControlBinding
 
         private void OnPropertyValidationChanged(Godot.Control control, string propertyName, bool isValid, string message)
         {
-            if(isValid)
+            if (isValid)
             {
                 BindingConfiguration.Owner.OnPropertyValidationSucceeded(control, propertyName);
             }
@@ -284,7 +299,11 @@ namespace Godot.Community.ControlBinding
 
             if (BindingConfiguration.BoundControl.IsAlive)
             {
-                (_controlBinder as ControlBinderBase).ControlValueChanged -= OnSourcePropertyChanged;
+                (_controlBinder as ControlBinderBase).ControlValueChanged -= OnSourcePropertyChanged;                
+                if (BindingConfiguration.BoundControl.Target is IObservableObject observable2)
+                {
+                    observable2.PropertyChanged -= OnSourcePropertyChanged;
+                }
             }
 
             BindingConfiguration.BackReferences.Clear();
