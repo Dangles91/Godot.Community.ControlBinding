@@ -124,7 +124,6 @@ public partial class ObservableList<T> : ObservableObject, IList<T>, IObservable
 
     public ObservableList()
     {
-
     }
 
     public ObservableList(IList<T> list)

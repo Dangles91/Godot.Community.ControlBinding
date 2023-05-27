@@ -4,11 +4,11 @@ using System.Reflection;
 namespace Godot.Community.ControlBinding.Services;
 public static class ReflectionService
 {
-    private static Dictionary<string, PropertyInfo> _propertyInfoCache = new();
-    
+    private static readonly Dictionary<string, PropertyInfo> _propertyInfoCache = new();
+
     public static PropertyInfo GetPropertyInfo(object instance, string propertyName)
     {
-        if(instance == null)
+        if (instance == null)
             return null;
 
         string cacheKey = $"{instance.GetType().FullName}.{propertyName}";

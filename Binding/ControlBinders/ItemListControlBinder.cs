@@ -94,7 +94,7 @@ public partial class ItemListControlBinder : ControlBinderBase
         }
     }
 
-    private void SetItemValues(ItemList itemList, int index, ListItem listItem)
+    private static void SetItemValues(ItemList itemList, int index, ListItem listItem)
     {
         itemList.SetItemText(index, listItem.DisplayValue);
         if (listItem.Icon != null)
