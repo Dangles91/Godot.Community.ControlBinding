@@ -20,6 +20,11 @@ namespace Godot.Community.ControlBinding
     {
         public event EventHandler<BindingStatus> BindingStatusChanged;
 
+        public delegate void ValidationFailedEventHandler(Godot.Control control, string propertyName, string message);
+        public event ValidationFailedEventHandler ValidationFailed;
+
+        public delegate void ValidationSuceededEventHandler(Godot.Control control, string propertyName);
+        public event ValidationSuceededEventHandler ValidationSucceeded;
 
         private BindingConfiguration _bindingConfiguration;
         public BindingConfiguration BindingConfiguration
@@ -49,6 +54,41 @@ namespace Godot.Community.ControlBinding
             resolveBindingPath();
             subscribeChangeEvents();
             setInitialValue();
+        }
+
+        public void UnbindControl()
+        {
+            if (BindingConfiguration.TargetObject.Target is IObservableObject observable)
+            {
+                observable.PropertyChanged -= OnPropertyChanged;
+            }
+
+            if (BindingConfiguration.TargetObject.Target is IObservableList observable1)
+            {
+                observable1.ObservableListChanged -= _controlBinder.OnObservableListChanged;
+                foreach (var item in observable1.GetBackingList())
+                {
+                    if (item is IObservableObject oItem)
+                    {
+                        oItem.PropertyChanged -= OnItemListChanged;
+                    }
+                }
+            }
+
+            foreach (var backReference in BindingConfiguration.BackReferences)
+            {
+                if (backReference.ObjectReference.Target is IObservableObject observableObject)
+                {
+                    observableObject.PropertyChanged -= OnBackReferenceChanged;
+                }
+            }
+
+            if (BindingConfiguration.BoundControl.IsAlive)
+            {
+                (_controlBinder as ControlBinderBase).ControlValueChanged -= OnSourcePropertyChanged;
+            }
+
+            BindingConfiguration.BackReferences.Clear();
         }
 
         private void resolveBindingPath()
@@ -213,12 +253,6 @@ namespace Godot.Community.ControlBinding
             }
         }
 
-        public delegate void ValidationFailedEventHandler(Godot.Control control, string propertyName, string message);
-        public event ValidationFailedEventHandler ValidationFailed;
-
-        public delegate void ValidationSuceededEventHandler(Godot.Control control, string propertyName);
-        public event ValidationSuceededEventHandler ValidationSucceeded;
-
         private void OnPropertyValidationChanged(Godot.Control control, string propertyName, bool isValid, string message)
         {
             if (isValid)
@@ -263,41 +297,6 @@ namespace Godot.Community.ControlBinding
         private void OnItemListChanged(object sender, string propertyName)
         {
             _controlBinder.OnListItemChanged(sender);
-        }
-
-        public void UnbindControl()
-        {
-            if (BindingConfiguration.TargetObject.Target is IObservableObject observable)
-            {
-                observable.PropertyChanged -= OnPropertyChanged;
-            }
-
-            if (BindingConfiguration.TargetObject.Target is IObservableList observable1)
-            {
-                observable1.ObservableListChanged -= _controlBinder.OnObservableListChanged;
-                foreach (var item in observable1.GetBackingList())
-                {
-                    if (item is IObservableObject oItem)
-                    {
-                        oItem.PropertyChanged -= OnItemListChanged;
-                    }
-                }
-            }
-
-            foreach (var backReference in BindingConfiguration.BackReferences)
-            {
-                if (backReference.ObjectReference.Target is IObservableObject observableObject)
-                {
-                    observableObject.PropertyChanged -= OnBackReferenceChanged;
-                }
-            }
-
-            if (BindingConfiguration.BoundControl.IsAlive)
-            {
-                (_controlBinder as ControlBinderBase).ControlValueChanged -= OnSourcePropertyChanged;
-            }
-
-            BindingConfiguration.BackReferences.Clear();
         }
     }
 }
