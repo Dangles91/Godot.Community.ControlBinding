@@ -1,17 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using Godot.Community.ControlBinding.Collections;
 using Godot.Community.ControlBinding.ControlBinders;
-using Godot.Community.ControlBinding.Extensions;
 using Godot.Community.ControlBinding.Factories;
 using Godot.Community.ControlBinding.Formatters;
 using Godot.Community.ControlBinding.Interfaces;
 
 namespace Godot.Community.ControlBinding
 {
-    public class BindingContainer : IObservableObject
+    public class BindingContainer : ObservableObject
     {
         private readonly IObservableObject _bindingRoot;
         public BindingContainer(IObservableObject bindingRoot)
@@ -213,22 +211,20 @@ namespace Godot.Community.ControlBinding
 
         private bool _hasErrors;
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
         public bool HasErrors
         {
             get => _hasErrors;
-            private set => this.SetValue(ref _hasErrors, HasErrors);
+
+            private set
+            {
+                _hasErrors = value;
+                OnPropertyChanged();
+            }
         }
 
         public List<string> GetValidationMessages()
         {
             return _validationErrors.SelectMany(x => x.Value).ToList();
-        }
-
-        public void OnPropertyChanged([CallerMemberName] string name = "not a property")
-        {
-            PropertyChanged?.Invoke(this, name);
         }
 
         public event ValidationChangedEventHandler ControlValidationChanged;
