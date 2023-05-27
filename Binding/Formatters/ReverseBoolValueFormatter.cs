@@ -2,9 +2,9 @@ using System;
 
 namespace Godot.Community.ControlBinding.Formatters;
 
-public class ReverseBoolValueFormatter : IValueFormatter
+public class ReverseBoolValueFormatter : IValueFormatter<bool, bool>
 {
-    public Func<object, object, object> FormatControl => (v, pv) => !(bool)v;
+    public Func<bool, bool, bool> FormatControl => (v, pv) => !v;
 
-    public Func<object, object, object> FormatTarget => (v, pv) => !(bool)v;
+    public Func<bool, bool, bool> FormatTarget => (v, pv) => !v;
 }

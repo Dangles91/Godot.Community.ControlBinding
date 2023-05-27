@@ -14,34 +14,35 @@ namespace Godot.Community.ControlBinding.Factories
         }
     }
 
-    public class BindingValidatorBuilder<T> : BindingBuilderBase where T : BindingValidatorBuilder<T>
-    {
+    public class BindingValidatorBuilder<TBuilder, T, TSource, TTarget> : BindingBuilderBase 
+        where TBuilder : BindingValidatorBuilder<TBuilder, T, TSource, TTarget> 
+        where T : Control {
         public BindingValidatorBuilder(Binding binding) : base(binding)
         {
         }
 
-        public virtual T AddValidator(Func<object, string> validator)
+        public virtual TBuilder AddValidator(Func<TTarget, string> validator)
         {
-            _binding.BoundPropertySetter.Validators.Add(validator);
-            return (T)this;
+            _binding.BoundPropertySetter.Validators.Add((source) => validator((TTarget)source));
+            return (TBuilder)this;
         }
     }
 
-    public class BindingBuilderValidationHandler<T> : BindingValidatorBuilder<T> where T : BindingBuilderValidationHandler<T>
-    {
+    public class BindingBuilderValidationHandler<TBuilder, T, TSource, TTarget> : BindingValidatorBuilder<TBuilder, T, TSource, TTarget> 
+        where TBuilder : BindingBuilderValidationHandler<TBuilder, T, TSource, TTarget>
+        where T : Control {
         public BindingBuilderValidationHandler(Binding binding) : base(binding)
         {
         }
 
-        public BindingValidatorBuilder<T> AddValidationHandler(Action<Control, bool, string> handler)
+        public TBuilder AddValidationHandler(Action<T, bool, string> handler)
         {
-            _binding.BindingConfiguration.OnValidationChangedHandler = handler;
-            return (T)this;
+            _binding.BindingConfiguration.OnValidationChangedHandler = (control, b, arg3) => handler((T)control, b, arg3);
+            return (TBuilder)this;
         }
     }
 
-    public class BindingBuilder : BindingBuilderValidationHandler<BindingBuilder>
-    {
+    public class BindingBuilder<T, TSource, TTarget> : BindingBuilderValidationHandler<BindingBuilder<T, TSource, TTarget>, T, TSource, TTarget> where T : Control {
         public BindingBuilder(Binding binding) : base(binding)
         {
         }

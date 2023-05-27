@@ -16,7 +16,7 @@ public partial class PlayerDataListItem : ObservableNode
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
-        BindProperty("%TextEdit", "Text", "ViewModelData.Health", BindingMode.TwoWay);
+        BindProperty<TextEdit, string, int>("%TextEdit", "Text", "ViewModelData.Health", BindingMode.TwoWay);
         GetNode<Button>("%Button").Pressed += () =>
         {
             this.QueueFree();

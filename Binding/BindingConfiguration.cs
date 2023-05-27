@@ -21,7 +21,7 @@ public class BindingConfiguration
     public IObservableNode Owner { get; init; }
     public WeakReference BoundControl { get; set; }
     public WeakReference TargetObject { get; set; }
-    public IValueFormatter Formatter { get; set; }
+    public IValueFormatter<object, object> Formatter { get; set; }
     public List<WeakBackReference> BackReferences { get; set; }
     public ISceneFormatter SceneFormatter { get; set; }
     public List<Func<object, string>> Validators { get; set; } = new();
