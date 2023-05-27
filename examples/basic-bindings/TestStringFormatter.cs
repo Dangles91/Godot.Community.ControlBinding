@@ -5,13 +5,13 @@ using System;
 
 namespace ControlBinding;
 
-public class PlayerHealthFormatter : IValueFormatter
+public class PlayerHealthFormatter : IValueFormatter<string, string>
 {
-    public Func<object, object, object> FormatControl => (v,p) =>
+    public Func<string, string, string> FormatControl => (v,p) =>
     {
         var input = (string)v;
         return $"Player health: {v}";
     };
 
-    public Func<object, object, object> FormatTarget => (v, p) => throw new NotImplementedException();
+    public Func<string, string, string> FormatTarget => (v, p) => throw new NotImplementedException();
 }

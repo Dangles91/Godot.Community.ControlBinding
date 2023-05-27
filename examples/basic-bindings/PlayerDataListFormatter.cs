@@ -5,9 +5,9 @@ using System;
 
 namespace ControlBinding;
 
-public class PlayerDataListFormatter : IValueFormatter
+public class PlayerDataListFormatter : IValueFormatter<PlayerData, ListItem>
 {
-    public Func<object, object, object> FormatControl => (v,p) =>
+    public Func<PlayerData, ListItem, ListItem> FormatControl => (v,p) =>
     {
         var pData = v as PlayerData;
         var listItem = new ListItem
@@ -21,5 +21,5 @@ public class PlayerDataListFormatter : IValueFormatter
         return listItem;
     };
 
-    public Func<object, object, object> FormatTarget => throw new NotImplementedException();
+    public Func<ListItem, PlayerData, PlayerData> FormatTarget => throw new NotImplementedException();
 }

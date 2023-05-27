@@ -9,9 +9,9 @@ namespace Godot.Community.ControlBinding.Utilities;
 
 public class BoundPropertySetter
 {
-    private readonly IValueFormatter _valueFormatter;
+    private readonly IValueFormatter<object, object> _valueFormatter;
     public readonly List<Func<object, string>> Validators;
-    public BoundPropertySetter(IValueFormatter valueFormatter, List<Func<object, string>> validators = null)
+    public BoundPropertySetter(IValueFormatter<object, object> valueFormatter, List<Func<object, string>> validators = null)
     {
         _valueFormatter = valueFormatter;
         Validators = validators;
@@ -84,6 +84,7 @@ public class BoundPropertySetter
             try
             {
                 var previousValue = targetValue;
+                Console.WriteLine("formatter("+sourceValue.GetType().Name+" "+sourceValue+", "+targetValue.GetType().Name+" "+targetValue+")"); 
                 convertedValue = formatter(sourceValue, targetValue);
             }
             catch(ValidationException)
