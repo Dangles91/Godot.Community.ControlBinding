@@ -58,12 +58,12 @@ public partial class Control : ControlViewModel
         set { this.SetValue(ref errorMessage, value); }
     }
 
-    BindingContainer bindingContainer;
+    BindingContainer bindingContainer {get; set;}
 
     public override void _Ready()
     {
         bindingContainer = new BindingContainer(this);
-        
+
         // Bind root properties to UI        
         bindingContainer.BindProperty(GetNode("%Button"), nameof(Button.Disabled), nameof(IsAddNewPlayerEnabled), formatter: new ReverseBoolValueFormatter());
         GetNode("%CodeEdit").BindProperty(bindingContainer, nameof(CodeEdit.Text), nameof(LongText), BindingMode.TwoWay);
@@ -103,7 +103,7 @@ public partial class Control : ControlViewModel
 
         bindingContainer.BindEnumProperty<BindingMode>(GetNode<OptionButton>("%OptionButton"), $"{nameof(SelectedPlayerData)}.BindingMode");
         bindingContainer.BindSceneList(GetNode("%VBoxContainer"), nameof(playerDatas), "uid://die1856ftg8w8", BindingMode.TwoWay);
-        bindingContainer.BindProperty(GetNode("%ErrorLabel"), nameof(Visible), nameof(bindingContainer.HasErrors), BindingMode.OneWay);
+        bindingContainer.BindProperty(GetNode("%ErrorLabel"), nameof(Visible), $"{nameof(bindingContainer)}.{nameof(bindingContainer.HasErrors)}", BindingMode.OneWay);
         bindingContainer.BindProperty(GetNode("%ErrorLabel"), nameof(Label.Text), nameof(ErrorMessage), BindingMode.OneWay);
 
         bindingContainer.ControlValidationChanged += (control, propertyName, message, isValid) =>
