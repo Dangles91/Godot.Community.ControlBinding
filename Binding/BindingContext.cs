@@ -9,10 +9,10 @@ using Godot.Community.ControlBinding.Interfaces;
 
 namespace Godot.Community.ControlBinding
 {
-    public class BindingContainer : ObservableObject
+    public class BindingContext : ObservableObject
     {
         private readonly IObservableObject _bindingRoot;
-        public BindingContainer(IObservableObject bindingRoot)
+        public BindingContext(IObservableObject bindingRoot)
         {
             _bindingRoot = bindingRoot;
         }
@@ -28,8 +28,24 @@ namespace Godot.Community.ControlBinding
 
             binding.ValidationFailed += OnPropertyValidationFailed;
             binding.ValidationSucceeded += OnPropertyValidationSucceeded;
+            binding.BindingStatusChanged += OnBindingStatusChanged;
 
             _bindings[binding.BindingConfiguration.BoundControl.Target].Add(binding);
+        }
+
+        private void OnBindingStatusChanged(object sender, BindingStatus e)
+        {
+            if(sender is Binding binding)
+            {
+                if (e == BindingStatus.Invalid)
+                {
+                    _bindings[binding.BindingConfiguration.BoundControl.Target].Remove(binding);
+                    if(_bindings[binding.BindingConfiguration.BoundControl.Target].Count == 0)
+                    {
+                        _bindings.Remove(binding.BindingConfiguration.BoundControl.Target);
+                    }
+                }
+            }
         }
 
         /// <summary>

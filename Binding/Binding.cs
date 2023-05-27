@@ -18,6 +18,9 @@ namespace Godot.Community.ControlBinding
 
     public class Binding
     {
+        public event EventHandler<BindingStatus> BindingStatusChanged;
+
+
         private BindingConfiguration _bindingConfiguration;
         public BindingConfiguration BindingConfiguration
         {
@@ -180,6 +183,7 @@ namespace Godot.Community.ControlBinding
         private void OnBoundControlTreeExiting()
         {
             BindingStatus = BindingStatus.Invalid;
+            BindingStatusChanged?.Invoke(this, BindingStatus);
             UnbindControl();
         }
 
@@ -217,7 +221,7 @@ namespace Godot.Community.ControlBinding
 
         private void OnPropertyValidationChanged(Godot.Control control, string propertyName, bool isValid, string message)
         {
-            if(isValid)
+            if (isValid)
             {
                 ValidationSucceeded?.Invoke(control, propertyName);
             }

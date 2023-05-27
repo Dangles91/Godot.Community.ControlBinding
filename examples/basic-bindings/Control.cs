@@ -58,11 +58,11 @@ public partial class Control : ControlViewModel
         set { this.SetValue(ref errorMessage, value); }
     }
 
-    BindingContainer bindingContainer {get; set;}
+    BindingContext bindingContainer {get; set;}
 
     public override void _Ready()
     {
-        bindingContainer = new BindingContainer(this);
+        bindingContainer = new BindingContext(this);
 
         // Bind root properties to UI        
         bindingContainer.BindProperty(GetNode("%Button"), nameof(Button.Disabled), nameof(IsAddNewPlayerEnabled), formatter: new ReverseBoolValueFormatter());
