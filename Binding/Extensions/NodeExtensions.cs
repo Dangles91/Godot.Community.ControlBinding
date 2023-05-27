@@ -11,14 +11,14 @@ public static class NodeExtensions
     /// <param name="controlPath">The path of the Godot control in the scene.</param>
     /// <param name="selectedItemPath">The path of the property to bind to. Relative to this object.</param>
     /// <typeparam name="T">The enum type to bind the OptionButton to</typeparam>
-    public static void BindEnumProperty<T>(this OptionButton node, BindingContainer bindingContainer, string selectedItemPath = null) where T : Enum
+    public static void BindEnumProperty<T>(this OptionButton node, BindingContext bindingContainer, string selectedItemPath = null) where T : Enum
     {
         bindingContainer.BindEnumProperty<T>(node, selectedItemPath);
     }
 
     public static void BindSceneList(
         this Node node,
-        BindingContainer bindingContainer,
+        BindingContext bindingContainer,
         string path,
         string scenePath,
         BindingMode bindingMode = BindingMode.OneWay)
@@ -36,7 +36,7 @@ public static class NodeExtensions
     /// <param name="formatter">The IValueFormatter to use to format the list item and target property. Return a <see cref="ControlBinding.Collections.ListItem"/> for greater formatting control.</param>
     public static void BindListProperty(
         this Node node,
-        BindingContainer bindingContainer,
+        BindingContext bindingContainer,
 
         string path,
         BindingMode bindingMode = BindingMode.OneWay,
@@ -56,7 +56,7 @@ public static class NodeExtensions
     /// <param name="formatter">The <see cref="ControlBinding.Formatters.IValueFormatter" /> to use to format the Control property and target property</param>
     public static Factories.BindingBuilder BindProperty(
         this Node node,
-        BindingContainer bindingContainer,
+        BindingContext bindingContainer,
         string sourceProperty,
         string path,
         BindingMode bindingMode = BindingMode.OneWay,
