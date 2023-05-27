@@ -209,15 +209,21 @@ namespace Godot.Community.ControlBinding
             }
         }
 
+        public delegate void ValidationFailedEventHandler(Godot.Control control, string propertyName, string message);
+        public event ValidationFailedEventHandler ValidationFailed;
+
+        public delegate void ValidationSuceededEventHandler(Godot.Control control, string propertyName);
+        public event ValidationSuceededEventHandler ValidationSucceeded;
+
         private void OnPropertyValidationChanged(Godot.Control control, string propertyName, bool isValid, string message)
         {
             if(isValid)
             {
-                BindingConfiguration.Owner.OnPropertyValidationSucceeded(control, propertyName);
+                ValidationSucceeded?.Invoke(control, propertyName);
             }
             else
             {
-                BindingConfiguration.Owner.OnPropertyValidationFailed(control, propertyName, message);
+                ValidationFailed?.Invoke(control, propertyName, message);
             }
 
             BindingConfiguration.OnValidationChangedHandler?.Invoke(control, isValid, message);

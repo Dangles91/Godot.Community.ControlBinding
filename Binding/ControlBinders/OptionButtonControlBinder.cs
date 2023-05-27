@@ -136,7 +136,7 @@ public partial class OptionButtonControlBinder : ControlBinderBase
         }
     }
 
-    private void SetItemValues(OptionButton optionButton, int index, ListItem listItem)
+    private static void SetItemValues(OptionButton optionButton, int index, ListItem listItem)
     {
         optionButton.SetItemText(index, listItem.DisplayValue);
         if (listItem.Icon != null)

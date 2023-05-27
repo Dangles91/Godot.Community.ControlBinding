@@ -18,7 +18,7 @@ public class BindingConfiguration
     public string TargetPropertyName { get; set; }
     public BindingMode BindingMode { get; set; }
     public bool IsListBinding { get; set; }
-    public IObservableNode Owner { get; init; }
+    public IObservableObject Owner { get; init; }
     public WeakReference BoundControl { get; set; }
     public WeakReference TargetObject { get; set; }
     public IValueFormatter Formatter { get; set; }

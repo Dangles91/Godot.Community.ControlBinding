@@ -2,31 +2,31 @@ using Godot.Community.ControlBinding.Collections;
 using Godot.Community.ControlBinding.Formatters;
 using Godot;
 using Godot.Community.ControlBinding;
-using System.Collections.Generic;
+using Godot.Community.ControlBinding.Extensions;
 
 namespace ControlBinding;
 
-public partial class Control : ObservableNode
+public partial class Control : ControlViewModel
 {
     private bool labelIsVisible = true;
     public bool IsAddNewPlayerEnabled
     {
         get { return labelIsVisible; }
-        set { SetValue(ref labelIsVisible, value); }
+        set { this.SetValue(ref labelIsVisible, value); }
     }
 
     private string longText;
     public string LongText
     {
         get { return longText; }
-        set { SetValue(ref longText, value); }
+        set { this.SetValue(ref longText, value); }
     }
 
     private int spinBoxValue;
     public int SpinBoxValue
     {
         get { return spinBoxValue; }
-        set { SetValue(ref spinBoxValue, value); }
+        set { this.SetValue(ref spinBoxValue, value); }
     }
 
     public ObservableList<PlayerData> playerDatas { get; set; } = new(){
@@ -41,43 +41,48 @@ public partial class Control : ObservableNode
     public BindingMode SelectedBindingMode
     {
         get { return _selectedBindingMode; }
-        set { SetValue(ref _selectedBindingMode, value); }
+        set { this.SetValue(ref _selectedBindingMode, value); }
     }
 
     private ObservableList<string> _backinglistForTesting = new() { "Test" };
     public ObservableList<string> BackingListForTesting
     {
         get { return _backinglistForTesting; }
-        set { SetValue(ref _backinglistForTesting, value); }
+        set { this.SetValue(ref _backinglistForTesting, value); }
     }
 
     private string errorMessage;
     public string ErrorMessage
     {
         get { return errorMessage; }
-        set { SetValue(ref errorMessage, value); }
+        set { this.SetValue(ref errorMessage, value); }
     }
+
+    BindingContainer bindingContainer;
 
     public override void _Ready()
     {
+        bindingContainer = new BindingContainer(this);
+        
         // Bind root properties to UI        
-        BindProperty("%Button", nameof(Button.Disabled), nameof(IsAddNewPlayerEnabled), formatter: new ReverseBoolValueFormatter());
-        BindProperty("%CheckBox", nameof(CheckBox.ButtonPressed), nameof(IsAddNewPlayerEnabled), BindingMode.TwoWay);
-        BindProperty("%CodeEdit", nameof(CodeEdit.Text), nameof(LongText), BindingMode.TwoWay);
-        BindProperty("%CodeEdit2", nameof(CodeEdit.Text), nameof(LongText), BindingMode.TwoWay);
+        bindingContainer.BindProperty(GetNode("%Button"), nameof(Button.Disabled), nameof(IsAddNewPlayerEnabled), formatter: new ReverseBoolValueFormatter());
+        GetNode("%CodeEdit").BindProperty(bindingContainer, nameof(CodeEdit.Text), nameof(LongText), BindingMode.TwoWay);
 
-        BindProperty("%HSlider", nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay);
-        BindProperty("%VSlider", nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay);
-        BindProperty("%SpinBox", nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay)
+        bindingContainer.BindProperty(GetNode("%CodeEdit2"), nameof(CodeEdit.Text), nameof(LongText), BindingMode.TwoWay);
+        bindingContainer.BindProperty(GetNode("%CheckBox"), nameof(CheckBox.ButtonPressed), nameof(IsAddNewPlayerEnabled), BindingMode.TwoWay);
+
+        bindingContainer.BindProperty(GetNode("%HSlider"), nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay);
+        bindingContainer.BindProperty(GetNode("%VSlider"), nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay);
+        bindingContainer.BindProperty(GetNode("%SpinBox"), nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay)
             .AddValidator(v => (double)v > 0f ? null : "Value must be greater than 0");
 
-        BindProperty("%HScrollBar", nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay);
-        BindProperty("%VScrollBar", nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay);
-        BindProperty("%ProgressBar", nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay);
-        BindProperty("%SpinboxLabel", nameof(Label.Text), nameof(SpinBoxValue), BindingMode.OneWay);
+        bindingContainer.BindProperty(GetNode("%HScrollBar"), nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay);
+        bindingContainer.BindProperty(GetNode("%VScrollBar"), nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay);
+        bindingContainer.BindProperty(GetNode("%ProgressBar"), nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay);
+        bindingContainer.BindProperty(GetNode("%SpinboxLabel"), nameof(Label.Text), nameof(SpinBoxValue), BindingMode.OneWay);
 
         // Bind to SelectedPlayerData.Health        
-        BindProperty("%LineEdit", nameof(LineEdit.Text), $"{nameof(SelectedPlayerData)}.{nameof(PlayerData.Health)}", BindingMode.TwoWay,
+        bindingContainer.BindProperty(GetNode("%LineEdit"), nameof(LineEdit.Text), $"{nameof(SelectedPlayerData)}.{nameof(PlayerData.Health)}", BindingMode.TwoWay,
             new ValueFormatter()
             {
                 FormatTarget = (v, p) => int.TryParse((string)v, out int value) ? value : 0,
@@ -85,23 +90,23 @@ public partial class Control : ObservableNode
             .AddValidator(v => int.TryParse((string)v, out int value) ? null : "Health must be a number")
             .AddValidator(v => int.TryParse((string)v, out int value) && value > 0 ? null : "Health must be greater than 0")
             .AddValidationHandler((control, isValid, message) => { 
-                (control as LineEdit).RightIcon = isValid ? null : (Texture2D)ResourceLoader.Load("uid://b5s5nstqwi4jh"); 
+                (control as LineEdit).RightIcon = isValid ? null : (Texture2D)ResourceLoader.Load("uid://b5s5nstqwi4jh");
                 (control as LineEdit).Modulate = new Color(1, 1, 1, 1) ;
             });
 
         // list binding
-        BindListProperty("%ItemList", nameof(playerDatas), formatter: new PlayerDataListFormatter());
-        BindListProperty("%ItemList2", nameof(playerDatas2), formatter: new PlayerDataListFormatter());
+        bindingContainer.BindListProperty(GetNode("%ItemList"), nameof(playerDatas), formatter: new PlayerDataListFormatter());
+        bindingContainer.BindListProperty(GetNode("%ItemList2"), nameof(playerDatas2), formatter: new PlayerDataListFormatter());
 
-        BindProperty("%TextEdit", nameof(TextEdit.Text), $"{nameof(SelectedPlayerData)}.{nameof(PlayerData.ListOfThings)}", BindingMode.OneWayToTarget, new StringToListFormatter());
-        BindListProperty("%ItemList3", $"{nameof(SelectedPlayerData)}.{nameof(PlayerData.ListOfThings)}", BindingMode.TwoWay);
+        bindingContainer.BindProperty(GetNode("%TextEdit"), nameof(TextEdit.Text), $"{nameof(SelectedPlayerData)}.{nameof(PlayerData.ListOfThings)}", BindingMode.OneWayToTarget, new StringToListFormatter());
+        bindingContainer.BindListProperty(GetNode("%ItemList3"), $"{nameof(SelectedPlayerData)}.{nameof(PlayerData.ListOfThings)}", BindingMode.TwoWay);
 
-        BindEnumProperty<BindingMode>("%OptionButton", $"{nameof(SelectedPlayerData)}.BindingMode");
-        BindSceneList("%VBoxContainer", nameof(playerDatas), "uid://die1856ftg8w8", BindingMode.TwoWay);
-        BindProperty("%ErrorLabel", nameof(Label.Visible), nameof(HasErrors), BindingMode.OneWay);
-        BindProperty("%ErrorLabel", nameof(Label.Text), nameof(ErrorMessage), BindingMode.OneWay);
+        bindingContainer.BindEnumProperty<BindingMode>(GetNode<OptionButton>("%OptionButton"), $"{nameof(SelectedPlayerData)}.BindingMode");
+        bindingContainer.BindSceneList(GetNode("%VBoxContainer"), nameof(playerDatas), "uid://die1856ftg8w8", BindingMode.TwoWay);
+        bindingContainer.BindProperty(GetNode("%ErrorLabel"), nameof(Visible), nameof(bindingContainer.HasErrors), BindingMode.OneWay);
+        bindingContainer.BindProperty(GetNode("%ErrorLabel"), nameof(Label.Text), nameof(ErrorMessage), BindingMode.OneWay);
 
-        ControlValidationChanged += (control, propertyName, message, isValid) =>
+        bindingContainer.ControlValidationChanged += (control, propertyName, message, isValid) =>
         {
             control.Modulate = isValid ? Colors.White : Colors.Red;
             control.TooltipText = message;
@@ -131,7 +136,7 @@ public partial class Control : ObservableNode
     public PlayerData SelectedPlayerData
     {
         get { return selectedPlayerData; }
-        set { SetValue(ref selectedPlayerData, value); }
+        set { this.SetValue(ref selectedPlayerData, value); }
     }
 
     public void _on_button_2_pressed()
@@ -165,5 +170,10 @@ public partial class Control : ObservableNode
                 playerDatas.Add(item);
             }
         }
+    }
+
+    public override void SetViewModelData(object viewModelData)
+    {
+        throw new System.NotImplementedException();
     }
 }

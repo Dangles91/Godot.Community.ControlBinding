@@ -53,7 +53,7 @@ public partial class GenericControlBinder : ControlBinderBase
         {
             if (itemIndex.Value > index)
             {
-                _controlChildIndexes[itemIndex.Key] -= 1;
+                _controlChildIndexes[itemIndex.Key]--;
             }
         }
     }

@@ -1,3 +1,5 @@
+using Godot.Community.ControlBinding.Interfaces;
+
 namespace Godot.Community.ControlBinding.Utilities;
 
 public static class SceneInstancer
@@ -5,9 +7,9 @@ public static class SceneInstancer
     public static Node CreateSceneInstance(string scenePath, object viewModelData)
     {
         var scene = (Godot.PackedScene)ResourceLoader.Load(scenePath);
-        var node = scene.Instantiate<ObservableNode>();
-
-        node.SetViewModelData(viewModelData);
+        var node = scene.Instantiate();
+        if (node is IViewModel viewModel)
+            viewModel.SetViewModelData(viewModelData);
         return node;
     }
 }

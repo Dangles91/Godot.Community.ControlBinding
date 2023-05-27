@@ -17,7 +17,6 @@ public partial class CheckBoxControlBinder : ControlBinderBase
             CheckBox boundControl = bindingConfiguration.BoundControl.Target as CheckBox;
             if (bindingConfiguration.BoundPropertyName == nameof(CheckBox.ButtonPressed))
                 boundControl.Toggled += onToggledChanged;
-
         }
         base.BindControl(bindingConfiguration);
     }
@@ -50,7 +49,6 @@ public partial class CheckBoxControlBinder : ControlBinderBase
             CheckBox boundControl = _bindingConfiguration.BoundControl.Target as CheckBox;
             if (_bindingConfiguration.BoundPropertyName == nameof(CheckBox.ButtonPressed))
                 boundControl.Toggled -= onToggledChanged;
-
         }
     }
 
