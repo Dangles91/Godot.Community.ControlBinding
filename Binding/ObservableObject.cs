@@ -1,4 +1,5 @@
 using Godot.Community.ControlBinding.Interfaces;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace Godot.Community.ControlBinding;
@@ -12,6 +13,6 @@ public partial class ObservableObject : IObservableObject
         if (name == "not a property")
             return;
 
-        PropertyChanged?.Invoke(this, name);
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }

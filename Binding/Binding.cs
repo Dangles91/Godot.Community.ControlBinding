@@ -5,6 +5,7 @@ using Godot.Community.ControlBinding.Interfaces;
 using Godot.Community.ControlBinding.Services;
 using Godot.Community.ControlBinding.Utilities;
 using System;
+using System.ComponentModel;
 using System.Linq;
 
 namespace Godot.Community.ControlBinding
@@ -199,10 +200,10 @@ namespace Godot.Community.ControlBinding
             }
         }
 
-        public virtual void OnPropertyChanged(object sender, string propertyName)
+        public virtual void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if ((BindingConfiguration.BindingMode == BindingMode.OneWay || BindingConfiguration.BindingMode == BindingMode.TwoWay)
-                && propertyName == BindingConfiguration.TargetPropertyName)
+                && e.PropertyName == BindingConfiguration.TargetPropertyName)
             {
                 BoundPropertySetter.SetBoundControlValue(BindingConfiguration.TargetObject.Target,
                     BindingConfiguration.TargetPropertyName,
@@ -211,9 +212,9 @@ namespace Godot.Community.ControlBinding
             }
         }
 
-        public void OnBackReferenceChanged(object sender, string propertyName)
+        public void OnBackReferenceChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (BindingConfiguration.BackReferences.Any(x => x.ObjectReference.Target == sender && x.PropertyName == propertyName))
+            if (BindingConfiguration.BackReferences.Any(x => x.ObjectReference.Target == sender && x.PropertyName == e.PropertyName))
             {
                 UnbindControl();
                 BindControl();
@@ -294,7 +295,7 @@ namespace Godot.Community.ControlBinding
             }
         }
 
-        private void OnItemListChanged(object sender, string propertyName)
+        private void OnItemListChanged(object sender, PropertyChangedEventArgs e)
         {
             _controlBinder.OnListItemChanged(sender);
         }
