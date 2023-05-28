@@ -30,15 +30,10 @@ public partial class Control : Godot.Control, IObservableObject
         new PlayerData{Health = 500},
     };
 
-    [Notify]
-    private BindingMode _selectedBindingMode;
-
-    [Notify]
-    private ObservableList<string> _backinglistForTesting = new() { "Test" };
-
-
-    [Notify]
-    private string _errorMessage;
+    [Notify] private BindingMode _selectedBindingMode;
+    [Notify] private ObservableList<string> _backinglistForTesting = new() { "Test" };
+    [Notify] private string _errorMessage;
+    [Notify] private string _customControlInput;
 
     BindingContext bindingContext { get; set; }
 
@@ -88,6 +83,10 @@ public partial class Control : Godot.Control, IObservableObject
         bindingContext.BindSceneList(GetNode("%VBoxContainer"), nameof(playerDatas), "uid://die1856ftg8w8", BindingMode.TwoWay);
         bindingContext.BindProperty(GetNode("%ErrorLabel"), nameof(Visible), $"{nameof(bindingContext)}.{nameof(bindingContext.HasErrors)}", BindingMode.OneWay);
         bindingContext.BindProperty(GetNode("%ErrorLabel"), nameof(Label.Text), nameof(ErrorMessage), BindingMode.OneWay);
+
+        // Binding a custom control
+        bindingContext.BindProperty(GetNode<CustomControl>("%CustomControl"), nameof(CustomControl.Input), nameof(CustomControlInput), BindingMode.TwoWay);
+        bindingContext.BindProperty(GetNode("%CustomInput"), nameof(Label.Text), nameof(CustomControlInput), BindingMode.OneWay);
 
         bindingContext.ControlValidationChanged += (control, propertyName, message, isValid) =>
         {
