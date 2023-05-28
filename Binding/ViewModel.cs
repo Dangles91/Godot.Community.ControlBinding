@@ -19,6 +19,15 @@ public abstract partial class NodeViewModel : Node, IViewModel
     }
 
     public abstract void SetViewModelData(object viewModelData);
+
+    public virtual void SetValue<T>(ref T field, T value, [CallerMemberName] string name = "not a property")
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value))
+            return;
+
+        field = value;
+        OnPropertyChanged(name);
+    }
 }
 
 public abstract partial class ControlViewModel : Control, IViewModel
@@ -31,4 +40,13 @@ public abstract partial class ControlViewModel : Control, IViewModel
     }
 
     public abstract void SetViewModelData(object viewModelData);
+
+    public virtual void SetValue<T>(ref T field, T value, [CallerMemberName] string name = "not a property")
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value))
+            return;
+
+        field = value;
+        OnPropertyChanged(name);
+    }
 }
