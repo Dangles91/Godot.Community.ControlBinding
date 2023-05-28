@@ -87,6 +87,10 @@ namespace Godot.Community.ControlBinding
             if (BindingConfiguration.BoundControl.IsAlive)
             {
                 (_controlBinder as ControlBinderBase).ControlValueChanged -= OnSourcePropertyChanged;
+                if(BindingConfiguration.BoundControl.Target is IObservableObject observable2)
+                {
+                    observable2.PropertyChanged -= OnSourcePropertyChanged;
+                }
             }
 
             BindingConfiguration.BackReferences.Clear();
@@ -144,6 +148,10 @@ namespace Godot.Community.ControlBinding
             if (BindingConfiguration.BoundControl.IsAlive)
             {
                 (_controlBinder as ControlBinderBase).ControlValueChanged += OnSourcePropertyChanged;
+                if (BindingConfiguration.BoundControl.Target is IObservableObject observable2)
+                {
+                    observable2.PropertyChanged += OnSourcePropertyChanged;
+                }
             }
 
             BindingStatus = BindingStatus.Active;
@@ -228,12 +236,12 @@ namespace Godot.Community.ControlBinding
             UnbindControl();
         }
 
-        public void OnSourcePropertyChanged(GodotObject sender, string propertyName)
+        public void OnSourcePropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (BindingConfiguration.TargetObject.Target == null)
                 return;
 
-            if (BindingConfiguration.BoundPropertyName != propertyName)
+            if (BindingConfiguration.BoundPropertyName != e.PropertyName)
                 return;
 
             if (BindingConfiguration.BindingMode == BindingMode.TwoWay || BindingConfiguration.BindingMode == BindingMode.OneWayToTarget)

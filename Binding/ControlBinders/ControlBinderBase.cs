@@ -1,15 +1,16 @@
+using System.ComponentModel;
 using Godot.Community.ControlBinding.EventArgs;
 
 namespace Godot.Community.ControlBinding.ControlBinders
 {
     public abstract partial class ControlBinderBase : IControlBinder
     {
-        public delegate void ControlValueChangedEventHandler(Godot.Control control, string propertyName);
+        public delegate void ControlValueChangedEventHandler(Godot.Control control, PropertyChangedEventArgs args);
         public event ControlValueChangedEventHandler ControlValueChanged;
 
         public void OnControlValueChanged(Godot.Control control, string propertyName)
         {
-            ControlValueChanged?.Invoke(control, propertyName);
+            ControlValueChanged?.Invoke(control, new PropertyChangedEventArgs(propertyName));
         }
 
         public delegate void ControlChildListChangedEventHandler(Godot.Control control, ObservableListChangedEventArgs args);
