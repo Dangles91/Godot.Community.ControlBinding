@@ -6,4 +6,10 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Godot.Community.ControlBinding.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="PropertyChanged.SourceGenerator" Version="1.0.8">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
 </Project>

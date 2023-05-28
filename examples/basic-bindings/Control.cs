@@ -3,31 +3,24 @@ using Godot.Community.ControlBinding.Formatters;
 using Godot;
 using Godot.Community.ControlBinding;
 using Godot.Community.ControlBinding.Extensions;
+using Godot.Community.ControlBinding.Interfaces;
+using PropertyChanged.SourceGenerator;
 
 namespace ControlBinding;
 
-public partial class Control : ControlViewModel
+public partial class Control : Godot.Control, IObservableObject
 {
-    private bool labelIsVisible = true;
-    public bool IsAddNewPlayerEnabled
-    {
-        get { return labelIsVisible; }
-        set { this.SetValue(ref labelIsVisible, value); }
-    }
+    [Notify]
+    private bool _labelIsVisible = true;
 
-    private string longText;
-    public string LongText
-    {
-        get { return longText; }
-        set { this.SetValue(ref longText, value); }
-    }
+    [Notify]
+    private bool _isAddNewPlayerEnabled = true;
 
-    private int spinBoxValue;
-    public int SpinBoxValue
-    {
-        get { return spinBoxValue; }
-        set { this.SetValue(ref spinBoxValue, value); }
-    }
+    [Notify]
+    private string _longText;
+
+    [Notify]
+    private int _spinBoxValue;
 
     public ObservableList<PlayerData> playerDatas { get; set; } = new(){
         new PlayerData{Health = 500},
@@ -37,28 +30,17 @@ public partial class Control : ControlViewModel
         new PlayerData{Health = 500},
     };
 
+    [Notify]
     private BindingMode _selectedBindingMode;
-    public BindingMode SelectedBindingMode
-    {
-        get { return _selectedBindingMode; }
-        set { this.SetValue(ref _selectedBindingMode, value); }
-    }
 
+    [Notify]
     private ObservableList<string> _backinglistForTesting = new() { "Test" };
-    public ObservableList<string> BackingListForTesting
-    {
-        get { return _backinglistForTesting; }
-        set { this.SetValue(ref _backinglistForTesting, value); }
-    }
 
-    private string errorMessage;
-    public string ErrorMessage
-    {
-        get { return errorMessage; }
-        set { this.SetValue(ref errorMessage, value); }
-    }
 
-    BindingContext bindingContext {get; set;}
+    [Notify]
+    private string _errorMessage;
+
+    BindingContext bindingContext { get; set; }
 
     public override void _Ready()
     {
@@ -89,9 +71,10 @@ public partial class Control : ControlViewModel
             })
             .AddValidator(v => int.TryParse((string)v, out int value) ? null : "Health must be a number")
             .AddValidator(v => int.TryParse((string)v, out int value) && value > 0 ? null : "Health must be greater than 0")
-            .AddValidationHandler((control, isValid, message) => { 
+            .AddValidationHandler((control, isValid, message) =>
+            {
                 (control as LineEdit).RightIcon = isValid ? null : (Texture2D)ResourceLoader.Load("uid://b5s5nstqwi4jh");
-                (control as LineEdit).Modulate = new Color(1, 1, 1, 1) ;
+                (control as LineEdit).Modulate = new Color(1, 1, 1, 1);
             });
 
         // list binding
@@ -132,12 +115,8 @@ public partial class Control : ControlViewModel
         });
     }
 
-    private PlayerData selectedPlayerData = new();
-    public PlayerData SelectedPlayerData
-    {
-        get { return selectedPlayerData; }
-        set { this.SetValue(ref selectedPlayerData, value); }
-    }
+    [Notify]
+    private PlayerData _selectedPlayerData = new();
 
     public void _on_button_2_pressed()
     {
@@ -170,10 +149,5 @@ public partial class Control : ControlViewModel
                 playerDatas.Add(item);
             }
         }
-    }
-
-    public override void SetViewModelData(object viewModelData)
-    {
-        throw new System.NotImplementedException();
     }
 }
