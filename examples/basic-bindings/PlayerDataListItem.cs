@@ -2,12 +2,14 @@ using ControlBinding;
 using Godot;
 using Godot.Community.ControlBinding;
 using Godot.Community.ControlBinding.Extensions;
+using PropertyChanged.SourceGenerator;
 
 namespace ControlBinding;
 
-public partial class PlayerDataListItem : NodeViewModel
+public partial class PlayerDataListItem : ControlViewModel
 {
-    private PlayerData ViewModelData { get; set; }
+    [Notify]
+    private PlayerData _viewModelData;
 
     public BindingContext BindingContext { get; set; }
     public override void SetViewModelData(object viewModelData)
