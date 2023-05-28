@@ -115,6 +115,9 @@ public class BoundPropertySetter
         if (targetValue?.Equals(convertedValue) == true)
             return;
 
+        if (targetValue == convertedValue)
+            return;
+
         targetPropertyInfo.SetValue(targetObject, convertedValue);
     }
 }
