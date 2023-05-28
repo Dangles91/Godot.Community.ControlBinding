@@ -25,7 +25,7 @@ public abstract partial class ControlViewModel : Control, IViewModel
 {
     public event PropertyChangedEventHandler PropertyChanged;
 
-    public void OnPropertyChanged([CallerMemberName] string name = "not a property")
+    public virtual void OnPropertyChanged([CallerMemberName] string name = "not a property")
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
