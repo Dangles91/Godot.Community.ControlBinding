@@ -97,8 +97,7 @@ public class BoundPropertySetter
             }
         }
 
-        if (_valueFormatter == null || _valueFormatter.FormatControl == null ||
-            formatterFailed)
+        if (formatter == null || formatterFailed)
         {
             try
             {
