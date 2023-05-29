@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Godot.Community.ControlBinding.Collections;
 using Godot.Community.ControlBinding.ControlBinders;
@@ -150,7 +151,7 @@ namespace Godot.Community.ControlBinding
         /// <typeparam name="T">The enum type to bind the OptionButton to</typeparam>
         public void BindEnumProperty<T>(OptionButton node, string selectedItemPath = null) where T : Enum
         {
-            ObservableList<T> targetObject = new();
+            ObservableCollection<T> targetObject = new();
             foreach (var entry in Enum.GetValues(typeof(T)))
             {
                 targetObject.Add((T)entry);

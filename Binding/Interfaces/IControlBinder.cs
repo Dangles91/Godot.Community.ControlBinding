@@ -1,3 +1,4 @@
+using System.Collections.Specialized;
 using Godot.Community.ControlBinding.EventArgs;
 
 namespace Godot.Community.ControlBinding.ControlBinders;
@@ -7,7 +8,7 @@ public interface IControlBinder
     void BindControl(BindingConfiguration bindingConfiguration);
     void OnListItemChanged(object entry);
     IControlBinder CreateInstance();
-    void OnObservableListChanged(ObservableListChangedEventArgs eventArgs);
+    void OnObservableListChanged(object sender, NotifyCollectionChangedEventArgs eventArgs);
     void ClearEventBindings();
     bool IsBound { get; set; }
     int Priority { get; }

@@ -5,6 +5,10 @@ using Godot.Community.ControlBinding.Interfaces;
 using Godot.Community.ControlBinding.Services;
 using Godot.Community.ControlBinding.Utilities;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 
@@ -64,10 +68,10 @@ namespace Godot.Community.ControlBinding
                 observable.PropertyChanged -= OnPropertyChanged;
             }
 
-            if (BindingConfiguration.TargetObject.Target is IObservableList observable1)
+            if (BindingConfiguration.TargetObject.Target is INotifyCollectionChanged observable1)
             {
-                observable1.ObservableListChanged -= _controlBinder.OnObservableListChanged;
-                foreach (var item in observable1.GetBackingList())
+                observable1.CollectionChanged -= _controlBinder.OnObservableListChanged;
+                foreach (var item in observable1 as IList)
                 {
                     if (item is IObservableObject oItem)
                     {
@@ -105,7 +109,7 @@ namespace Godot.Community.ControlBinding
 
             var targetObject = pathObjects.Last();
 
-            if (targetObject is not null && targetObject is not IObservableObject && targetObject is not IObservableList)
+            if (targetObject is not null && targetObject is not IObservableObject && targetObject is not INotifyCollectionChanged)
             {
                 GD.PrintErr($"ControlBinding: Binding from node {targetObject} on path {BindingConfiguration.Path} will not update with changes. Node is not of type ObservableObject");
             }
@@ -130,9 +134,9 @@ namespace Godot.Community.ControlBinding
                 observable.PropertyChanged += OnPropertyChanged;
             }
 
-            if (BindingConfiguration.TargetObject.Target is IObservableList observable1)
+            if (BindingConfiguration.TargetObject.Target is INotifyCollectionChanged observable1)
             {
-                observable1.ObservableListChanged += OnObservableListChanged;
+                observable1.CollectionChanged += OnObservableListChanged;
             }
 
             // Register for changes to back references to trigger rebinding
@@ -190,21 +194,10 @@ namespace Godot.Community.ControlBinding
 
         private void setInitialListValue(object sender)
         {
-            if (sender is IObservableList list)
+            if (sender is INotifyCollectionChanged list)
             {
-                OnObservableListChanged(new ObservableListChangedEventArgs
-                {
-                    ChangeType = ObservableListChangeType.Clear,
-                    ChangedEntries = list.GetBackingList(),
-                    Index = 0
-                });
-
-                OnObservableListChanged(new ObservableListChangedEventArgs
-                {
-                    ChangeType = ObservableListChangeType.Add,
-                    ChangedEntries = list.GetBackingList(),
-                    Index = 0
-                });
+                OnObservableListChanged(sender,  new (NotifyCollectionChangedAction.Reset));
+                OnObservableListChanged(sender,  new (NotifyCollectionChangedAction.Add, list as IList));
             }
         }
 
@@ -276,13 +269,13 @@ namespace Godot.Community.ControlBinding
             BindingConfiguration.OnValidationChangedHandler?.Invoke(control, isValid, message);
         }
 
-        public virtual void OnObservableListChanged(ObservableListChangedEventArgs eventArgs)
+        public virtual void OnObservableListChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
         {
-            _controlBinder.OnObservableListChanged(eventArgs);
+            _controlBinder.OnObservableListChanged(sender, eventArgs);
 
-            if (eventArgs.ChangeType == ObservableListChangeType.Add)
+            if (eventArgs.Action == NotifyCollectionChangedAction.Add)
             {
-                foreach (var item in eventArgs.ChangedEntries)
+                foreach (var item in eventArgs.NewItems)
                 {
                     if (item is IObservableObject observableObject)
                     {
@@ -291,9 +284,9 @@ namespace Godot.Community.ControlBinding
                 }
             }
 
-            if (eventArgs.ChangeType == ObservableListChangeType.Remove)
+            if (eventArgs.Action == NotifyCollectionChangedAction.Remove)
             {
-                foreach (var item in eventArgs.ChangedEntries)
+                foreach (var item in eventArgs.OldItems)
                 {
                     if (item is IObservableObject observableObject)
                     {

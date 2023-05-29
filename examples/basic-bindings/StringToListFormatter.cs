@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Godot.Community.ControlBinding.Collections;
 using Godot.Community.ControlBinding.Formatters;
@@ -19,7 +20,7 @@ namespace ControlBinding
         {
             if (v is not string data)
                 return null;
-            return new ObservableList<string>(data.Split("\n").ToList());
+            return new ObservableCollection<string>(data.Split("\n").ToList());
         };
     }
 }

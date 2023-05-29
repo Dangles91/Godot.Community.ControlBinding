@@ -1,5 +1,6 @@
 using Godot.Community.ControlBinding.Collections;
 using Godot.Community.ControlBinding;
+using System.Collections.ObjectModel;
 
 namespace ControlBinding;
 public partial class PlayerData : ObservableObject
@@ -18,8 +19,8 @@ public partial class PlayerData : ObservableObject
         set { bindingMode = value; OnPropertyChanged(nameof(BindingMode)); }
     }
 
-    private ObservableList<string> _listOfThings;
-    public ObservableList<string> ListOfThings
+    private ObservableCollection<string> _listOfThings;
+    public ObservableCollection<string> ListOfThings
     {
         get { return _listOfThings; }
         set { _listOfThings = value; OnPropertyChanged(nameof(ListOfThings));}
