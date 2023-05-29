@@ -105,14 +105,13 @@ public partial class OptionButtonControlBinder : ControlBinderBase
             }
         }
 
-
         // Move an item
         if (eventArgs.Action == NotifyCollectionChangedAction.Move)
         {
             IList items = _bindingConfiguration.TargetObject.Target as IList;
             int newIndex = eventArgs.NewStartingIndex;
 
-            if(newIndex > items.Count -1)
+            if (newIndex > items.Count - 1)
                 return;
 
             // fake a move by updating the items?

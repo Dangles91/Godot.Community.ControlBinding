@@ -83,7 +83,7 @@ public partial class ItemListControlBinder : ControlBinderBase
             IList items = _bindingConfiguration.TargetObject.Target as IList;
             int newIndex = eventArgs.NewStartingIndex;
 
-            if(newIndex > items.Count -1)
+            if (newIndex > items.Count - 1)
                 return;
 
             // fake a move by updating the items?
@@ -101,12 +101,12 @@ public partial class ItemListControlBinder : ControlBinderBase
     private void UpdateSelections(int newIndex, int oldIndex)
     {
         ItemList itemList = _bindingConfiguration.BoundControl.Target as ItemList;
-        for(int i = 0; i < itemList.ItemCount; i++)
+        for (int i = 0; i < itemList.ItemCount; i++)
         {
             bool isSelected = itemList.IsSelected(i);
-            if(!isSelected)
+            if (!isSelected)
                 continue;
-            
+
             if (i >= oldIndex && i < newIndex)
             {
                 itemList.Deselect(i);

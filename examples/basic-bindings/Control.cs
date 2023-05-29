@@ -96,33 +96,36 @@ public partial class Control : Godot.Control, IObservableObject
         };
 
         // Connect some buttons to test collection modifications
-        GetNode<Button>("%MoveUp").Pressed += () => {
-            if(SelectedPlayerData != null)
+        GetNode<Button>("%MoveUp").Pressed += () =>
+        {
+            if (SelectedPlayerData != null)
             {
                 var index = playerDatas.IndexOf(SelectedPlayerData);
-                if(index > 0)
+                if (index > 0)
                 {
                     playerDatas.Move(index, index - 1);
                 }
             }
         };
 
-        GetNode<Button>("%MoveDown").Pressed += () => {
-            if(SelectedPlayerData != null)
+        GetNode<Button>("%MoveDown").Pressed += () =>
+        {
+            if (SelectedPlayerData != null)
             {
                 var index = playerDatas.IndexOf(SelectedPlayerData);
-                if(index >= 0 && index < playerDatas.Count - 1)
+                if (index >= 0 && index < playerDatas.Count - 1)
                 {
                     playerDatas.Move(index, index + 1);
                 }
             }
         };
 
-        GetNode<Button>("%InsertAbove").Pressed += () => {
-            if(SelectedPlayerData != null)
+        GetNode<Button>("%InsertAbove").Pressed += () =>
+        {
+            if (SelectedPlayerData != null)
             {
                 var index = playerDatas.IndexOf(SelectedPlayerData);
-                playerDatas.Insert(index,  new PlayerData{Health = 200});
+                playerDatas.Insert(index, new PlayerData { Health = 200 });
             }
         };
 
