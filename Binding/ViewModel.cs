@@ -1,10 +1,7 @@
 using Godot.Community.ControlBinding.Interfaces;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using Godot.Community.ControlBinding.Extensions;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace Godot.Community.ControlBinding;
 

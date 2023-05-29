@@ -1,6 +1,5 @@
-using System;
 using Godot.Community.ControlBinding.Formatters;
-using Godot.Community.ControlBinding.Interfaces;
+using System;
 
 namespace Godot.Community.ControlBinding.Extensions;
 public static class NodeExtensions

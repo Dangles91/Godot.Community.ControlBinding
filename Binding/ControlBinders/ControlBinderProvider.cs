@@ -5,20 +5,16 @@ namespace Godot.Community.ControlBinding.ControlBinders
 {
     public static class ControlBinderProvider
     {
-        private static readonly List<IControlBinder> _binders;
-        static ControlBinderProvider()
+        private static readonly List<IControlBinder> _binders = new()
         {
-            _binders = new()
-            {
-                new LineEditControlBinder(),
-                new CheckBoxControlBinder(),
-                new OptionButtonControlBinder(),
-                new TextEditControlBinder(),
-                new RangeControlBinder(),
-                new ItemListControlBinder(),
-                new GenericControlBinder(),
-            };
-        }
+            new LineEditControlBinder(),
+            new CheckBoxControlBinder(),
+            new OptionButtonControlBinder(),
+            new TextEditControlBinder(),
+            new RangeControlBinder(),
+            new ItemListControlBinder(),
+            new GenericControlBinder(),
+        };
 
         public static IControlBinder GetBinder(object sourceObject)
         {

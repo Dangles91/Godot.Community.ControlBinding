@@ -1,5 +1,4 @@
 using Godot.Community.ControlBinding.Collections;
-using Godot.Community.ControlBinding.EventArgs;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;

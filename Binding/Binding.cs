@@ -1,13 +1,9 @@
-using Godot.Community.ControlBinding.Collections;
 using Godot.Community.ControlBinding.ControlBinders;
-using Godot.Community.ControlBinding.EventArgs;
 using Godot.Community.ControlBinding.Interfaces;
 using Godot.Community.ControlBinding.Services;
 using Godot.Community.ControlBinding.Utilities;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
@@ -135,12 +131,9 @@ namespace Godot.Community.ControlBinding
                 return;
             }
 
-            if (BindingStatus != BindingStatus.Active)
+            if (BindingStatus != BindingStatus.Active && BindingConfiguration.BoundControl.Target is Node node)
             {
-                if (BindingConfiguration.BoundControl.Target is Node node)
-                {
-                    node.TreeExiting += OnBoundControlTreeExiting;
-                }
+                node.TreeExiting += OnBoundControlTreeExiting;
             }
 
             if (BindingConfiguration.TargetObject.Target is IObservableObject observable)
@@ -318,7 +311,6 @@ namespace Godot.Community.ControlBinding
                 }
             }
         }
-
         private void OnItemListChanged(object sender, PropertyChangedEventArgs e)
         {
             _controlBinder.OnListItemChanged(sender);
