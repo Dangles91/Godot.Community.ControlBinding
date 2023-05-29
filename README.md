@@ -85,7 +85,7 @@ Bind an `ObservableCollection<T>` to any control and provide a scene to instiate
 
 Scene list bindings have limited TwoWay binding support. Child items removed from the tree will also be removed from the bound list.
 
-![Animation](https://github.com/Dangles91/Godot.Community.ControlBinding/assets/9249458/8c21a527-8326-4ace-b4b3-8035b6c25ac6)
+![scenelist](https://github.com/Dangles91/Godot.Community.ControlBinding/assets/9249458/eb5c04d3-c938-4424-bc35-48a43e272e79)
 
 ## :toolbox: Usage
 The main components of control binding are the `ObservableObject`, `ControlViewModel`, and `NodeViewModel` classes which implement `INotifyPropertyChanged`. These classes are included for ease of use, but you can inherit from your own base classes which implement `INotifyPropertyChanged` or use source generators to implement this interface instead.
