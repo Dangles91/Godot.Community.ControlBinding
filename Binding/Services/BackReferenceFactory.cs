@@ -2,6 +2,7 @@ using Godot.Community.ControlBinding.Collections;
 using Godot.Community.ControlBinding.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 
 namespace Godot.Community.ControlBinding.Services;
@@ -67,7 +68,7 @@ public static class BackReferenceFactory
                 pathObjects.Add(bindingConfiguration.TargetObject.Target);
             }
 
-            if (pathObjects.Last() is IObservableObject observableObject && pathObjects.Last() is not IObservableList)
+            if (pathObjects.Last() is IObservableObject observableObject && pathObjects.Last() is not INotifyCollectionChanged)
             {
                 var list = ReflectionService.GetPropertyInfo(observableObject, pathNodes.Last()).GetValue(observableObject);
                 pathObjects.Add(list);

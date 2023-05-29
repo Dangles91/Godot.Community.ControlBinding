@@ -1,6 +1,7 @@
 using Godot.Community.ControlBinding.EventArgs;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 
 namespace Godot.Community.ControlBinding.ControlBinders;
 
@@ -42,7 +43,7 @@ public partial class RangeControlBinder : ControlBinderBase
         }
     }
 
-    public override void OnObservableListChanged(ObservableListChangedEventArgs eventArgs)
+    public override void OnObservableListChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
     {
         throw new NotImplementedException();
     }

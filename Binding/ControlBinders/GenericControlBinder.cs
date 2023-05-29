@@ -1,7 +1,9 @@
 using Godot.Community.ControlBinding.Collections;
 using Godot.Community.ControlBinding.EventArgs;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 
 namespace Godot.Community.ControlBinding.ControlBinders;
@@ -32,7 +34,7 @@ public partial class GenericControlBinder : ControlBinderBase
         {
             int itemIndex = _controlChildIndexes[node.GetInstanceId()];
             removeControlCacheItem(listItem, node.GetInstanceId());
-            (_bindingConfiguration.TargetObject.Target as IObservableList)?.RemoveAt(itemIndex);
+            (_bindingConfiguration.TargetObject.Target as IList)?.RemoveAt(itemIndex);
         }
     }
 
@@ -88,7 +90,7 @@ public partial class GenericControlBinder : ControlBinderBase
         // do nothing
     }
 
-    public override void OnObservableListChanged(ObservableListChangedEventArgs eventArgs)
+    public override void OnObservableListChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
     {
         // this should only be used to manage control children using a scene formatter            
         if (_bindingConfiguration.SceneFormatter == null)
@@ -96,10 +98,10 @@ public partial class GenericControlBinder : ControlBinderBase
             return;
         }
 
-        if (eventArgs.ChangeType == ObservableListChangeType.Add)
+        if (eventArgs.Action == NotifyCollectionChangedAction.Add)
         {
-            int i = eventArgs.Index;
-            foreach (var addition in eventArgs.ChangedEntries)
+            int i = eventArgs.NewStartingIndex;
+            foreach (var addition in eventArgs.NewItems)
             {
                 var sceneItem = _bindingConfiguration.SceneFormatter.Format(addition);
                 _boundControl.AddChild(sceneItem);
@@ -111,9 +113,9 @@ public partial class GenericControlBinder : ControlBinderBase
             }
         }
 
-        if (eventArgs.ChangeType == ObservableListChangeType.Remove)
+        if (eventArgs.Action == NotifyCollectionChangedAction.Remove)
         {
-            foreach (var removedItem in eventArgs.ChangedEntries)
+            foreach (var removedItem in eventArgs.OldItems)
             {
                 // get the corresponding scene item
                 if (!_controlChildCache.TryGetValue(removedItem, out var instanceId))
@@ -130,7 +132,7 @@ public partial class GenericControlBinder : ControlBinderBase
             }
         }
 
-        if (eventArgs.ChangeType == ObservableListChangeType.Clear)
+        if (eventArgs.Action == NotifyCollectionChangedAction.Reset)
         {
             clearControlCache();
             if (_boundControl != null)

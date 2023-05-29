@@ -2,9 +2,11 @@ using Godot.Community.ControlBinding.Collections;
 using Godot.Community.ControlBinding.Formatters;
 using Godot;
 using Godot.Community.ControlBinding;
-using Godot.Community.ControlBinding.Extensions;
-using Godot.Community.ControlBinding.Interfaces;
+using System.Collections.Generic;
 using PropertyChanged.SourceGenerator;
+using Godot.Community.ControlBinding.Interfaces;
+using System.Collections.ObjectModel;
+using Godot.Community.ControlBinding.Extensions;
 
 namespace ControlBinding;
 
@@ -22,20 +24,20 @@ public partial class Control : Godot.Control, IObservableObject
     [Notify]
     private int _spinBoxValue;
 
-    public ObservableList<PlayerData> playerDatas { get; set; } = new(){
+    public ObservableCollection<PlayerData> playerDatas { get; set; } = new(){
         new PlayerData{Health = 500},
     };
 
-    public ObservableList<PlayerData> playerDatas2 { get; set; } = new(){
+    public ObservableCollection<PlayerData> playerDatas2 { get; set; } = new(){
         new PlayerData{Health = 500},
     };
 
     [Notify] private BindingMode _selectedBindingMode;
-    [Notify] private ObservableList<string> _backinglistForTesting = new() { "Test" };
+    [Notify] private ObservableCollection<string> _backinglistForTesting = new() { "Test" };
     [Notify] private string _errorMessage;
     [Notify] private string _customControlInput;
 
-    BindingContext bindingContext { get; set; }
+    private BindingContext bindingContext;
 
     public override void _Ready()
     {

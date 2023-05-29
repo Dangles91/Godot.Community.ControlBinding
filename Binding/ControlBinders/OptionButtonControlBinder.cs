@@ -1,6 +1,8 @@
 using Godot.Community.ControlBinding.Collections;
 using Godot.Community.ControlBinding.EventArgs;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 
 namespace Godot.Community.ControlBinding.ControlBinders;
@@ -46,7 +48,7 @@ public partial class OptionButtonControlBinder : ControlBinderBase
         }
     }
 
-    public override void OnObservableListChanged(ObservableListChangedEventArgs eventArgs)
+    public override void OnObservableListChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
     {
         if (_bindingConfiguration.BoundControl == null)
         {
@@ -55,14 +57,15 @@ public partial class OptionButtonControlBinder : ControlBinderBase
         }
 
         OptionButton optionButton = (OptionButton)_bindingConfiguration.BoundControl.Target;
-        List<object> convertedValues = eventArgs.ChangedEntries.ToList();
-        if (_bindingConfiguration.Formatter != null)
-        {
-            convertedValues = eventArgs.ChangedEntries.Select(x => _bindingConfiguration.Formatter.FormatControl(x, null)).ToList();
-        }
 
-        if (eventArgs.ChangeType == ObservableListChangeType.Add)
+        if (eventArgs.Action == NotifyCollectionChangedAction.Add)
         {
+            List<object> convertedValues = eventArgs.NewItems.Cast<object>().ToList();
+            if (_bindingConfiguration.Formatter != null)
+            {
+                convertedValues = convertedValues.ConvertAll(x => _bindingConfiguration.Formatter.FormatControl(x, null));
+            }
+
             foreach (var item in convertedValues)
             {
                 if (item is string stringValue)
@@ -87,15 +90,15 @@ public partial class OptionButtonControlBinder : ControlBinderBase
             }
         }
 
-        if (eventArgs.ChangeType == ObservableListChangeType.Remove)
+        if (eventArgs.Action == NotifyCollectionChangedAction.Remove)
         {
             bool itemsSelected = optionButton.Selected != -1;
-            optionButton.RemoveItem(eventArgs.Index);
+            optionButton.RemoveItem(eventArgs.OldStartingIndex);
             optionButton.Select(-1);
 
             if (itemsSelected && optionButton.ItemCount > 0)
             {
-                var newIndex = eventArgs.Index - 1 <= 0 ? 0 : eventArgs.Index - 1;
+                var newIndex = eventArgs.OldStartingIndex - 1 <= 0 ? 0 : eventArgs.OldStartingIndex - 1;
                 optionButton.Select(newIndex);
                 optionButton.EmitSignal(OptionButton.SignalName.ItemSelected, newIndex);
             }
@@ -106,7 +109,7 @@ public partial class OptionButtonControlBinder : ControlBinderBase
             }
         }
 
-        if (eventArgs.ChangeType == ObservableListChangeType.Clear)
+        if (eventArgs.Action == NotifyCollectionChangedAction.Reset)
         {
             optionButton.Clear();
         }
@@ -114,12 +117,10 @@ public partial class OptionButtonControlBinder : ControlBinderBase
 
     public override void OnListItemChanged(object entry)
     {
-        var observableList = _bindingConfiguration.TargetObject.Target as IObservableList;
+        var observableList = _bindingConfiguration.TargetObject.Target as IList;
         OptionButton itemList = _bindingConfiguration.BoundControl.Target as OptionButton;
 
-        var listItems = observableList.GetBackingList();
-
-        var changedIndex = listItems.IndexOf(entry);
+        var changedIndex = observableList.IndexOf(entry);
         object convertedVal = entry;
         if (_bindingConfiguration.Formatter != null)
         {

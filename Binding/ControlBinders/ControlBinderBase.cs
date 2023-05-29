@@ -1,3 +1,4 @@
+using System.Collections.Specialized;
 using System.ComponentModel;
 using Godot.Community.ControlBinding.EventArgs;
 
@@ -39,7 +40,7 @@ namespace Godot.Community.ControlBinding.ControlBinders
         public abstract void OnListItemChanged(object entry);
 
         public abstract void ClearEventBindings();
-        public abstract void OnObservableListChanged(ObservableListChangedEventArgs eventArgs);
+        public abstract void OnObservableListChanged(object sender, NotifyCollectionChangedEventArgs eventArgs);
 
         #endregion
 

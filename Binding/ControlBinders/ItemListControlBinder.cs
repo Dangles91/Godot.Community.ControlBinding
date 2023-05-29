@@ -1,13 +1,15 @@
 using Godot.Community.ControlBinding.Collections;
 using Godot.Community.ControlBinding.EventArgs;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 
 namespace Godot.Community.ControlBinding.ControlBinders;
 public partial class ItemListControlBinder : ControlBinderBase
 {
-    public override void OnObservableListChanged(ObservableListChangedEventArgs eventArgs)
+    public override void OnObservableListChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
     {
         if (_bindingConfiguration.BoundControl == null)
         {
@@ -17,14 +19,13 @@ public partial class ItemListControlBinder : ControlBinderBase
 
         ItemList itemList = _bindingConfiguration.BoundControl.Target as ItemList;
 
-        List<object> convertedValues = eventArgs.ChangedEntries.ToList();
-        if (_bindingConfiguration.Formatter != null)
+        if (eventArgs.Action == NotifyCollectionChangedAction.Add)
         {
-            convertedValues = eventArgs.ChangedEntries.Select(x => _bindingConfiguration.Formatter.FormatControl(x, null)).ToList();
-        }
-
-        if (eventArgs.ChangeType == ObservableListChangeType.Add)
-        {
+            var convertedValues = eventArgs.NewItems.Cast<object>().ToList();
+            if (_bindingConfiguration.Formatter != null)
+            {
+                convertedValues = convertedValues.ConvertAll(x => _bindingConfiguration.Formatter.FormatControl(x, null));
+            }
             foreach (var item in convertedValues)
             {
                 if (item is string stringValue)
@@ -38,10 +39,10 @@ public partial class ItemListControlBinder : ControlBinderBase
             }
         }
 
-        if (eventArgs.ChangeType == ObservableListChangeType.Remove)
+        if (eventArgs.Action == NotifyCollectionChangedAction.Remove)
         {
             bool itemsSelected = itemList.GetSelectedItems().Any();
-            itemList.RemoveItem(eventArgs.Index);
+            itemList.RemoveItem(eventArgs.OldStartingIndex);
 
             if (itemsSelected && itemList.ItemCount == 0)
             {
@@ -52,7 +53,7 @@ public partial class ItemListControlBinder : ControlBinderBase
             {
                 if (itemsSelected && itemList.ItemCount > 0)
                 {
-                    var newIndex = eventArgs.Index - 1 <= 0 ? 0 : eventArgs.Index - 1;
+                    var newIndex = eventArgs.OldStartingIndex - 1 <= 0 ? 0 : eventArgs.OldStartingIndex - 1;
                     itemList.Select(newIndex);
                     itemList.EmitSignal(ItemList.SignalName.ItemSelected, newIndex);
                 }
@@ -64,7 +65,17 @@ public partial class ItemListControlBinder : ControlBinderBase
             }
         }
 
-        if (eventArgs.ChangeType == ObservableListChangeType.Clear)
+        if (eventArgs.Action == NotifyCollectionChangedAction.Replace)
+        {
+
+        }
+
+        if (eventArgs.Action == NotifyCollectionChangedAction.Move)
+        {
+
+        }
+
+        if (eventArgs.Action == NotifyCollectionChangedAction.Reset)
         {
             itemList.Clear();
         }
@@ -72,12 +83,10 @@ public partial class ItemListControlBinder : ControlBinderBase
 
     public override void OnListItemChanged(object entry)
     {
-        var observableList = _bindingConfiguration.TargetObject.Target as IObservableList;
+        var observableList = _bindingConfiguration.TargetObject.Target as IList;
         ItemList itemList = _bindingConfiguration.BoundControl.Target as ItemList;
 
-        var listItems = observableList.GetBackingList();
-
-        var changedIndex = listItems.IndexOf(entry);
+        var changedIndex = observableList.IndexOf(entry);
         object convertedVal = entry;
         if (_bindingConfiguration.Formatter != null)
         {
