@@ -17,26 +17,40 @@ public partial class ItemListControlBinder : ControlBinderBase
 
         ItemList itemList = _bindingConfiguration.BoundControl.Target as ItemList;
 
+        // Add new items
+        // This also handles inserts, but the index is ignored as Godot does support re-ordering of items
+        // We could possibly support this by removing all items and re-adding them in the correct order
         if (eventArgs.Action == NotifyCollectionChangedAction.Add)
         {
-            var convertedValues = eventArgs.NewItems.Cast<object>().ToList();
-            if (_bindingConfiguration.Formatter != null)
+            AddListItems(itemList, eventArgs.NewItems, eventArgs.NewStartingIndex);
+            if (eventArgs.NewStartingIndex != itemList.ItemCount - 1)
             {
-                convertedValues = convertedValues.ConvertAll(x => _bindingConfiguration.Formatter.FormatControl(x, null));
-            }
-            foreach (var item in convertedValues)
-            {
-                if (item is string stringValue)
-                    itemList.AddItem(stringValue);
-
-                if (item is ListItem listItem)
-                {
-                    itemList.AddItem(listItem.DisplayValue);
-                    SetItemValues(itemList, itemList.ItemCount - 1, listItem);
-                }
+                // this is an insert event
+                // we need to move the item to the correct position
+                RedrawListItems();
+                itemList.EmitSignal(ItemList.SignalName.ItemSelected, eventArgs.NewStartingIndex);
             }
         }
 
+        // Replace an item
+        if (eventArgs.Action == NotifyCollectionChangedAction.Replace)
+        {
+            var selectedItems = itemList.GetSelectedItems();
+            bool itemWasSelected = false;
+            if (selectedItems.Contains(eventArgs.NewStartingIndex))
+                itemWasSelected = true;
+
+            itemList.RemoveItem(eventArgs.NewStartingIndex);
+            AddListItems(itemList, eventArgs.NewItems, eventArgs.NewStartingIndex);
+
+            if (itemWasSelected)
+            {
+                itemList.Select(eventArgs.NewStartingIndex);
+                itemList.EmitSignal(ItemList.SignalName.ItemSelected, eventArgs.NewStartingIndex);
+            }
+        }
+
+        // Remove items
         if (eventArgs.Action == NotifyCollectionChangedAction.Remove)
         {
             bool itemsSelected = itemList.GetSelectedItems().Any();
@@ -63,19 +77,77 @@ public partial class ItemListControlBinder : ControlBinderBase
             }
         }
 
-        if (eventArgs.Action == NotifyCollectionChangedAction.Replace)
-        {
-
-        }
-
+        // Move an item
         if (eventArgs.Action == NotifyCollectionChangedAction.Move)
         {
+            IList items = _bindingConfiguration.TargetObject.Target as IList;
+            int newIndex = eventArgs.NewStartingIndex;
 
+            if(newIndex > items.Count -1)
+                return;
+
+            // fake a move by updating the items?
+            RedrawListItems();
+            UpdateSelections(newIndex, eventArgs.OldStartingIndex);
         }
 
+        // Clear the list
         if (eventArgs.Action == NotifyCollectionChangedAction.Reset)
         {
             itemList.Clear();
+        }
+    }
+
+    private void UpdateSelections(int newIndex, int oldIndex)
+    {
+        ItemList itemList = _bindingConfiguration.BoundControl.Target as ItemList;
+        for(int i = 0; i < itemList.ItemCount; i++)
+        {
+            bool isSelected = itemList.IsSelected(i);
+            if(!isSelected)
+                continue;
+            
+            if (i >= oldIndex && i < newIndex)
+            {
+                itemList.Deselect(i);
+                itemList.Select(i + 1);
+                itemList.EmitSignal(ItemList.SignalName.ItemSelected, i + 1);
+            }
+            else if (i > newIndex && i <= oldIndex)
+            {
+                itemList.Deselect(i);
+                itemList.Select(i - 1);
+                itemList.EmitSignal(ItemList.SignalName.ItemSelected, i - 1);
+            }
+        }
+    }
+
+    private void RedrawListItems()
+    {
+        IList items = _bindingConfiguration.TargetObject.Target as IList;
+        ItemList itemList = _bindingConfiguration.BoundControl.Target as ItemList;
+        // fake a move by updating the items?
+        for (int i = 0; i < items.Count; i++)
+        {
+            var selectedItems = itemList.GetSelectedItems();
+
+            object item = string.Empty;
+            if (_bindingConfiguration.Formatter != null)
+            {
+                item = _bindingConfiguration.Formatter.FormatControl(items[i], null);
+            }
+            else
+            {
+                item = items[i].ToString();
+            }
+
+            if (item is string stringValue)
+                itemList.SetItemText(i, stringValue);
+
+            if (item is ListItem listItem)
+            {
+                SetItemValues(itemList, i, listItem);
+            }
         }
     }
 
@@ -143,5 +215,25 @@ public partial class ItemListControlBinder : ControlBinderBase
     public override void ClearEventBindings()
     {
         throw new NotImplementedException();
+    }
+
+    private void AddListItems(ItemList itemList, IList newItems, int newIndex)
+    {
+        var convertedValues = newItems.Cast<object>().ToList();
+        if (_bindingConfiguration.Formatter != null)
+        {
+            convertedValues = convertedValues.ConvertAll(x => _bindingConfiguration.Formatter.FormatControl(x, null));
+        }
+        foreach (var item in convertedValues)
+        {
+            if (item is string stringValue)
+                itemList.AddItem(stringValue);
+
+            if (item is ListItem listItem)
+            {
+                itemList.AddItem(listItem.DisplayValue);
+                SetItemValues(itemList, itemList.ItemCount - 1, listItem);
+            }
+        }
     }
 }
