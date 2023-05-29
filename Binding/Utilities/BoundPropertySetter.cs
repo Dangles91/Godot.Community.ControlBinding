@@ -61,8 +61,8 @@ public class BoundPropertySetter
         PropertyInfo sourcePropertyInfo = ReflectionService.GetPropertyInfo(sourceObject, sourcePropertyName);
         PropertyInfo targetPropertyInfo = ReflectionService.GetPropertyInfo(targetObject, targetPropertyName);
 
-        var sourceValue = sourcePropertyInfo.GetValue(sourceObject);
-        var targetValue = targetPropertyInfo.GetValue(targetObject);
+        var sourceValue = sourcePropertyInfo?.GetValue(sourceObject);
+        var targetValue = targetPropertyInfo?.GetValue(targetObject);
 
         object convertedValue = sourceValue;
         bool formatterFailed = false;

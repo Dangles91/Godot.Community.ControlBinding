@@ -56,9 +56,18 @@ namespace Godot.Community.ControlBinding
             if (!_controlBinder.IsBound)
                 _controlBinder.BindControl(BindingConfiguration);
 
-            resolveBindingPath();
-            subscribeChangeEvents();
-            setInitialValue();
+            if (BindingStatus != BindingStatus.Invalid)
+            {
+                if (!_bindingConfiguration.BoundControl.IsAlive)
+                {
+                    BindingStatus = BindingStatus.Invalid;
+                    return;
+                }
+
+                resolveBindingPath();
+                subscribeChangeEvents();
+                setInitialValue();
+            }
         }
 
         public void UnbindControl()
@@ -91,7 +100,7 @@ namespace Godot.Community.ControlBinding
             if (BindingConfiguration.BoundControl.IsAlive)
             {
                 (_controlBinder as ControlBinderBase).ControlValueChanged -= OnSourcePropertyChanged;
-                if(BindingConfiguration.BoundControl.Target is IObservableObject observable2)
+                if (BindingConfiguration.BoundControl.Target is IObservableObject observable2)
                 {
                     observable2.PropertyChanged -= OnSourcePropertyChanged;
                 }
@@ -127,7 +136,12 @@ namespace Godot.Community.ControlBinding
             }
 
             if (BindingStatus != BindingStatus.Active)
-                (BindingConfiguration.BoundControl.Target as Godot.Control).TreeExiting += OnBoundControlTreeExiting;
+            {
+                if (BindingConfiguration.BoundControl.Target is Node node)
+                {
+                    node.TreeExiting += OnBoundControlTreeExiting;
+                }
+            }
 
             if (BindingConfiguration.TargetObject.Target is IObservableObject observable)
             {
@@ -174,9 +188,12 @@ namespace Godot.Community.ControlBinding
                 }
                 else
                 {
-                    BoundPropertySetter.SetBoundControlValue(BindingConfiguration.TargetObject.Target,
+                    var target = BindingConfiguration.TargetObject.Target;
+                    var source = BindingConfiguration.BoundControl.Target;
+
+                    BoundPropertySetter.SetBoundControlValue(target,
                                     BindingConfiguration.TargetPropertyName,
-                                    BindingConfiguration.BoundControl.Target as Godot.Control,
+                                    source as Godot.Control,
                                     BindingConfiguration.BoundPropertyName);
                 }
             }
@@ -184,6 +201,9 @@ namespace Godot.Community.ControlBinding
             {
                 if (!BindingConfiguration.IsListBinding)
                 {
+                    if (!BindingConfiguration.BoundControl.IsAlive)
+                        return;
+
                     BoundPropertySetter.SetBoundPropertyValue(BindingConfiguration.BoundControl.Target as Godot.Control,
                         BindingConfiguration.BoundPropertyName,
                         BindingConfiguration.TargetObject.Target,
@@ -196,8 +216,8 @@ namespace Godot.Community.ControlBinding
         {
             if (sender is INotifyCollectionChanged list)
             {
-                OnObservableListChanged(sender,  new (NotifyCollectionChangedAction.Reset));
-                OnObservableListChanged(sender,  new (NotifyCollectionChangedAction.Add, list as IList));
+                OnObservableListChanged(sender, new(NotifyCollectionChangedAction.Reset));
+                OnObservableListChanged(sender, new(NotifyCollectionChangedAction.Add, list as IList, 0));
             }
         }
 
@@ -221,11 +241,14 @@ namespace Godot.Community.ControlBinding
                 BindControl();
             }
         }
-
         private void OnBoundControlTreeExiting()
         {
             BindingStatus = BindingStatus.Invalid;
             BindingStatusChanged?.Invoke(this, BindingStatus);
+            if (_bindingConfiguration.BoundControl.Target is Node node)
+            {
+                node.TreeExiting -= OnBoundControlTreeExiting;
+            }
             UnbindControl();
         }
 

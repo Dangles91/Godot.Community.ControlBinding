@@ -7,9 +7,11 @@ namespace ControlBinding;
 
 public class PlayerDataListFormatter : IValueFormatter
 {
-    public Func<object, object, object> FormatControl => (v,_) =>
+    public Func<object, object, object> FormatControl => (v, _) =>
     {
-        var pData = v as PlayerData;
+        if (v is not PlayerData pData)
+            return null;
+
         var listItem = new ListItem
         {
             DisplayValue = $"Health: {pData.Health}",
