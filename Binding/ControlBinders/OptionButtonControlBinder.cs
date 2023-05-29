@@ -57,38 +57,35 @@ public partial class OptionButtonControlBinder : ControlBinderBase
 
         OptionButton optionButton = (OptionButton)_bindingConfiguration.BoundControl.Target;
 
+        // Add new items
         if (eventArgs.Action == NotifyCollectionChangedAction.Add)
         {
-            List<object> convertedValues = eventArgs.NewItems.Cast<object>().ToList();
-            if (_bindingConfiguration.Formatter != null)
+            AddListItems(optionButton, eventArgs.NewItems, eventArgs.NewStartingIndex);
+            if (eventArgs.NewStartingIndex != optionButton.ItemCount - 1)
             {
-                convertedValues = convertedValues.ConvertAll(x => _bindingConfiguration.Formatter.FormatControl(x, null));
-            }
-
-            foreach (var item in convertedValues)
-            {
-                if (item is string stringValue)
-                {
-                    optionButton.AddItem(stringValue);
-                }
-
-                if (item is ListItem listItem)
-                {
-                    optionButton.AddItem(listItem.DisplayValue);
-                    SetItemValues(optionButton, optionButton.ItemCount - 1, listItem);
-                }
-
-                if (optionButton.ItemCount == 1)
-                {
-                    optionButton.Select(0);
-                }
-                else
-                {
-                    optionButton.Select(optionButton.Selected);
-                }
+                // this is an insert event
+                // we need to move the item to the correct position
+                RedrawListItems();
+                optionButton.EmitSignal(ItemList.SignalName.ItemSelected, eventArgs.NewStartingIndex);
             }
         }
 
+        // Replace an existing item
+        if (eventArgs.Action == NotifyCollectionChangedAction.Replace)
+        {
+            bool itemWasSelected = optionButton.Selected == eventArgs.NewStartingIndex;
+
+            optionButton.RemoveItem(eventArgs.NewStartingIndex);
+            AddListItems(optionButton, eventArgs.NewItems, eventArgs.NewStartingIndex);
+
+            if (itemWasSelected)
+            {
+                optionButton.Select(eventArgs.NewStartingIndex);
+                optionButton.EmitSignal(ItemList.SignalName.ItemSelected, eventArgs.NewStartingIndex);
+            }
+        }
+
+        // Remove an item
         if (eventArgs.Action == NotifyCollectionChangedAction.Remove)
         {
             bool itemsSelected = optionButton.Selected != -1;
@@ -108,6 +105,22 @@ public partial class OptionButtonControlBinder : ControlBinderBase
             }
         }
 
+
+        // Move an item
+        if (eventArgs.Action == NotifyCollectionChangedAction.Move)
+        {
+            IList items = _bindingConfiguration.TargetObject.Target as IList;
+            int newIndex = eventArgs.NewStartingIndex;
+
+            if(newIndex > items.Count -1)
+                return;
+
+            // fake a move by updating the items?
+            RedrawListItems();
+            UpdateSelections(newIndex, eventArgs.OldStartingIndex);
+        }
+
+        // Clear the list
         if (eventArgs.Action == NotifyCollectionChangedAction.Reset)
         {
             optionButton.Clear();
@@ -157,5 +170,86 @@ public partial class OptionButtonControlBinder : ControlBinderBase
     public override bool CanBindFor(object control)
     {
         return control is OptionButton;
+    }
+
+    private void AddListItems(OptionButton optionButton, IList newItems, int newIndex)
+    {
+        List<object> convertedValues = newItems.Cast<object>().ToList();
+        if (_bindingConfiguration.Formatter != null)
+        {
+            convertedValues = convertedValues.ConvertAll(x => _bindingConfiguration.Formatter.FormatControl(x, null));
+        }
+
+        foreach (var item in convertedValues)
+        {
+            if (item is string stringValue)
+            {
+                optionButton.AddItem(stringValue);
+            }
+
+            if (item is ListItem listItem)
+            {
+                optionButton.AddItem(listItem.DisplayValue);
+                SetItemValues(optionButton, optionButton.ItemCount - 1, listItem);
+            }
+
+            if (optionButton.ItemCount == 1)
+            {
+                optionButton.Select(0);
+            }
+            else
+            {
+                optionButton.Select(optionButton.Selected);
+            }
+        }
+    }
+
+    private void UpdateSelections(int newIndex, int oldIndex)
+    {
+        OptionButton optionButton = _bindingConfiguration.BoundControl.Target as OptionButton;
+        for (int i = 0; i < optionButton.ItemCount; i++)
+        {
+            bool isSelected = optionButton.Selected == i;
+            if (!isSelected)
+                continue;
+
+            if (i >= oldIndex && i < newIndex)
+            {
+                optionButton.Select(i + 1);
+                optionButton.EmitSignal(ItemList.SignalName.ItemSelected, i + 1);
+            }
+            else if (i > newIndex && i <= oldIndex)
+            {
+                optionButton.Select(i - 1);
+                optionButton.EmitSignal(ItemList.SignalName.ItemSelected, i - 1);
+            }
+        }
+    }
+
+    private void RedrawListItems()
+    {
+        IList items = _bindingConfiguration.TargetObject.Target as IList;
+        OptionButton optionButton = _bindingConfiguration.BoundControl.Target as OptionButton;
+        // fake a move by updating the items?
+        for (int i = 0; i < items.Count; i++)
+        {
+            object item = string.Empty;
+            if (_bindingConfiguration.Formatter != null)
+            {
+                item = _bindingConfiguration.Formatter.FormatControl(items[i], null);
+            }
+            else
+            {
+                item = items[i].ToString();
+            }
+
+            if (item is string stringValue)
+                optionButton.SetItemText(i, stringValue);
+
+            if (item is ListItem listItem)
+            {
+                SetItemValues(optionButton, i, listItem);
+            }
+        }
     }
 }
