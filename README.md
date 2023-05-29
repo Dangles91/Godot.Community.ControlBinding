@@ -30,18 +30,26 @@ Though functional, this project is in the early stages of development. More adva
 * [x] Control validation
 * [ ] Control style formatting
 * [ ] Creating an editor plugin to specify bindings in the editor
-* [ ] Code generation to implement OnPropertyChanged via an attribute decorator
+* [x] Code generation to implement OnPropertyChanged via an attribute decorator
+
+> Source generators such as [PropertyBinding.SourceGenerator](https://github.com/canton7/PropertyChanged.SourceGenerator) can be used to implement `INotifyPropertyChanged`
+
+## Overview
+Godot.Community.ControlBinding implements control bindings using Microsofts System.ComponentModel `INotifyPropertyChanged` and `INotifyCollectionChanged` interfaces.
 
 ##  :dart: Features
 ### Property binding
 Simple property binding from Godot controls to C# properties
 
 ### List binding
-Bind list controls to an `ObservableList<T>`. List bindings support `OptionButton` and `ItemList` controls.
-If the list objects inherit from `ObservableList` the controls will be updated to reflect changes made to the backing list.
+Bind list controls to an `ObservableCollection<T>`. List bindings support `OptionButton` and `ItemList` controls.
+If the list objects implement `INotifyPropertyChanged` the controls will be updated to reflect changes made to the backing list.
 
 ### Enum list binding
 A very specific list binding implementation to bind Enums to an OptionButton with support for a target property to store the selected option.
+```csharp
+bindingContext.BindEnumProperty<BindingMode>(GetNode<OptionButton>("%OptionButton"), $"{nameof(SelectedPlayerData)}.BindingMode");
+```
 
 ### Two-way binding
 Some controls support two-way binding by subscribing to their update signals for supported properties.
@@ -66,26 +74,26 @@ List items can be further customised during binding by implementing a custom `IV
 Binding to target properties is implemented using a path syntax. eg. `MyClass.MyClassName` will bind to the `MyClassName` property on the `MyClass` object.
 
 ### Automatic rebinding
-If any objects along the path are updated, the binding will be refreshed. Objects along the path must inherit from `ObservableObject` and implement `PropertyChanged`.
+If any objects along the path are updated, the binding will be refreshed. Objects along the path must inherit from `ObservableObject` or implement `INotifyPropertyChanged`.
 
 ### Scene list binding
-Bind a `ObservableList<T>` to any control and provide a scene to instiate as child nodes. Modifications (add/remove) are reflected in the control's child list.
+Bind an `ObservableCollection<T>` to any control and provide a scene to instiate as child nodes. Modifications (add/remove) are reflected in the control's child list.
 
 Scene list bindings have limited TwoWay binding support. Child items removed from the tree will also be removed from the bound list.
 
 ![Animation](https://github.com/Dangles91/Godot.Community.ControlBinding/assets/9249458/8c21a527-8326-4ace-b4b3-8035b6c25ac6)
 
 ## :toolbox: Usage
-The main components of control binding are the `ObservableObject` and `ObservableNode` classes which implement a `PropertyChanged` event and `OnPropertyChanged` method.
+The main components of control binding are the `ObservableObject`, `ControlViewModel`, and `NodeViewModel` classes which implement `INotifyPropertyChanged`. These classes are included for ease of use, but you can inherit from your own base classes which implement `INotifyPropertyChanged` or use source generators to implement this interface instead.
 
-The script which backs your scene must inherit from `ObservableNode`. Other observable objects that are not added to the scene tree should inherit from `ObservableObject`. This prevents orphaned nodes.
+The script which backs your scene must implement `INotifyPropertyChanged`.
+
+Bindings are registered against a `BindingContext` instance. This also provides support for input validation.
 
 See the ![example project](/examples/basic-bindings) for some bindings in action!
 
 ### Property binding
 Create a property with a backing field and trigger `OnPropertyChanged` in the setter
-<details>
-  <summary>details</summary>
 
 ```c#
 private int spinBoxValue;
@@ -108,13 +116,25 @@ public int SpinBoxValue
 }
 ```
 
+Or use a source generator instead
+```c#
+[Notify] private int _spinBoxValue;
+
+```
+
 Add a binding in `_Ready()`. This binding targets a control in the scene with the unique name **%SpinBox** with the `BindingMode` __TwoWay__. A BindingMode of TwoWay states that we want the spinbox value to be set into the target property and vice-versa.
 
 ```c#
-BindProperty("%SpinBox", nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay);
-```
+public override void _Ready()
+{
+    BindingContext bindingContext = new(this);
+    bindingContext.BindProperty(GetNode("%SpinBox"), nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay);
 
-</details>
+    // alternatively, use the extensions methods
+    GetNode("%SpinBox").BindProperty(bindingContext, nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay);
+}
+
+```
 
 ### Deep property binding
 Bind to property members on other objects. These objects and properties must be relative to the current scene script.
@@ -124,14 +144,14 @@ Bind to property members on other objects. These objects and properties must be 
 
 ```c#
 // Bind to SelectedPlayerData.Health
-BindProperty("%LineEdit", nameof(LineEdit.Text), $"{nameof(SelectedPlayerData)}.{nameof(PlayerData.Health)}", BindingMode.TwoWay);
+bindingContext.BindProperty(GetNode("%LineEdit"), nameof(LineEdit.Text), $"{nameof(SelectedPlayerData)}.{nameof(PlayerData.Health)}", BindingMode.TwoWay);
 
 // Alternatively represent this as a string path instead
-BindProperty("%LineEdit", nameof(LineEdit.Text), "SelectedPlayerData.Health", BindingMode.TwoWay);
+bindingContext.BindProperty(GetNode("%LineEdit"), nameof(LineEdit.Text), "SelectedPlayerData.Health", BindingMode.TwoWay);
 
 ```
 
-The property `SelectedPlayerData` must notify about changes to automatically rebind the control. TwoWay binding also requires that the PlayerData class implements `ObservableObject` and notify of property changes.
+The property `SelectedPlayerData` must notify about changes to automatically rebind the control. TwoWay binding also requires that the PlayerData class implements `INotifyPropertyChanged` to notify of property changes.
 ```c#
 private PlayerData selectedPlayerData = new();
 public PlayerData SelectedPlayerData
@@ -164,7 +184,7 @@ public class PlayerHealthFormatter : IValueFormatter
     };
 }
 
-BindProperty("%SpinBox", nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay, new PlayerHealthFormatter());
+bindingContext.BindProperty(GetNode("%SpinBox"), nameof(SpinBox.Value), nameof(SpinBoxValue), BindingMode.TwoWay, new PlayerHealthFormatter());
 ```
 
 This formatter will set a string value into the target control using the input value substituted into a string. `FormatControl` is not implemented here so the value would be passed back as-is in the case of a two-way binding.
@@ -172,7 +192,7 @@ This formatter will set a string value into the target control using the input v
 </details>
 
 ### List Binding
-List bindings can be bound to an `ObservableList<T>` to benefit from adding and removing items
+List bindings can be bound to an `ObservableCollection<T>` (or any data structure that implements `INotifyCollectionChanged`) to benefit from adding and removing items
 
 <details>
 <summary>details</summary>
@@ -182,7 +202,7 @@ public ObservableList<PlayerData> PlayerDatas {get;set;} = new(){
     new PlayerData{Health = 500},
 };
 
-BindListProperty("%ItemList2", nameof(PlayerDatas), formatter: new PlayerDataListFormatter());
+bindingContext.BindListProperty(GetNode("%ItemList2"), nameof(PlayerDatas), formatter: new PlayerDataListFormatter());
 ```
 
 The `PlayerDataListFormatter` formats the PlayerData entry into a usable string value using a `ListItem` to also provided conditional formatting to the control
@@ -211,14 +231,14 @@ public class PlayerDataListFormatter : IValueFormatter
 </details>
 
 ### Scene List Binding
-Bind an `ObservableList<T>` to a control's child list to add/remove children. The target scene must have a script attached and inherit from `ObservableNode`. It must also provide an implementation for `SetViewModeldata()`
+Bind an `ObservableCollection<T>` to a control's child list to add/remove children. The target scene must have a script attached and implement `IViewModel`, which inherits from `INotifyPropertyChanged`. It must also provide an implementation for `SetViewModeldata()` from the `IViewModel` interface.
 
 <details>
 <summary>details</summary>
 
 **Bind the control to a list and provide a path to the scene to instiate**
 ```c#
-BindSceneList("%VBoxContainer", nameof(PlayerDatas), "uid://die1856ftg8w8");
+bindingContext.BindSceneList(GetNode("%VBoxContainer"), nameof(PlayerDatas), "uid://die1856ftg8w8");
 ```
 
 **Scene implementation**
@@ -235,7 +255,8 @@ public partial class PlayerDataListItem : ObservableNode
 
     public override void _Ready()
     {
-        BindProperty("%TextEdit", "Text", "ViewModelData.Health", BindingMode.TwoWay);
+        BindingContext bindingContext = new(this);
+        bindingContext.BindProperty(GetNode("%TextEdit"), "Text", "ViewModelData.Health", BindingMode.TwoWay);
         base._Ready();
     }
 }
@@ -248,10 +269,10 @@ Control bindings can be validated by either:
 * Throwing a `ValidationException` from a formatter
 
 There also two main ways of subscribing to validation changed events:
-* Subscribe to the `ControlValidationChanged` event on the `ObservableNode` your bindings reside on
+* Subscribe to the `ControlValidationChanged` event on the `BindingContext` your bindings reside on
 * Add a validation handler to the control binding
 
-You can also use the `HasErrors` property on an `ObservableNode` to notify your UI of errors and review a full list of validation errors using the `GetValidationMessages()` method.
+You can also use the `HasErrors` property on a `BindingContext` to notify your UI of errors and review a full list of validation errors using the `GetValidationMessages()` method.
 
 
 <details>
@@ -269,7 +290,7 @@ Validators are run the in the order they are registered and validation will stop
 This example adds two validators and a callback to modulate the control and set the tooltip text.
 
 ```c#
-BindProperty("%LineEdit", nameof(LineEdit.Text), $"{nameof(SelectedPlayerData)}.{nameof(PlayerData.Health)}", BindingMode.TwoWay)
+bindingContext.BindProperty(GetNode("%LineEdit"), nameof(LineEdit.Text), $"{nameof(SelectedPlayerData)}.{nameof(PlayerData.Health)}", BindingMode.TwoWay)
     .AddValidator(v => int.TryParse((string)v, out int value) ? null : "Health must be a number")
     .AddValidator(v => int.TryParse((string)v, out int value) && value > 0 ? null : "Health must be greater than 0")
     .AddValidationHandler((control, isValid, message) => { 
@@ -298,9 +319,10 @@ public partial class MyClass : ObservableNode
 
     public override void _Ready()
     {
-        BindProperty("%ErrorLabel", nameof(Label.Visible), nameof(HasErrors), BindingMode.OneWay);
-        BindProperty("%ErrorLabel", nameof(Label.Text), nameof(ErrorMessage), BindingMode.OneWay);
-        ControlValidationChanged += OnControlValidationChanged;
+        BindingContext bindingContext = new(this);
+        bindingContext.BindProperty(GetNode("%ErrorLabel"), nameof(Label.Visible), $"{nameof(bindingContext)}.{nameof(HasErrors)}", BindingMode.OneWay);
+        bindingContext.BindProperty(GetNode("%ErrorLabel"), nameof(Label.Text), nameof(ErrorMessage), BindingMode.OneWay);
+        bindingContext.ControlValidationChanged += OnControlValidationChanged;
     }
 
     private void OnControlValidationChanged(control, propertyName, message, isValid)
