@@ -25,6 +25,9 @@ public static class BackReferenceFactory
             object pathObject = root;
             for (int i = 0; i < pathNodes.Count; i++)
             {
+                if (root == null)
+                    continue;
+
                 if (i == 0)
                 {
                     pathObjects.Add(root);
@@ -32,7 +35,11 @@ public static class BackReferenceFactory
                 else
                 {
                     var pathNode = pathNodes[i - 1];
-                    pathObject = ReflectionService.GetPropertyInfo(root, pathNode).GetValue(root);
+                    pathObject = ReflectionService.GetPropertyInfo(root, pathNode)?.GetValue(root);
+
+                    if (pathObject == null)
+                        continue;
+
                     pathObjects.Add(pathObject);
                 }
 

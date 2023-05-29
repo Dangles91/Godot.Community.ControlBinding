@@ -36,12 +36,12 @@ namespace Godot.Community.ControlBinding
 
         private void OnBindingStatusChanged(object sender, BindingStatus e)
         {
-            if(sender is Binding binding)
+            if (sender is Binding binding)
             {
                 if (e == BindingStatus.Invalid)
                 {
                     _bindings[binding.BindingConfiguration.BoundControl.Target].Remove(binding);
-                    if(_bindings[binding.BindingConfiguration.BoundControl.Target].Count == 0)
+                    if (_bindings[binding.BindingConfiguration.BoundControl.Target].Count == 0)
                     {
                         _bindings.Remove(binding.BindingConfiguration.BoundControl.Target);
                     }
@@ -190,8 +190,20 @@ namespace Godot.Community.ControlBinding
             {
                 BindProperty(node, "Selected", selectedItemPath, BindingMode.TwoWay, new ValueFormatter
                 {
-                    FormatTarget = (v, _) => targetObject[(int)v == -1 ? 0 : (int)v],
-                    FormatControl = (v, _) => targetObject.IndexOf((T)v)
+                    FormatTarget = (v, _) =>
+                    {
+                        if (v is null || targetObject is null)
+                            return null;
+
+                        return targetObject[(int)v == -1 ? 0 : (int)v];
+                    },
+                    FormatControl = (v, _) =>
+                    {
+                        if (v is null || targetObject is null)
+                            return null;
+
+                        return targetObject.IndexOf((T)v);
+                    }
                 });
             }
         }
