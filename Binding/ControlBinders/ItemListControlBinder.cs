@@ -41,6 +41,7 @@ public partial class ItemListControlBinder : ControlBinderBase
 
             itemList.RemoveItem(eventArgs.NewStartingIndex);
             itemList.AddListItems(eventArgs.NewItems, _bindingConfiguration.Formatter);
+            itemList.RedrawItems(_bindingConfiguration.TargetObject.Target as IList, _bindingConfiguration.Formatter);
 
             if (itemWasSelected)
             {
