@@ -1,4 +1,5 @@
 using Godot.Community.ControlBinding.Collections;
+using Godot.Community.ControlBinding.Utilities;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -60,12 +61,12 @@ public partial class OptionButtonControlBinder : ControlBinderBase
         // Add new items
         if (eventArgs.Action == NotifyCollectionChangedAction.Add)
         {
-            AddListItems(optionButton, eventArgs.NewItems, eventArgs.NewStartingIndex);
+            optionButton.AddListItems(eventArgs.NewItems, _bindingConfiguration.Formatter);
             if (eventArgs.NewStartingIndex != optionButton.ItemCount - 1)
             {
                 // this is an insert event
                 // we need to move the item to the correct position
-                RedrawListItems();
+                optionButton.RedrawItems(_bindingConfiguration.TargetObject.Target as IList, _bindingConfiguration.Formatter);
                 optionButton.EmitSignal(ItemList.SignalName.ItemSelected, eventArgs.NewStartingIndex);
             }
         }
@@ -76,7 +77,8 @@ public partial class OptionButtonControlBinder : ControlBinderBase
             bool itemWasSelected = optionButton.Selected == eventArgs.NewStartingIndex;
 
             optionButton.RemoveItem(eventArgs.NewStartingIndex);
-            AddListItems(optionButton, eventArgs.NewItems, eventArgs.NewStartingIndex);
+            optionButton.AddListItems(eventArgs.NewItems, _bindingConfiguration.Formatter);
+            optionButton.RedrawItems(_bindingConfiguration.TargetObject.Target as IList, _bindingConfiguration.Formatter);
 
             if (itemWasSelected)
             {
@@ -115,8 +117,8 @@ public partial class OptionButtonControlBinder : ControlBinderBase
                 return;
 
             // fake a move by updating the items?
-            RedrawListItems();
-            UpdateSelections(newIndex, eventArgs.OldStartingIndex);
+            optionButton.RedrawItems(items, _bindingConfiguration.Formatter);
+            optionButton.UpdateSelections(newIndex, eventArgs.OldStartingIndex);
         }
 
         // Clear the list
@@ -129,7 +131,7 @@ public partial class OptionButtonControlBinder : ControlBinderBase
     public override void OnListItemChanged(object entry)
     {
         var observableList = _bindingConfiguration.TargetObject.Target as IList;
-        OptionButton itemList = _bindingConfiguration.BoundControl.Target as OptionButton;
+        OptionButton optionButton = _bindingConfiguration.BoundControl.Target as OptionButton;
 
         var changedIndex = observableList.IndexOf(entry);
         object convertedVal = entry;
@@ -140,26 +142,14 @@ public partial class OptionButtonControlBinder : ControlBinderBase
 
         if (convertedVal is ListItem listItem)
         {
-            SetItemValues(itemList, changedIndex, listItem);
+            optionButton.SetItemValues(changedIndex, listItem);
         }
         else
         {
-            itemList.SetItemText(changedIndex, convertedVal.ToString());
+            optionButton.SetItemText(changedIndex, convertedVal.ToString());
         }
     }
 
-    private static void SetItemValues(OptionButton optionButton, int index, ListItem listItem)
-    {
-        optionButton.SetItemText(index, listItem.DisplayValue);
-        if (listItem.Icon != null)
-            optionButton.SetItemIcon(index, listItem.Icon);
-        if (listItem.Id != -1)
-            optionButton.SetItemId(index, listItem.Id);
-        if (listItem.Disabled.HasValue)
-            optionButton.SetItemDisabled(index, listItem.Disabled.Value);
-        if (listItem.Metadata.VariantType != Variant.Type.Nil)
-            optionButton.SetItemMetadata(index, listItem.Metadata);
-    }
 
     public override IControlBinder CreateInstance()
     {
@@ -169,86 +159,5 @@ public partial class OptionButtonControlBinder : ControlBinderBase
     public override bool CanBindFor(object control)
     {
         return control is OptionButton;
-    }
-
-    private void AddListItems(OptionButton optionButton, IList newItems, int newIndex)
-    {
-        List<object> convertedValues = newItems.Cast<object>().ToList();
-        if (_bindingConfiguration.Formatter != null)
-        {
-            convertedValues = convertedValues.ConvertAll(x => _bindingConfiguration.Formatter.FormatControl(x, null));
-        }
-
-        foreach (var item in convertedValues)
-        {
-            if (item is string stringValue)
-            {
-                optionButton.AddItem(stringValue);
-            }
-
-            if (item is ListItem listItem)
-            {
-                optionButton.AddItem(listItem.DisplayValue);
-                SetItemValues(optionButton, optionButton.ItemCount - 1, listItem);
-            }
-
-            if (optionButton.ItemCount == 1)
-            {
-                optionButton.Select(0);
-            }
-            else
-            {
-                optionButton.Select(optionButton.Selected);
-            }
-        }
-    }
-
-    private void UpdateSelections(int newIndex, int oldIndex)
-    {
-        OptionButton optionButton = _bindingConfiguration.BoundControl.Target as OptionButton;
-        for (int i = 0; i < optionButton.ItemCount; i++)
-        {
-            bool isSelected = optionButton.Selected == i;
-            if (!isSelected)
-                continue;
-
-            if (i >= oldIndex && i < newIndex)
-            {
-                optionButton.Select(i + 1);
-                optionButton.EmitSignal(ItemList.SignalName.ItemSelected, i + 1);
-            }
-            else if (i > newIndex && i <= oldIndex)
-            {
-                optionButton.Select(i - 1);
-                optionButton.EmitSignal(ItemList.SignalName.ItemSelected, i - 1);
-            }
-        }
-    }
-
-    private void RedrawListItems()
-    {
-        IList items = _bindingConfiguration.TargetObject.Target as IList;
-        OptionButton optionButton = _bindingConfiguration.BoundControl.Target as OptionButton;
-        // fake a move by updating the items?
-        for (int i = 0; i < items.Count; i++)
-        {
-            object item = string.Empty;
-            if (_bindingConfiguration.Formatter != null)
-            {
-                item = _bindingConfiguration.Formatter.FormatControl(items[i], null);
-            }
-            else
-            {
-                item = items[i].ToString();
-            }
-
-            if (item is string stringValue)
-                optionButton.SetItemText(i, stringValue);
-
-            if (item is ListItem listItem)
-            {
-                SetItemValues(optionButton, i, listItem);
-            }
-        }
     }
 }
