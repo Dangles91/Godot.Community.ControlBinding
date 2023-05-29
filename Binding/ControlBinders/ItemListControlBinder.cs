@@ -129,8 +129,6 @@ public partial class ItemListControlBinder : ControlBinderBase
         // fake a move by updating the items?
         for (int i = 0; i < items.Count; i++)
         {
-            var selectedItems = itemList.GetSelectedItems();
-
             object item = string.Empty;
             if (_bindingConfiguration.Formatter != null)
             {
