@@ -57,6 +57,36 @@ public partial class GenericControlBinder : ControlBinderBase
         }
     }
 
+    private void insertControlCacheItem(ulong sceneInstanceId, int newIndex)
+    {
+        _controlChildIndexes[sceneInstanceId] = newIndex;
+
+        foreach (var itemIndex in _controlChildIndexes)
+        {
+            if (itemIndex.Value >= newIndex && itemIndex.Key != sceneInstanceId)
+            {
+                _controlChildIndexes[itemIndex.Key]++;
+            }
+        }
+    }
+
+    private void moveControlCacheItem(ulong sceneInstanceId, int newIndex)
+    {
+        var oldIndex = _controlChildIndexes[sceneInstanceId];
+        foreach (var itemIndex in _controlChildIndexes)
+        {
+            if (itemIndex.Value > oldIndex && itemIndex.Value <= newIndex)
+            {
+                _controlChildIndexes[itemIndex.Key]--;
+            }
+            else if (itemIndex.Value > newIndex && itemIndex.Value <= oldIndex)
+            {
+                _controlChildIndexes[itemIndex.Key]++;
+            }
+        }
+        _controlChildIndexes[sceneInstanceId] = newIndex;
+    }
+
     public void clearControlCache()
     {
         _controlChildCache.Clear();
@@ -95,40 +125,52 @@ public partial class GenericControlBinder : ControlBinderBase
             return;
         }
 
+        // Add new child items        
         if (eventArgs.Action == NotifyCollectionChangedAction.Add)
         {
-            int i = eventArgs.NewStartingIndex;
-            foreach (var addition in eventArgs.NewItems)
-            {
-                var sceneItem = _bindingConfiguration.SceneFormatter.Format(addition);
-                _boundControl.AddChild(sceneItem);
+            AddItems(eventArgs.NewItems, eventArgs.NewStartingIndex);
 
-                // list item references are cached against a node ID so they can be removed from the
-                // list of children when removed from the backing ObservableList 
-                addControlCacheItem(addition, sceneItem.GetInstanceId(), i);
-                i++;
+            if (eventArgs.NewStartingIndex != _boundControl.GetChildCount() - 1)
+            {
+                // this is an insert event
+                // we need to move the item to the correct position
+                var item = _boundControl.GetChild(_boundControl.GetChildCount() - 1);
+                _boundControl.MoveChild(item, eventArgs.NewStartingIndex);
+                insertControlCacheItem(item.GetInstanceId(), eventArgs.NewStartingIndex);
             }
         }
 
+        // Remove child items
         if (eventArgs.Action == NotifyCollectionChangedAction.Remove)
         {
-            foreach (var removedItem in eventArgs.OldItems)
+            RemoveItems(eventArgs.OldItems, eventArgs.OldStartingIndex);
+        }
+
+        // Replace a child item        
+        if (eventArgs.Action == NotifyCollectionChangedAction.Replace)
+        {
+            RemoveItems(eventArgs.OldItems, eventArgs.OldStartingIndex);
+            var newSceneItems = AddItems(eventArgs.NewItems, eventArgs.NewStartingIndex);
+
+            _boundControl.MoveChild(newSceneItems[0], eventArgs.NewStartingIndex);
+            moveControlCacheItem(newSceneItems[0].GetInstanceId(), eventArgs.NewStartingIndex);
+        }
+
+        // Move a child item
+        if (eventArgs.Action == NotifyCollectionChangedAction.Move)
+        {
+            int oldIndex = eventArgs.OldStartingIndex;
+            int newIndex = eventArgs.NewStartingIndex;
+            for (int i = 0; i < eventArgs.NewItems.Count; i++)
             {
-                // get the corresponding scene item
-                if (!_controlChildCache.TryGetValue(removedItem, out var instanceId))
-                {
-                    return;
-                }
-                removeControlCacheItem(removedItem, instanceId);
-                var sceneItem = _boundControl.GetChildren().FirstOrDefault(x => x.GetInstanceId() == instanceId);
-                if (sceneItem != null)
-                {
-                    _boundControl.RemoveChild(sceneItem);
-                    sceneItem.QueueFree();
-                }
+                var item = _boundControl.GetChild(oldIndex);
+                _boundControl.MoveChild(item, newIndex);
+                moveControlCacheItem(item.GetInstanceId(), newIndex);
+                oldIndex++; newIndex++;
             }
         }
 
+        // Clear all child items
         if (eventArgs.Action == NotifyCollectionChangedAction.Reset)
         {
             clearControlCache();
@@ -141,6 +183,42 @@ public partial class GenericControlBinder : ControlBinderBase
                 }
             }
             _controlChildCache.Clear();
+        }
+    }
+
+    private List<Node> AddItems(IList newItems, int newIndex)
+    {
+        int i = newIndex;
+        var newScenes = new List<Node>();
+        foreach (var addition in newItems)
+        {
+            var sceneItem = _bindingConfiguration.SceneFormatter.Format(addition);
+            _boundControl.AddChild(sceneItem);
+            newScenes.Add(sceneItem);
+            // list item references are cached against a node ID so they can be removed from the
+            // list of children when removed from the backing ObservableList 
+            addControlCacheItem(addition, sceneItem.GetInstanceId(), i);
+            i++;
+        }
+        return newScenes;
+    }
+
+    private void RemoveItems(IList oldItems, int OldStartingIndex)
+    {
+        foreach (var removedItem in oldItems)
+        {
+            // get the corresponding scene item
+            if (!_controlChildCache.TryGetValue(removedItem, out var instanceId))
+            {
+                return;
+            }
+            removeControlCacheItem(removedItem, instanceId);
+            var sceneItem = _boundControl.GetChildren().FirstOrDefault(x => x.GetInstanceId() == instanceId);
+            if (sceneItem != null)
+            {
+                _boundControl.RemoveChild(sceneItem);
+                sceneItem.QueueFree();
+            }
         }
     }
 }
