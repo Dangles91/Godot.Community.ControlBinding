@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using Godot.Community.ControlBinding.Services;
 
 namespace Godot.Community.ControlBinding.ControlBinders;
 
@@ -9,9 +10,7 @@ public partial class GenericControlBinder : ControlBinderBase
 {
     public new static int Priority => 0;
     internal Godot.Control _boundControl;
-    private readonly Dictionary<object, ulong> _controlChildCache = new();
-    private readonly Dictionary<ulong, object> _controlChildCacheReverseLookup = new();
-    private readonly Dictionary<ulong, int> _controlChildIndexes = new();
+    private readonly NodeChildCache _nodeChildCache = new();
 
     public override void BindControl(BindingConfiguration bindingConfiguration)
     {
@@ -27,71 +26,12 @@ public partial class GenericControlBinder : ControlBinderBase
 
     private void OnChildExitingTree(Node node)
     {
-        if (_controlChildCacheReverseLookup.TryGetValue(node.GetInstanceId(), out var listItem))
+        if (_nodeChildCache.TryGetControlListValue(node.GetInstanceId(), out var listItem))
         {
-            int itemIndex = _controlChildIndexes[node.GetInstanceId()];
-            removeControlCacheItem(listItem, node.GetInstanceId());
+            int itemIndex = _nodeChildCache.GetControlIndex(node.GetInstanceId());
+            _nodeChildCache.Remove(listItem, node.GetInstanceId());
             (_bindingConfiguration.TargetObject.Target as IList)?.RemoveAt(itemIndex);
         }
-    }
-
-    private void addControlCacheItem(object listItem, ulong sceneInstanceId, int index)
-    {
-        _controlChildCache.Add(listItem, sceneInstanceId);
-        _controlChildCacheReverseLookup.Add(sceneInstanceId, listItem);
-        _controlChildIndexes.Add(sceneInstanceId, index);
-    }
-
-    private void removeControlCacheItem(object listItem, ulong sceneInstanceId)
-    {
-        _controlChildCache.Remove(listItem);
-        _controlChildCacheReverseLookup.Remove(sceneInstanceId);
-        var index = _controlChildIndexes[sceneInstanceId];
-        _controlChildIndexes.Remove(sceneInstanceId);
-        foreach (var itemIndex in _controlChildIndexes)
-        {
-            if (itemIndex.Value > index)
-            {
-                _controlChildIndexes[itemIndex.Key]--;
-            }
-        }
-    }
-
-    private void insertControlCacheItem(ulong sceneInstanceId, int newIndex)
-    {
-        _controlChildIndexes[sceneInstanceId] = newIndex;
-
-        foreach (var itemIndex in _controlChildIndexes)
-        {
-            if (itemIndex.Value >= newIndex && itemIndex.Key != sceneInstanceId)
-            {
-                _controlChildIndexes[itemIndex.Key]++;
-            }
-        }
-    }
-
-    private void moveControlCacheItem(ulong sceneInstanceId, int newIndex)
-    {
-        var oldIndex = _controlChildIndexes[sceneInstanceId];
-        foreach (var itemIndex in _controlChildIndexes)
-        {
-            if (itemIndex.Value > oldIndex && itemIndex.Value <= newIndex)
-            {
-                _controlChildIndexes[itemIndex.Key]--;
-            }
-            else if (itemIndex.Value > newIndex && itemIndex.Value <= oldIndex)
-            {
-                _controlChildIndexes[itemIndex.Key]++;
-            }
-        }
-        _controlChildIndexes[sceneInstanceId] = newIndex;
-    }
-
-    public void clearControlCache()
-    {
-        _controlChildCache.Clear();
-        _controlChildCacheReverseLookup.Clear();
-        _controlChildIndexes.Clear();
     }
 
     public override bool CanBindFor(object control)
@@ -136,7 +76,7 @@ public partial class GenericControlBinder : ControlBinderBase
                 // we need to move the item to the correct position
                 var item = _boundControl.GetChild(_boundControl.GetChildCount() - 1);
                 _boundControl.MoveChild(item, eventArgs.NewStartingIndex);
-                insertControlCacheItem(item.GetInstanceId(), eventArgs.NewStartingIndex);
+                _nodeChildCache.Insert(item.GetInstanceId(), eventArgs.NewStartingIndex);
             }
         }
 
@@ -153,7 +93,7 @@ public partial class GenericControlBinder : ControlBinderBase
             var newSceneItems = AddItems(eventArgs.NewItems, eventArgs.NewStartingIndex);
 
             _boundControl.MoveChild(newSceneItems[0], eventArgs.NewStartingIndex);
-            moveControlCacheItem(newSceneItems[0].GetInstanceId(), eventArgs.NewStartingIndex);
+            _nodeChildCache.Move(newSceneItems[0].GetInstanceId(), eventArgs.NewStartingIndex);
         }
 
         // Move a child item
@@ -165,7 +105,7 @@ public partial class GenericControlBinder : ControlBinderBase
             {
                 var item = _boundControl.GetChild(oldIndex);
                 _boundControl.MoveChild(item, newIndex);
-                moveControlCacheItem(item.GetInstanceId(), newIndex);
+                _nodeChildCache.Move(item.GetInstanceId(), newIndex);
                 oldIndex++; newIndex++;
             }
         }
@@ -173,7 +113,7 @@ public partial class GenericControlBinder : ControlBinderBase
         // Clear all child items
         if (eventArgs.Action == NotifyCollectionChangedAction.Reset)
         {
-            clearControlCache();
+            _nodeChildCache.Clear();
             if (_boundControl != null)
             {
                 foreach (var child in _boundControl.GetChildren())
@@ -182,7 +122,6 @@ public partial class GenericControlBinder : ControlBinderBase
                     child.QueueFree();
                 }
             }
-            _controlChildCache.Clear();
         }
     }
 
@@ -197,7 +136,7 @@ public partial class GenericControlBinder : ControlBinderBase
             newScenes.Add(sceneItem);
             // list item references are cached against a node ID so they can be removed from the
             // list of children when removed from the backing ObservableList 
-            addControlCacheItem(addition, sceneItem.GetInstanceId(), i);
+            _nodeChildCache.Add(addition, sceneItem.GetInstanceId(), i);
             i++;
         }
         return newScenes;
@@ -208,11 +147,11 @@ public partial class GenericControlBinder : ControlBinderBase
         foreach (var removedItem in oldItems)
         {
             // get the corresponding scene item
-            if (!_controlChildCache.TryGetValue(removedItem, out var instanceId))
+            if (!_nodeChildCache.TryGetListItemControlValue(removedItem, out var instanceId))
             {
                 return;
             }
-            removeControlCacheItem(removedItem, instanceId);
+            _nodeChildCache.Remove(removedItem, instanceId);
             var sceneItem = _boundControl.GetChildren().FirstOrDefault(x => x.GetInstanceId() == instanceId);
             if (sceneItem != null)
             {
