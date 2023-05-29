@@ -19,7 +19,11 @@
 <details>
   <summary>:clapper: Movie</summary>
   
-https://github.com/Dangles91/Godot.Community.ControlBinding/assets/9249458/0983acb5-fe14-46ae-9c9c-38a073bf3b7c
+
+
+https://github.com/Dangles91/Godot.Community.ControlBinding/assets/9249458/91295e19-91cd-4eb8-adf1-1798cae6b532
+
+
 
 </details>
 
