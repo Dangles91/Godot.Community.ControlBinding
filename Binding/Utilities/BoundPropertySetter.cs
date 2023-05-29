@@ -10,11 +10,11 @@ namespace Godot.Community.ControlBinding.Utilities;
 public class BoundPropertySetter
 {
     private readonly IValueFormatter _valueFormatter;
-    public readonly List<Func<object, string>> Validators;
+    private readonly List<Func<object, string>> _validators;
     public BoundPropertySetter(IValueFormatter valueFormatter, List<Func<object, string>> validators = null)
     {
         _valueFormatter = valueFormatter;
-        Validators = validators;
+        _validators = validators;
     }
 
     private enum SetDirection
@@ -35,6 +35,11 @@ public class BoundPropertySetter
     public void SetBoundControlValue(object sourceObject, string sourcePropertyName, Godot.Control targetControl, string targetPropertyName)
     {
         setPropertyValue(sourceObject, sourcePropertyName, targetControl, targetPropertyName, _valueFormatter?.FormatControl, SetDirection.ToControl);
+    }
+
+    public void AddValidator(Func<object, string> validator)
+    {
+        _validators.Add(validator);
     }
 
     private void setPropertyValue(
@@ -67,12 +72,12 @@ public class BoundPropertySetter
         object convertedValue = sourceValue;
         bool formatterFailed = false;
 
-        if(direction == SetDirection.ToProperty && Validators?.Any() == true)
+        if (direction == SetDirection.ToProperty && _validators != null && _validators.Any())
         {
-            foreach(var validator in Validators)
+            foreach (var validator in _validators)
             {
                 var result = validator(sourceValue);
-                if(!string.IsNullOrEmpty(result))
+                if (!string.IsNullOrEmpty(result))
                 {
                     throw new ValidationException(result);
                 }
@@ -83,10 +88,9 @@ public class BoundPropertySetter
         {
             try
             {
-                var previousValue = targetValue;
                 convertedValue = formatter(sourceValue, targetValue);
             }
-            catch(ValidationException)
+            catch (ValidationException)
             {
                 throw;
             }
@@ -101,7 +105,8 @@ public class BoundPropertySetter
         {
             try
             {
-                convertedValue = PropertyTypeConverter.ConvertValue(sourcePropertyInfo.PropertyType,
+                convertedValue = PropertyTypeConverter.ConvertValue(
+                    sourcePropertyInfo.PropertyType,
                     targetPropertyInfo.PropertyType,
                     sourceValue);
             }
@@ -117,6 +122,6 @@ public class BoundPropertySetter
         if (targetValue == convertedValue)
             return;
 
-        targetPropertyInfo.SetValue(targetObject, convertedValue);
+        targetPropertyInfo?.SetValue(targetObject, convertedValue);
     }
 }

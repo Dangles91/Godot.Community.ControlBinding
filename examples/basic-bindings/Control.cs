@@ -1,12 +1,10 @@
-using Godot.Community.ControlBinding.Collections;
-using Godot.Community.ControlBinding.Formatters;
 using Godot;
 using Godot.Community.ControlBinding;
-using System.Collections.Generic;
-using PropertyChanged.SourceGenerator;
-using Godot.Community.ControlBinding.Interfaces;
-using System.Collections.ObjectModel;
 using Godot.Community.ControlBinding.Extensions;
+using Godot.Community.ControlBinding.Formatters;
+using Godot.Community.ControlBinding.Interfaces;
+using PropertyChanged.SourceGenerator;
+using System.Collections.ObjectModel;
 
 namespace ControlBinding;
 

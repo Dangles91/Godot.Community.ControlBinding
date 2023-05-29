@@ -1,6 +1,5 @@
 using System.Collections.Specialized;
 using System.ComponentModel;
-using Godot.Community.ControlBinding.EventArgs;
 
 namespace Godot.Community.ControlBinding.ControlBinders
 {
@@ -14,9 +13,9 @@ namespace Godot.Community.ControlBinding.ControlBinders
             ControlValueChanged?.Invoke(control, new PropertyChangedEventArgs(propertyName));
         }
 
-        public delegate void ControlChildListChangedEventHandler(Godot.Control control, ObservableListChangedEventArgs args);
+        public delegate void ControlChildListChangedEventHandler(Godot.Control control, NotifyCollectionChangedEventArgs args);
         public event ControlChildListChangedEventHandler ControlChildListChanged;
-        public void OnControlChildListChanged(Godot.Control control, ObservableListChangedEventArgs args)
+        public void OnControlChildListChanged(Godot.Control control, NotifyCollectionChangedEventArgs args)
         {
             ControlChildListChanged?.Invoke(control, args);
         }

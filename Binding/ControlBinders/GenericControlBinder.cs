@@ -1,6 +1,3 @@
-using Godot.Community.ControlBinding.Collections;
-using Godot.Community.ControlBinding.EventArgs;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -74,7 +71,7 @@ public partial class GenericControlBinder : ControlBinderBase
 
     public override void ClearEventBindings()
     {
-        if(_bindingConfiguration.BindingMode == BindingMode.TwoWay)
+        if (_bindingConfiguration.BindingMode == BindingMode.TwoWay)
         {
             _boundControl.ChildExitingTree -= OnChildExitingTree;
         }

@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 
 namespace Godot.Community.ControlBinding.Interfaces;
 

@@ -1,5 +1,4 @@
 using System.Collections.Specialized;
-using Godot.Community.ControlBinding.EventArgs;
 
 namespace Godot.Community.ControlBinding.ControlBinders;
 public interface IControlBinder

@@ -30,5 +30,6 @@ public partial class PlayerDataListItem : ControlViewModel
     // Called every frame. 'delta' is the elapsed time since the previous frame.
     public override void _Process(double delta)
     {
+        // Nothing to process
     }
 }

@@ -1,12 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using Godot.Community.ControlBinding.Collections;
 using Godot.Community.ControlBinding.ControlBinders;
 using Godot.Community.ControlBinding.Factories;
 using Godot.Community.ControlBinding.Formatters;
 using Godot.Community.ControlBinding.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace Godot.Community.ControlBinding
 {
@@ -36,15 +36,12 @@ namespace Godot.Community.ControlBinding
 
         private void OnBindingStatusChanged(object sender, BindingStatus e)
         {
-            if (sender is Binding binding)
+            if (sender is Binding binding && e == BindingStatus.Invalid)
             {
-                if (e == BindingStatus.Invalid)
+                _bindings[binding.BindingConfiguration.BoundControl.Target].Remove(binding);
+                if (_bindings[binding.BindingConfiguration.BoundControl.Target].Count == 0)
                 {
-                    _bindings[binding.BindingConfiguration.BoundControl.Target].Remove(binding);
-                    if (_bindings[binding.BindingConfiguration.BoundControl.Target].Count == 0)
-                    {
-                        _bindings.Remove(binding.BindingConfiguration.BoundControl.Target);
-                    }
+                    _bindings.Remove(binding.BindingConfiguration.BoundControl.Target);
                 }
             }
         }

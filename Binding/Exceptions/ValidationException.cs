@@ -16,5 +16,10 @@ namespace Godot.Community.ControlBinding
         public ValidationException(string message, Exception innerException) : base(message, innerException)
         {
         }
+
+        protected ValidationException(System.Runtime.Serialization.SerializationInfo serializationInfo, System.Runtime.Serialization.StreamingContext streamingContext) : base(serializationInfo, streamingContext)
+        {
+
+        }
     }
 }

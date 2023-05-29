@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Godot.Community.ControlBinding.Factories
 {
@@ -22,7 +19,7 @@ namespace Godot.Community.ControlBinding.Factories
 
         public virtual T AddValidator(Func<object, string> validator)
         {
-            _binding.BoundPropertySetter.Validators.Add(validator);
+            _binding.BoundPropertySetter.AddValidator(validator);
             return (T)this;
         }
     }
