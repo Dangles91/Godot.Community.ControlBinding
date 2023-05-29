@@ -36,9 +36,6 @@ public static class BackReferenceFactory
                     var pathNode = pathNodes[i - 1];
                     pathObject = ReflectionService.GetPropertyInfo(root, pathNode)?.GetValue(root);
 
-                    if (pathObject == null)
-                        continue;
-
                     pathObjects.Add(pathObject);
                 }
 
