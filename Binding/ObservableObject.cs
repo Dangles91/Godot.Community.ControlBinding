@@ -1,4 +1,5 @@
 using Godot.Community.ControlBinding.Interfaces;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -14,5 +15,13 @@ public partial class ObservableObject : IObservableObject
             return;
 
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    }
+    public virtual void SetValue<T>(ref T field, T value, [CallerMemberName] string name = "not a property")
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value))
+            return;
+
+        field = value;
+        OnPropertyChanged(name);
     }
 }
