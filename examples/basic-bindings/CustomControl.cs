@@ -10,7 +10,6 @@ namespace ControlBinding;
 
 public partial class CustomControl : Control, IObservableObject
 {
-
     [Notify]
     private string _input;
 
