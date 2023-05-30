@@ -4,7 +4,7 @@ using System.Collections.Specialized;
 
 namespace Godot.Community.ControlBinding.ControlBinders;
 
-public partial class TextEditControlBinder : ControlBinderBase
+internal partial class TextEditControlBinder : ControlBinderBase
 {
     private readonly List<string> _allowedTwoBindingProperties = new(){
             nameof(TextEdit.Text)
@@ -18,14 +18,14 @@ public partial class TextEditControlBinder : ControlBinderBase
             TextEdit boundControl = bindingConfiguration.BoundControl.Target as TextEdit;
             if (bindingConfiguration.BoundPropertyName == "Text")
             {
-                boundControl.TextChanged += onTextChanged;
+                boundControl.TextChanged += OnTextChanged;
             }
         }
 
         base.BindControl(bindingConfiguration);
     }
 
-    public void onTextChanged()
+    public void OnTextChanged()
     {
         OnControlValueChanged(_bindingConfiguration.BoundControl.Target as Godot.Control, "Text");
     }
@@ -38,7 +38,7 @@ public partial class TextEditControlBinder : ControlBinderBase
             TextEdit boundControl = _bindingConfiguration.BoundControl.Target as TextEdit;
             if (_bindingConfiguration.BoundPropertyName == "Text")
             {
-                boundControl.TextChanged -= onTextChanged;
+                boundControl.TextChanged -= OnTextChanged;
             }
         }
     }

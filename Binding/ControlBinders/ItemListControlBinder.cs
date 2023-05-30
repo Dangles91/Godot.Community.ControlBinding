@@ -6,7 +6,7 @@ using System.Collections.Specialized;
 using System.Linq;
 
 namespace Godot.Community.ControlBinding.ControlBinders;
-public partial class ItemListControlBinder : ControlBinderBase
+internal partial class ItemListControlBinder : ControlBinderBase
 {
     public override void OnObservableListChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
     {

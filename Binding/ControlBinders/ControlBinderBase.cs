@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace Godot.Community.ControlBinding.ControlBinders
 {
-    public abstract partial class ControlBinderBase : IControlBinder
+    internal abstract partial class ControlBinderBase : IControlBinder
     {
         public delegate void ControlValueChangedEventHandler(Godot.Control control, PropertyChangedEventArgs args);
         public event ControlValueChangedEventHandler ControlValueChanged;

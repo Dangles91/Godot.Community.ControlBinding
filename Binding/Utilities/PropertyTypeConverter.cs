@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace Godot.Community.ControlBinding.Utilities;
 
-public static class PropertyTypeConverter
+internal static class PropertyTypeConverter
 {
     public static object ConvertValue(Type fromType, Type targetType, object value)
     {

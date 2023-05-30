@@ -4,8 +4,8 @@ namespace Godot.Community.ControlBinding.Factories
 {
     public class BindingBuilderBase
     {
-        protected readonly Binding _binding;
-        public BindingBuilderBase(Binding binding)
+        internal readonly Binding _binding;
+        internal BindingBuilderBase(Binding binding)
         {
             _binding = binding;
         }
@@ -13,7 +13,7 @@ namespace Godot.Community.ControlBinding.Factories
 
     public class BindingValidatorBuilder<T> : BindingBuilderBase where T : BindingValidatorBuilder<T>
     {
-        public BindingValidatorBuilder(Binding binding) : base(binding)
+        internal BindingValidatorBuilder(Binding binding) : base(binding)
         {
         }
 
@@ -26,7 +26,7 @@ namespace Godot.Community.ControlBinding.Factories
 
     public class BindingBuilderValidationHandler<T> : BindingValidatorBuilder<T> where T : BindingBuilderValidationHandler<T>
     {
-        public BindingBuilderValidationHandler(Binding binding) : base(binding)
+        internal BindingBuilderValidationHandler(Binding binding) : base(binding)
         {
         }
 
@@ -39,7 +39,7 @@ namespace Godot.Community.ControlBinding.Factories
 
     public class BindingBuilder : BindingBuilderValidationHandler<BindingBuilder>
     {
-        public BindingBuilder(Binding binding) : base(binding)
+        internal BindingBuilder(Binding binding) : base(binding)
         {
         }
     }

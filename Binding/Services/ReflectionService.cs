@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Reflection;
 
 namespace Godot.Community.ControlBinding.Services;
-public static class ReflectionService
+internal static class ReflectionService
 {
     private static readonly Dictionary<string, PropertyInfo> _propertyInfoCache = new();
 

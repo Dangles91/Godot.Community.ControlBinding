@@ -4,7 +4,7 @@ using System.Collections.Specialized;
 
 namespace Godot.Community.ControlBinding.ControlBinders;
 
-public partial class RangeControlBinder : ControlBinderBase
+internal partial class RangeControlBinder : ControlBinderBase
 {
     private readonly List<string> _allowedTwoBindingProperties = new()
         {
@@ -19,13 +19,13 @@ public partial class RangeControlBinder : ControlBinderBase
             Godot.Range boundControl = bindingConfiguration.BoundControl.Target as Range;
 
             if (bindingConfiguration.BoundPropertyName == nameof(Range.Value))
-                boundControl.ValueChanged += onValueChanged;
+                boundControl.ValueChanged += OnValueChanged;
         }
 
         base.BindControl(bindingConfiguration);
     }
 
-    public void onValueChanged(double value)
+    public void OnValueChanged(double value)
     {
         OnControlValueChanged(_bindingConfiguration.BoundControl.Target as Godot.Control, "Value");
     }
@@ -38,7 +38,7 @@ public partial class RangeControlBinder : ControlBinderBase
             Godot.Range boundControl = _bindingConfiguration.BoundControl.Target as Range;
 
             if (_bindingConfiguration.BoundPropertyName == nameof(Range.Value))
-                boundControl.ValueChanged -= onValueChanged;
+                boundControl.ValueChanged -= OnValueChanged;
         }
     }
 

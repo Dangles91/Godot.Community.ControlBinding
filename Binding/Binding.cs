@@ -17,7 +17,7 @@ namespace Godot.Community.ControlBinding
         Invalid
     }
 
-    public class Binding
+    internal class Binding
     {
         public event EventHandler<BindingStatus> BindingStatusChanged;
 

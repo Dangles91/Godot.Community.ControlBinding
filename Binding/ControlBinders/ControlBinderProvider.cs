@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Godot.Community.ControlBinding.ControlBinders
 {
-    public static class ControlBinderProvider
+    internal static class ControlBinderProvider
     {
         private static readonly List<IControlBinder> _binders = new()
         {

@@ -1,7 +1,7 @@
 using System.Collections.Specialized;
 
 namespace Godot.Community.ControlBinding.ControlBinders;
-public interface IControlBinder
+internal interface IControlBinder
 {
     bool CanBindFor(System.Object control);
     void BindControl(BindingConfiguration bindingConfiguration);

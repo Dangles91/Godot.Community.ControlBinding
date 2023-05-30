@@ -12,7 +12,7 @@ public enum BindingMode
     OneWayToTarget,
 }
 
-public class BindingConfiguration
+internal class BindingConfiguration
 {
     public string BoundPropertyName { get; set; }
     public string TargetPropertyName { get; set; }
