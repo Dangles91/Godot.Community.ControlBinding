@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace Godot.Community.ControlBinding.ControlBinders
 {
-    internal abstract partial class ControlBinderBase : IControlBinder
+    internal abstract partial class ControlBinder : IControlBinder
     {
         public bool IsBound { get; set; }
         public int Priority => 1;

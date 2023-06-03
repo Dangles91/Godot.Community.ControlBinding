@@ -6,7 +6,7 @@ using System.Collections.Specialized;
 using System.Linq;
 
 namespace Godot.Community.ControlBinding.ControlBinders;
-internal partial class ItemListControlBinder : ControlBinderBase, IListControlBinder
+internal partial class ItemListControlBinder : ControlBinder, IListControlBinder
 {
     public event IListControlBinder.ControlChildListChangedEventHandler ControlChildListChanged;
 

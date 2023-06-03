@@ -6,7 +6,7 @@ using System.Collections.Specialized;
 using System.Linq;
 
 namespace Godot.Community.ControlBinding.ControlBinders;
-internal partial class OptionButtonControlBinder : ControlBinderBase, IListControlBinder
+internal partial class OptionButtonControlBinder : ControlBinder, IListControlBinder
 {
     private readonly List<string> _allowedTwoBindingProperties = new(){
             "Selected"

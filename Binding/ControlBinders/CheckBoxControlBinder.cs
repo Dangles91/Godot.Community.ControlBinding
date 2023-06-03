@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 
 namespace Godot.Community.ControlBinding.ControlBinders;
-internal partial class CheckBoxControlBinder : ControlBinderBase
+internal partial class CheckBoxControlBinder : ControlBinder
 {
     private readonly List<string> _allowedTwoWayBindingProperties = new(){
             nameof(CheckBox.ButtonPressed)

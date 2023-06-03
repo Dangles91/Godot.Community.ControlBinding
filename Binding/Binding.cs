@@ -96,7 +96,7 @@ namespace Godot.Community.ControlBinding
 
             if (BindingConfiguration.BoundControl.IsAlive)
             {
-                (_controlBinder as ControlBinderBase).ControlValueChanged -= OnSourcePropertyChanged;
+                (_controlBinder as ControlBinder).ControlValueChanged -= OnSourcePropertyChanged;
                 if (BindingConfiguration.BoundControl.Target is IObservableObject observable2)
                 {
                     observable2.PropertyChanged -= OnSourcePropertyChanged;
@@ -159,7 +159,7 @@ namespace Godot.Community.ControlBinding
 
             if (BindingConfiguration.BoundControl.IsAlive)
             {
-                (_controlBinder as ControlBinderBase).ControlValueChanged += OnSourcePropertyChanged;
+                (_controlBinder as ControlBinder).ControlValueChanged += OnSourcePropertyChanged;
                 if (BindingConfiguration.BoundControl.Target is IObservableObject observable2)
                 {
                     observable2.PropertyChanged += OnSourcePropertyChanged;

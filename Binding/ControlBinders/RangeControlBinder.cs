@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Godot.Community.ControlBinding.ControlBinders;
 
-internal partial class RangeControlBinder : ControlBinderBase
+internal partial class RangeControlBinder : ControlBinder
 {
     private readonly List<string> _allowedTwoBindingProperties = new()
         {

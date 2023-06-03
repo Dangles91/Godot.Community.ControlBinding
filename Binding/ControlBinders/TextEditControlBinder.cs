@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Godot.Community.ControlBinding.ControlBinders;
 
-internal partial class TextEditControlBinder : ControlBinderBase
+internal partial class TextEditControlBinder : ControlBinder
 {
     private readonly List<string> _allowedTwoBindingProperties = new(){
             nameof(TextEdit.Text)

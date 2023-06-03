@@ -6,7 +6,7 @@ using Godot.Community.ControlBinding.Services;
 
 namespace Godot.Community.ControlBinding.ControlBinders;
 
-internal partial class GenericControlBinder : ControlBinderBase, IListControlBinder
+internal partial class GenericControlBinder : ControlBinder, IListControlBinder
 {
     public new static int Priority => 0;
     internal Godot.Control _boundControl;
