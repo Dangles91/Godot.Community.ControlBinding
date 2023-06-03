@@ -6,11 +6,13 @@ using System.Collections.Specialized;
 using System.Linq;
 
 namespace Godot.Community.ControlBinding.ControlBinders;
-internal partial class OptionButtonControlBinder : ControlBinderBase
+internal partial class OptionButtonControlBinder : ControlBinderBase, IListControlBinder
 {
     private readonly List<string> _allowedTwoBindingProperties = new(){
             "Selected"
         };
+
+    public event IListControlBinder.ControlChildListChangedEventHandler ControlChildListChanged;
 
     public override void BindControl(BindingConfiguration bindingConfiguration)
     {
@@ -36,19 +38,7 @@ internal partial class OptionButtonControlBinder : ControlBinderBase
         OnControlValueChanged(_bindingConfiguration.BoundControl.Target as Godot.Control, "Selected");
     }
 
-    public override void ClearEventBindings()
-    {
-        if ((_bindingConfiguration.BindingMode == BindingMode.OneWayToTarget || _bindingConfiguration.BindingMode == BindingMode.TwoWay)
-            && _allowedTwoBindingProperties.Contains(_bindingConfiguration.BoundPropertyName))
-        {
-            OptionButton boundControl = _bindingConfiguration.BoundControl.Target as OptionButton;
-
-            if (_bindingConfiguration.BoundPropertyName == "Selected")
-                boundControl.ItemSelected -= OnItemSelected;
-        }
-    }
-
-    public override void OnObservableListChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
+    public void OnObservableListChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
     {
         if (_bindingConfiguration.BoundControl == null)
         {
@@ -128,7 +118,7 @@ internal partial class OptionButtonControlBinder : ControlBinderBase
         }
     }
 
-    public override void OnListItemChanged(object entry)
+    public void OnListItemChanged(object entry)
     {
         var observableList = _bindingConfiguration.TargetObject.Target as IList;
         OptionButton optionButton = _bindingConfiguration.BoundControl.Target as OptionButton;
@@ -150,7 +140,6 @@ internal partial class OptionButtonControlBinder : ControlBinderBase
         }
     }
 
-
     public override IControlBinder CreateInstance()
     {
         return new OptionButtonControlBinder();
@@ -159,5 +148,10 @@ internal partial class OptionButtonControlBinder : ControlBinderBase
     public override bool CanBindFor(object control)
     {
         return control is OptionButton;
+    }
+
+    public void OnControlChildListChanged(Control control, NotifyCollectionChangedEventArgs args)
+    {
+        ControlChildListChanged?.Invoke(control, args);
     }
 }

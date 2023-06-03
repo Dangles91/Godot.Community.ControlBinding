@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 
 namespace Godot.Community.ControlBinding.ControlBinders;
 
@@ -30,24 +28,6 @@ internal partial class TextEditControlBinder : ControlBinderBase
         OnControlValueChanged(_bindingConfiguration.BoundControl.Target as Godot.Control, "Text");
     }
 
-    public override void ClearEventBindings()
-    {
-        if ((_bindingConfiguration.BindingMode == BindingMode.OneWayToTarget || _bindingConfiguration.BindingMode == BindingMode.TwoWay)
-            && _allowedTwoBindingProperties.Contains(_bindingConfiguration.BoundPropertyName))
-        {
-            TextEdit boundControl = _bindingConfiguration.BoundControl.Target as TextEdit;
-            if (_bindingConfiguration.BoundPropertyName == "Text")
-            {
-                boundControl.TextChanged -= OnTextChanged;
-            }
-        }
-    }
-
-    public override void OnObservableListChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
-    {
-        throw new NotImplementedException();
-    }
-
     public override IControlBinder CreateInstance()
     {
         return new TextEditControlBinder();
@@ -56,10 +36,5 @@ internal partial class TextEditControlBinder : ControlBinderBase
     public override bool CanBindFor(object control)
     {
         return control is TextEdit;
-    }
-
-    public override void OnListItemChanged(object entry)
-    {
-        throw new NotImplementedException();
     }
 }

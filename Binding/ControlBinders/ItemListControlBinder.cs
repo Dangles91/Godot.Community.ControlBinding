@@ -6,9 +6,11 @@ using System.Collections.Specialized;
 using System.Linq;
 
 namespace Godot.Community.ControlBinding.ControlBinders;
-internal partial class ItemListControlBinder : ControlBinderBase
+internal partial class ItemListControlBinder : ControlBinderBase, IListControlBinder
 {
-    public override void OnObservableListChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
+    public event IListControlBinder.ControlChildListChangedEventHandler ControlChildListChanged;
+
+    public void OnObservableListChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
     {
         if (_bindingConfiguration.BoundControl == null)
         {
@@ -98,7 +100,7 @@ internal partial class ItemListControlBinder : ControlBinderBase
         }
     }
 
-    public override void OnListItemChanged(object entry)
+    public void OnListItemChanged(object entry)
     {
         var observableList = _bindingConfiguration.TargetObject.Target as IList;
         ItemList itemList = _bindingConfiguration.BoundControl.Target as ItemList;
@@ -129,8 +131,8 @@ internal partial class ItemListControlBinder : ControlBinderBase
         return control is ItemList;
     }
 
-    public override void ClearEventBindings()
+    public void OnControlChildListChanged(Control control, NotifyCollectionChangedEventArgs args)
     {
-        throw new NotImplementedException();
+        ControlChildListChanged?.Invoke(control, args);
     }
 }
