@@ -17,7 +17,7 @@ namespace Godot.Community.ControlBinding
         Invalid
     }
 
-    public class Binding
+    internal class Binding
     {
         public event EventHandler<BindingStatus> BindingStatusChanged;
 
@@ -60,9 +60,9 @@ namespace Godot.Community.ControlBinding
                     return;
                 }
 
-                resolveBindingPath();
-                subscribeChangeEvents();
-                setInitialValue();
+                ResolveBindingPath();
+                SubscribeChangeEvents();
+                SetInitialValue();
             }
         }
 
@@ -73,14 +73,15 @@ namespace Godot.Community.ControlBinding
                 observable.PropertyChanged -= OnPropertyChanged;
             }
 
-            if (BindingConfiguration.TargetObject.Target is INotifyCollectionChanged observable1)
+            if (BindingConfiguration.TargetObject.Target is INotifyCollectionChanged observable1
+            && _controlBinder is IListControlBinder listControlBinder)
             {
-                observable1.CollectionChanged -= _controlBinder.OnObservableListChanged;
+                observable1.CollectionChanged -= listControlBinder.OnObservableListChanged;
                 foreach (var item in observable1 as IList)
                 {
                     if (item is IObservableObject oItem)
                     {
-                        oItem.PropertyChanged -= OnItemListChanged;
+                        oItem.PropertyChanged -= OnListItemChanged;
                     }
                 }
             }
@@ -95,7 +96,7 @@ namespace Godot.Community.ControlBinding
 
             if (BindingConfiguration.BoundControl.IsAlive)
             {
-                (_controlBinder as ControlBinderBase).ControlValueChanged -= OnSourcePropertyChanged;
+                (_controlBinder as ControlBinder).ControlValueChanged -= OnSourcePropertyChanged;
                 if (BindingConfiguration.BoundControl.Target is IObservableObject observable2)
                 {
                     observable2.PropertyChanged -= OnSourcePropertyChanged;
@@ -105,7 +106,7 @@ namespace Godot.Community.ControlBinding
             BindingConfiguration.BackReferences.Clear();
         }
 
-        private void resolveBindingPath()
+        private void ResolveBindingPath()
         {
             var pathNodes = BindingConfiguration.Path?.Split('.');
             var targetPropertyName = pathNodes.Last();
@@ -123,7 +124,7 @@ namespace Godot.Community.ControlBinding
             BindingConfiguration.TargetPropertyName = targetPropertyName;
         }
 
-        private void subscribeChangeEvents()
+        private void SubscribeChangeEvents()
         {
             if (BindingConfiguration.BoundControl.Target is not Godot.Control)
             {
@@ -158,7 +159,7 @@ namespace Godot.Community.ControlBinding
 
             if (BindingConfiguration.BoundControl.IsAlive)
             {
-                (_controlBinder as ControlBinderBase).ControlValueChanged += OnSourcePropertyChanged;
+                (_controlBinder as ControlBinder).ControlValueChanged += OnSourcePropertyChanged;
                 if (BindingConfiguration.BoundControl.Target is IObservableObject observable2)
                 {
                     observable2.PropertyChanged += OnSourcePropertyChanged;
@@ -168,7 +169,7 @@ namespace Godot.Community.ControlBinding
             BindingStatus = BindingStatus.Active;
         }
 
-        private void setInitialValue()
+        private void SetInitialValue()
         {
             if (BindingStatus != BindingStatus.Active)
                 return;
@@ -177,7 +178,7 @@ namespace Godot.Community.ControlBinding
             {
                 if (BindingConfiguration.IsListBinding)
                 {
-                    setInitialListValue(BindingConfiguration.TargetObject.Target);
+                    SetInitialListValue(BindingConfiguration.TargetObject.Target);
                 }
                 else
                 {
@@ -205,7 +206,7 @@ namespace Godot.Community.ControlBinding
             }
         }
 
-        private void setInitialListValue(object sender)
+        private void SetInitialListValue(object sender)
         {
             if (sender is INotifyCollectionChanged list)
             {
@@ -234,6 +235,7 @@ namespace Godot.Community.ControlBinding
                 BindControl();
             }
         }
+
         private void OnBoundControlTreeExiting()
         {
             BindingStatus = BindingStatus.Invalid;
@@ -287,7 +289,8 @@ namespace Godot.Community.ControlBinding
 
         public virtual void OnObservableListChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
         {
-            _controlBinder.OnObservableListChanged(sender, eventArgs);
+            if (_controlBinder is IListControlBinder listControlBinder)
+                listControlBinder.OnObservableListChanged(sender, eventArgs);
 
             if (eventArgs.Action == NotifyCollectionChangedAction.Add)
             {
@@ -295,7 +298,7 @@ namespace Godot.Community.ControlBinding
                 {
                     if (item is IObservableObject observableObject)
                     {
-                        observableObject.PropertyChanged += OnItemListChanged;
+                        observableObject.PropertyChanged += OnListItemChanged;
                     }
                 }
             }
@@ -306,14 +309,16 @@ namespace Godot.Community.ControlBinding
                 {
                     if (item is IObservableObject observableObject)
                     {
-                        observableObject.PropertyChanged -= OnItemListChanged;
+                        observableObject.PropertyChanged -= OnListItemChanged;
                     }
                 }
             }
         }
-        private void OnItemListChanged(object sender, PropertyChangedEventArgs e)
+
+        private void OnListItemChanged(object sender, PropertyChangedEventArgs e)
         {
-            _controlBinder.OnListItemChanged(sender);
+            if (_controlBinder is IListControlBinder listControlBinder)
+                listControlBinder.OnListItemChanged(sender);
         }
     }
 }

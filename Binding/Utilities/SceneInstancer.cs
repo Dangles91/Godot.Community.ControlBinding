@@ -2,7 +2,7 @@ using Godot.Community.ControlBinding.Interfaces;
 
 namespace Godot.Community.ControlBinding.Utilities;
 
-public static class SceneInstancer
+internal static class SceneInstancer
 {
     public static Node CreateSceneInstance(string scenePath, object viewModelData)
     {

@@ -22,11 +22,11 @@ public partial class Control : Godot.Control, IObservableObject
     [Notify]
     private int _spinBoxValue;
 
-    public ObservableCollection<PlayerData> playerDatas { get; set; } = new(){
+    public ObservableCollection<PlayerData> PlayerDatas { get; set; } = new(){
         new PlayerData{Health = 500},
     };
 
-    public ObservableCollection<PlayerData> playerDatas2 { get; set; } = new(){
+    public ObservableCollection<PlayerData> PlayerDatas2 { get; set; } = new(){
         new PlayerData{Health = 500},
     };
 
@@ -73,14 +73,14 @@ public partial class Control : Godot.Control, IObservableObject
             });
 
         // list binding
-        bindingContext.BindListProperty(GetNode("%ItemList"), nameof(playerDatas), formatter: new PlayerDataListFormatter());
-        bindingContext.BindListProperty(GetNode("%ItemList2"), nameof(playerDatas2), formatter: new PlayerDataListFormatter());
+        bindingContext.BindListProperty(GetNode("%ItemList"), nameof(PlayerDatas), formatter: new PlayerDataListFormatter());
+        bindingContext.BindListProperty(GetNode("%ItemList2"), nameof(PlayerDatas2), formatter: new PlayerDataListFormatter());
 
         bindingContext.BindProperty(GetNode("%TextEdit"), nameof(TextEdit.Text), $"{nameof(SelectedPlayerData)}.{nameof(PlayerData.ListOfThings)}", BindingMode.OneWayToTarget, new StringToListFormatter());
         bindingContext.BindListProperty(GetNode("%ItemList3"), $"{nameof(SelectedPlayerData)}.{nameof(PlayerData.ListOfThings)}", BindingMode.TwoWay);
 
         bindingContext.BindEnumProperty<BindingMode>(GetNode<OptionButton>("%OptionButton"), $"{nameof(SelectedPlayerData)}.BindingMode");
-        bindingContext.BindSceneList(GetNode("%VBoxContainer"), nameof(playerDatas), "uid://die1856ftg8w8", BindingMode.TwoWay);
+        bindingContext.BindSceneList(GetNode("%VBoxContainer"), nameof(PlayerDatas), "uid://die1856ftg8w8", BindingMode.TwoWay);
         bindingContext.BindProperty(GetNode("%ErrorLabel"), nameof(Visible), $"{nameof(bindingContext)}.{nameof(bindingContext.HasErrors)}", BindingMode.OneWay);
         bindingContext.BindProperty(GetNode("%ErrorLabel"), nameof(Label.Text), nameof(ErrorMessage), BindingMode.OneWay);
 
@@ -100,10 +100,10 @@ public partial class Control : Godot.Control, IObservableObject
         {
             if (SelectedPlayerData != null)
             {
-                var index = playerDatas.IndexOf(SelectedPlayerData);
+                var index = PlayerDatas.IndexOf(SelectedPlayerData);
                 if (index > 0)
                 {
-                    playerDatas.Move(index, index - 1);
+                    PlayerDatas.Move(index, index - 1);
                 }
             }
         };
@@ -112,10 +112,10 @@ public partial class Control : Godot.Control, IObservableObject
         {
             if (SelectedPlayerData != null)
             {
-                var index = playerDatas.IndexOf(SelectedPlayerData);
-                if (index >= 0 && index < playerDatas.Count - 1)
+                var index = PlayerDatas.IndexOf(SelectedPlayerData);
+                if (index >= 0 && index < PlayerDatas.Count - 1)
                 {
-                    playerDatas.Move(index, index + 1);
+                    PlayerDatas.Move(index, index + 1);
                 }
             }
         };
@@ -124,8 +124,8 @@ public partial class Control : Godot.Control, IObservableObject
         {
             if (SelectedPlayerData != null)
             {
-                var index = playerDatas.IndexOf(SelectedPlayerData);
-                playerDatas.Insert(index, new PlayerData { Health = 200 });
+                var index = PlayerDatas.IndexOf(SelectedPlayerData);
+                PlayerDatas.Insert(index, new PlayerData { Health = 200 });
             }
         };
 
@@ -137,12 +137,12 @@ public partial class Control : Godot.Control, IObservableObject
         if (index == -1)
             SelectedPlayerData = null;
         else
-            SelectedPlayerData = playerDatas[index];
+            SelectedPlayerData = PlayerDatas[index];
     }
 
     public void _on_Button_pressed()
     {
-        playerDatas.Add(new PlayerData
+        PlayerDatas.Add(new PlayerData
         {
             Health = 100
         });
@@ -159,9 +159,9 @@ public partial class Control : Godot.Control, IObservableObject
         {
             foreach (var selectedIndex in selectedIndexes)
             {
-                var item = playerDatas[selectedIndex];
-                playerDatas.Remove(item);
-                playerDatas2.Add(item);
+                var item = PlayerDatas[selectedIndex];
+                PlayerDatas.Remove(item);
+                PlayerDatas2.Add(item);
 
                 if (SelectedPlayerData == item)
                     SelectedPlayerData = null;
@@ -177,9 +177,9 @@ public partial class Control : Godot.Control, IObservableObject
         {
             foreach (var selectedIndex in selectedIndexes)
             {
-                var item = playerDatas2[selectedIndex];
-                playerDatas2.Remove(item);
-                playerDatas.Add(item);
+                var item = PlayerDatas2[selectedIndex];
+                PlayerDatas2.Remove(item);
+                PlayerDatas.Add(item);
             }
         }
     }

@@ -1,10 +1,8 @@
-using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 
 namespace Godot.Community.ControlBinding.ControlBinders;
 
-public partial class TextEditControlBinder : ControlBinderBase
+internal partial class TextEditControlBinder : ControlBinder
 {
     private readonly List<string> _allowedTwoBindingProperties = new(){
             nameof(TextEdit.Text)
@@ -18,34 +16,16 @@ public partial class TextEditControlBinder : ControlBinderBase
             TextEdit boundControl = bindingConfiguration.BoundControl.Target as TextEdit;
             if (bindingConfiguration.BoundPropertyName == "Text")
             {
-                boundControl.TextChanged += onTextChanged;
+                boundControl.TextChanged += OnTextChanged;
             }
         }
 
         base.BindControl(bindingConfiguration);
     }
 
-    public void onTextChanged()
+    public void OnTextChanged()
     {
         OnControlValueChanged(_bindingConfiguration.BoundControl.Target as Godot.Control, "Text");
-    }
-
-    public override void ClearEventBindings()
-    {
-        if ((_bindingConfiguration.BindingMode == BindingMode.OneWayToTarget || _bindingConfiguration.BindingMode == BindingMode.TwoWay)
-            && _allowedTwoBindingProperties.Contains(_bindingConfiguration.BoundPropertyName))
-        {
-            TextEdit boundControl = _bindingConfiguration.BoundControl.Target as TextEdit;
-            if (_bindingConfiguration.BoundPropertyName == "Text")
-            {
-                boundControl.TextChanged -= onTextChanged;
-            }
-        }
-    }
-
-    public override void OnObservableListChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
-    {
-        throw new NotImplementedException();
     }
 
     public override IControlBinder CreateInstance()
@@ -56,10 +36,5 @@ public partial class TextEditControlBinder : ControlBinderBase
     public override bool CanBindFor(object control)
     {
         return control is TextEdit;
-    }
-
-    public override void OnListItemChanged(object entry)
-    {
-        throw new NotImplementedException();
     }
 }

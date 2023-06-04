@@ -5,7 +5,6 @@ using System.Runtime.CompilerServices;
 
 namespace Godot.Community.ControlBinding;
 
-
 public abstract partial class NodeViewModel : Node, IViewModel
 {
     public event PropertyChangedEventHandler PropertyChanged;

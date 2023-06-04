@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Godot.Community.ControlBinding.Services;
 
-public static class BackReferenceFactory
+internal static class BackReferenceFactory
 {
     public static List<object> GetPathObjectsAndBuildBackReferences(List<string> pathNodes, ref BindingConfiguration bindingConfiguration)
     {

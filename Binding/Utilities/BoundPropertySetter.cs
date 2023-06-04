@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace Godot.Community.ControlBinding.Utilities;
 
-public class BoundPropertySetter
+internal class BoundPropertySetter
 {
     private readonly IValueFormatter _valueFormatter;
     private readonly List<Func<object, string>> _validators;
@@ -29,12 +29,12 @@ public class BoundPropertySetter
         object targetObject,
         string targetPropertyName)
     {
-        setPropertyValue(sourceControl, sourcePropertyName, targetObject, targetPropertyName, _valueFormatter?.FormatTarget, SetDirection.ToProperty);
+        SetPropertyValue(sourceControl, sourcePropertyName, targetObject, targetPropertyName, _valueFormatter?.FormatTarget, SetDirection.ToProperty);
     }
 
     public void SetBoundControlValue(object sourceObject, string sourcePropertyName, Godot.Control targetControl, string targetPropertyName)
     {
-        setPropertyValue(sourceObject, sourcePropertyName, targetControl, targetPropertyName, _valueFormatter?.FormatControl, SetDirection.ToControl);
+        SetPropertyValue(sourceObject, sourcePropertyName, targetControl, targetPropertyName, _valueFormatter?.FormatControl, SetDirection.ToControl);
     }
 
     public void AddValidator(Func<object, string> validator)
@@ -42,7 +42,7 @@ public class BoundPropertySetter
         _validators.Add(validator);
     }
 
-    private void setPropertyValue(
+    private void SetPropertyValue(
         object sourceObject,
         string sourcePropertyName,
         object targetObject,

@@ -6,11 +6,13 @@ using Godot.Community.ControlBinding.Services;
 
 namespace Godot.Community.ControlBinding.ControlBinders;
 
-public partial class GenericControlBinder : ControlBinderBase
+internal partial class GenericControlBinder : ControlBinder, IListControlBinder
 {
     public new static int Priority => 0;
     internal Godot.Control _boundControl;
     private readonly NodeChildCache _nodeChildCache = new();
+
+    public event IListControlBinder.ControlChildListChangedEventHandler ControlChildListChanged;
 
     public override void BindControl(BindingConfiguration bindingConfiguration)
     {
@@ -39,25 +41,17 @@ public partial class GenericControlBinder : ControlBinderBase
         return control is Godot.Control;
     }
 
-    public override void ClearEventBindings()
-    {
-        if (_bindingConfiguration.BindingMode == BindingMode.TwoWay)
-        {
-            _boundControl.ChildExitingTree -= OnChildExitingTree;
-        }
-    }
-
     public override IControlBinder CreateInstance()
     {
         return new GenericControlBinder();
     }
 
-    public override void OnListItemChanged(object entry)
+    public void OnListItemChanged(object entry)
     {
         // do nothing
     }
 
-    public override void OnObservableListChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
+    public void OnObservableListChanged(object sender, NotifyCollectionChangedEventArgs eventArgs)
     {
         // this should only be used to manage control children using a scene formatter            
         if (_bindingConfiguration.SceneFormatter == null)
@@ -159,5 +153,10 @@ public partial class GenericControlBinder : ControlBinderBase
                 sceneItem.QueueFree();
             }
         }
+    }
+
+    public void OnControlChildListChanged(Control control, NotifyCollectionChangedEventArgs args)
+    {
+        ControlChildListChanged?.Invoke(control, args);
     }
 }
